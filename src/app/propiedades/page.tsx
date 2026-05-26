@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import PropertyFilters from "@/components/properties/PropertyFilters";
 import PropertyGrid from "@/components/properties/PropertyGrid";
 import PropiedadesHeader from "@/components/properties/PropiedadesHeader";
-import { getPropertiesFromDb } from "@/lib/sync";
+import { getPropertiesFromDb, ensureDbSeeded } from "@/lib/sync";
 
 export const metadata: Metadata = {
   title: "Propiedades en venta",
@@ -35,6 +35,8 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = Number(params.page ?? 1);
   const limit = 12;
+
+  await ensureDbSeeded();
 
   let properties: import("@/types/property").Property[] = [];
   let total = 0;

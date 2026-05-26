@@ -10,6 +10,24 @@ export interface SyncResult {
   error?: string;
 }
 
+/**
+ * Ensures the DB has properties. Called on every server render that needs data.
+ * On Vercel, each Lambda instance has its own empty /tmp — this auto-seeds it.
+ */
+export async function ensureDbSeeded(): Promise<void> {
+  try {
+    const db = getDb();
+    const { c } = db
+      .prepare("SELECT COUNT(*) as c FROM properties")
+      .get() as { c: number };
+    if (c === 0) {
+      await syncProperties();
+    }
+  } catch {
+    // Never block rendering — just log and continue with empty state
+  }
+}
+
 export async function syncProperties(): Promise<SyncResult> {
   const db = getDb();
   let added = 0;

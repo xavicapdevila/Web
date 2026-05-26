@@ -7,7 +7,7 @@ import FeaturedProperties from "@/components/home/FeaturedProperties";
 import Testimonials from "@/components/home/Testimonials";
 import ValuationCTA from "@/components/home/ValuationCTA";
 import SocialSection from "@/components/home/SocialSection";
-import { getFeaturedProperties } from "@/lib/sync";
+import { getFeaturedProperties, ensureDbSeeded } from "@/lib/sync";
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://www.thevilahome.com" },
@@ -84,6 +84,8 @@ const schemaRealEstateAgent = {
 };
 
 export default async function HomePage() {
+  await ensureDbSeeded();
+
   let featured: import("@/types/property").Property[] = [];
   try {
     featured = getFeaturedProperties(6);

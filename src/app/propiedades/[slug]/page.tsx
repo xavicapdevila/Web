@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { getPropertyBySlug, getAllPropertySlugs } from "@/lib/sync";
+import { getPropertyBySlug, getAllPropertySlugs, ensureDbSeeded } from "@/lib/sync";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import PropertyPageContent from "@/components/properties/PropertyPageContent";
 import { formatPrice } from "@/lib/utils";
@@ -81,6 +81,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PropertyPage({ params }: Props) {
   const { slug } = await params;
+  await ensureDbSeeded();
 
   let property;
   try {
