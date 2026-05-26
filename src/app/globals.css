@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0a;
+  --color-foreground: #f5f0e8;
+  --color-gold: #C9B99A;
+  --color-gold-light: #DDD0BB;
+  --color-gold-dark: #A09474;
+  --color-surface: #111111;
+  --color-surface-2: #1a1a1a;
+  --color-border: #2a2a2a;
+  --color-muted: #888888;
+
+  --font-display: "Cormorant Garamond", "Georgia", serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #f5f0e8;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #0a0a0a;
+    color: #f5f0e8;
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: "Cormorant Garamond", "Georgia", serif;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: #C9B99A33;
+    color: #C9B99A;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #C9B99A44;
+  }
+}
+
+@layer utilities {
+  .text-gold {
+    color: #C9B99A;
+  }
+
+  .bg-gold {
+    background-color: #C9B99A;
+  }
+
+  .border-gold {
+    border-color: #C9B99A;
+  }
+
+  .font-display {
+    font-family: "Cormorant Garamond", "Georgia", serif;
+  }
+
+  .font-body {
+    font-family: "Inter", system-ui, sans-serif;
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, #C9B99A, #DDD0BB);
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, #C9B99A, #DDD0BB);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hover-gold {
+    transition: color 0.3s ease;
+  }
+
+  .hover-gold:hover {
+    color: #C9B99A;
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  .line-gold {
+    display: block;
+    width: 48px;
+    height: 1px;
+    background: #C9B99A;
+  }
+}
+
+/*
+  Global text justification — unlayered so it wins over @layer utilities
+  (text-center / text-left / text-right utility classes live in @layer utilities,
+  which has LOWER cascade priority than unlayered declarations)
+*/
+p {
+  text-align: justify;
+}
+
+/* Display heading line-height — unlayered to win over leading-tight / leading-snug utilities */
+h1, h2 {
+  line-height: 1.05;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}

@@ -1,0 +1,231 @@
+"use client";
+
+import Link from "next/link";
+import { Phone, Mail, BedDouble, Bath, Maximize2 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
+import { getTipoLabel } from "@/lib/i18n";
+import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
+import PropertyDetails from "./PropertyDetails";
+import MortgageCalculator from "./MortgageCalculator";
+import AgentPhoto from "./AgentPhoto";
+import type { Property } from "@/types/property";
+
+interface Props {
+  property: Property;
+  agentInfo: { name: string; photo: string };
+  contactEmail: string;
+  waUrl: string;
+  isReserved: boolean;
+}
+
+function TranslatedDescription({ text }: { text: string }) {
+  const paragraphs = text.split("\n\n").filter(Boolean);
+  const translated = useAutoTranslateMulti(paragraphs);
+
+  return (
+    <div className="text-[#aaa] text-sm leading-relaxed space-y-4">
+      {translated.map((para, i) => (
+        <p key={i}>{para}</p>
+      ))}
+    </div>
+  );
+}
+
+function EnergyCertificate({
+  letra,
+  emisiones,
+  consumo,
+  labelTitle,
+  labelCO2,
+}: {
+  letra: string;
+  emisiones?: string;
+  consumo?: string;
+  labelTitle: string;
+  labelCO2: string;
+}) {
+  const colors: Record<string, string> = {
+    A: "#00a550", B: "#4db848", C: "#8dc63f", D: "#f7ed00",
+    E: "#f7a600", F: "#f05a22", G: "#ed1c24",
+  };
+  const upper = letra?.toUpperCase();
+  const grades = ["A", "B", "C", "D", "E", "F", "G"];
+
+  return (
+    <div className="bg-[#111] border border-[#1e1e1e] p-6">
+      <h3 className="font-display text-xl text-white mb-4">{labelTitle}</h3>
+      <div className="space-y-1.5">
+        {grades.map((g, i) => (
+          <div key={g} className="flex items-center gap-2">
+            <div
+              className="h-7 flex items-center justify-end pr-2 text-xs font-bold text-black shrink-0"
+              style={{
+                backgroundColor: colors[g],
+                width: `${20 + i * 8}%`,
+                opacity: g === upper ? 1 : 0.35,
+              }}
+            >
+              {g}
+            </div>
+            {g === upper && (
+              <span className="text-white text-xs">◄ {consumo ? `${consumo} kWh/m²·año` : ""}</span>
+            )}
+          </div>
+        ))}
+      </div>
+      {emisiones && (
+        <p className="text-[#666] text-xs mt-3">{labelCO2}: {emisiones} kg/m²·año</p>
+      )}
+    </div>
+  );
+}
+
+export default function PropertyPageContent({ property, agentInfo, contactEmail, waUrl, isReserved }: Props) {
+  const { t, lang } = useLanguage();
+  const titulo = useAutoTranslate(property.titulo);
+
+  return (
+    <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Left — main info: order-2 on mobile so sidebar shows first */}
+        <div className="lg:col-span-2 space-y-10 order-2 lg:order-1">
+          {/* Header */}
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase border border-[#C9B99A]/40 px-3 py-1">
+                {getTipoLabel(property.tipo, lang)}
+              </span>
+              {isReserved && (
+                <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase border border-[#C9B99A] px-3 py-1 bg-[#C9B99A]/10">
+                  {t("cardReserved")}
+                </span>
+              )}
+              <span className="text-[#666] text-xs">Ref. {property.ref}</span>
+            </div>
+
+            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl text-white font-light mb-2 leading-snug">
+              {titulo}
+            </h1>
+
+            <p className="text-[#888] text-sm mb-6">
+              {[property.zona, property.ciudad, property.provincia].filter(Boolean).join(", ")}
+            </p>
+
+            {/* Price */}
+            <div className="flex items-end gap-4">
+              <span className="font-display text-4xl text-[#C9B99A]">
+                {formatPrice(property.precio)}
+              </span>
+              {property.porcentajeBajada && (
+                <span className="bg-[#C9B99A] text-black text-sm font-bold px-2 py-1 mb-1">
+                  -{property.porcentajeBajada}%
+                </span>
+              )}
+            </div>
+
+            {/* Quick features */}
+            <div className="flex flex-wrap items-center gap-6 mt-6 pt-6 border-t border-[#1e1e1e]">
+              {property.habitaciones && (
+                <div className="flex items-center gap-2 text-white">
+                  <BedDouble size={18} className="text-[#C9B99A]" />
+                  <span className="font-body">
+                    {property.habitaciones} {property.habitaciones !== 1 ? t("propRooms") : t("propRoom")}
+                  </span>
+                </div>
+              )}
+              {property.banos && (
+                <div className="flex items-center gap-2 text-white">
+                  <Bath size={18} className="text-[#C9B99A]" />
+                  <span className="font-body">
+                    {property.banos} {property.banos !== 1 ? t("propBaths") : t("propBath")}
+                  </span>
+                </div>
+              )}
+              {property.m2Construidos && (
+                <div className="flex items-center gap-2 text-white">
+                  <Maximize2 size={18} className="text-[#C9B99A]" />
+                  <span className="font-body">{Math.round(property.m2Construidos)} m²</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          {property.descripcion && (
+            <div>
+              <h2 className="font-display text-2xl text-white mb-4">{t("propDescription")}</h2>
+              <TranslatedDescription text={property.descripcion} />
+            </div>
+          )}
+
+          {/* All property details */}
+          <PropertyDetails property={property} />
+
+          {/* Mortgage calculator */}
+          <MortgageCalculator precio={property.precio} />
+        </div>
+
+        {/* Right — sidebar: order-1 on mobile to appear first (price+CTA visible early) */}
+        <div className="space-y-6 order-1 lg:order-2">
+          {/* Contact card */}
+          <div className="bg-[#111] border border-[#1e1e1e] p-6">
+            {/* Agent */}
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[#1e1e1e]">
+              <div className="w-14 h-14 rounded-full bg-[#1a1a1a] border border-[#2a2a2a] overflow-hidden shrink-0 relative">
+                <AgentPhoto src={agentInfo.photo} name={agentInfo.name} />
+              </div>
+              <div>
+                <p className="text-white font-display text-lg">{agentInfo.name}</p>
+                <p className="text-[#666] text-xs font-body">{t("propAgent")}</p>
+              </div>
+            </div>
+
+            <h3 className="font-display text-xl text-white mb-5">{t("propInterested")}</h3>
+
+            {/* 3 contact options */}
+            <div className="space-y-3">
+              <a
+                href="tel:936061800"
+                className="flex items-center gap-3 w-full px-4 py-3 bg-[#C9B99A] text-black font-body text-sm tracking-wide hover:bg-[#DDD0BB] transition-colors"
+              >
+                <Phone size={16} />
+                {t("propCall")}
+              </a>
+              <a
+                href={`mailto:${contactEmail}?subject=Información sobre ref. ${property.ref} - ${property.titulo}`}
+                className="flex items-center gap-3 w-full px-4 py-3 border border-[#C9B99A]/40 text-[#C9B99A] font-body text-sm tracking-wide hover:bg-[#C9B99A]/10 transition-colors"
+              >
+                <Mail size={16} />
+                {t("propEmail")}
+              </a>
+            </div>
+
+            {/* WhatsApp */}
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full mt-3 py-2.5 border border-[#25D366]/30 text-[#25D366] text-sm hover:bg-[#25D366]/10 transition-colors"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+              {t("propWhatsapp")}
+            </a>
+          </div>
+
+          {/* Energy certificate */}
+          {property.certificadoEnergetico && (
+            <EnergyCertificate
+              letra={property.certificadoEnergetico}
+              emisiones={property.emisionesEnergeticas}
+              consumo={property.consumoEnergetico}
+              labelTitle={t("detailsEnergy")}
+              labelCO2={t("detailsCO2")}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

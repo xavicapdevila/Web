@@ -1,0 +1,42 @@
+import { NextResponse } from "next/server";
+import { syncProperties } from "@/lib/sync";
+
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
+export async function POST(request: Request) {
+  // Validate cron secret for production security
+  const authHeader = request.headers.get("authorization");
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const result = await syncProperties();
+    return NextResponse.json({
+      success: true,
+      ...result,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET() {
+  // Allow GET for manual trigger in dev
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Use POST" }, { status: 405 });
+  }
+  try {
+    const result = await syncProperties();
+    return NextResponse.json({ success: true, ...result });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+  }
+}
