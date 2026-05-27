@@ -404,7 +404,7 @@ export default function PostForm({ post, mode }: Props) {
                       <div className="flex flex-col items-center gap-2">
                         <Upload size={20} className="text-[#444]" />
                         <p className="text-[#888] text-xs font-body">Arrastra o haz clic para subir</p>
-                        <p className="text-[#444] text-xs">JPG, PNG, WEBP · máx. 10 MB</p>
+                        <p className="text-[#444] text-xs">1280 × 640 px recomendado · JPG, PNG, WEBP · máx. 10 MB</p>
                       </div>
                     )}
                   </div>
