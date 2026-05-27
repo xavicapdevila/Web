@@ -40,8 +40,9 @@ export default function PropertyCard({ property }: Props) {
     "s.pascual@thevilahome.com": "34679876331",
   };
   const waNumber = agentMobiles[property.agenteEmail ?? ""] ?? "34638359612";
+  const propertyUrl = `https://www.thevilahome.com/propiedades/${property.slug}`;
   const waMessage = encodeURIComponent(
-    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.`
+    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.\n\n${propertyUrl}`
   );
   const cardWaUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
   const isReserved = property.estadoFicha === 7;

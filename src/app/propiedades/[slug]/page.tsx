@@ -118,8 +118,9 @@ export default async function PropertyPage({ params }: Props) {
     "s.pascual@thevilahome.com": "34679876331",
   };
   const waNumber = agentMobiles[agentKey] ?? "34638359612";
+  const propertyUrl = `${BASE_URL}/propiedades/${slug}`;
   const waMessage = encodeURIComponent(
-    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.`
+    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.\n\n${propertyUrl}`
   );
   const waUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
 
