@@ -30,6 +30,7 @@ export interface Property {
   numPlantas?: number;
   ascensor?: boolean;
   garaje?: boolean;
+  garajeTipo?: "garaje" | "parking";
   trastero?: boolean;
   urbanizacion?: boolean;
   piscina?: boolean;

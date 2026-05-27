@@ -252,7 +252,10 @@ export default function PropertyDetails({ property }: Props) {
           </h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             <BoolRow label={t("detailsElevator")} value={!!property.ascensor} />
-            <BoolRow label={t("detailsGarage")} value={!!property.garaje} />
+            <BoolRow
+              label={property.garajeTipo === "parking" ? t("detailsGarage") : t("detailsGaraje")}
+              value={!!property.garaje}
+            />
             <BoolRow label={t("detailsPool")} value={!!property.piscina} />
             <BoolRow label={t("detailsAirCon")} value={!!property.aireCond} />
             {property.calefaccion && (

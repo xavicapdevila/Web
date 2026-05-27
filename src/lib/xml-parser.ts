@@ -197,7 +197,10 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const numPlantas = numPlantasRaw > 0 ? numPlantasRaw : undefined;
 
       const ascensor = safeBool(item["ascensor"]);
-      const garaje = safeBool(item["plaza_gara"] ?? item["parking"] ?? item["garaje"]);
+      const hasGaraje  = safeBool(item["plaza_gara"]) || safeBool(item["garaje"]);
+      const hasParking = safeBool(item["parking"]);
+      const garaje     = hasGaraje || hasParking;
+      const garajeTipo = hasParking ? "parking" : "garaje";
       const trastero = safeBool(item["trastero"]);
       const piscina = safeBool(item["piscina_prop"] ?? item["piscina_com"] ?? item["piscina"]);
       const terraza = safeBool(item["terraza"]);
@@ -267,6 +270,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         numPlantas,
         ascensor,
         garaje,
+        garajeTipo,
         trastero,
         urbanizacion,
         piscina,

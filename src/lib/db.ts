@@ -71,6 +71,7 @@ function initSchema(db: Database.Database): void {
       num_plantas INTEGER,
       ascensor INTEGER DEFAULT 0,
       garaje INTEGER DEFAULT 0,
+      garaje_tipo TEXT DEFAULT 'garaje',
       trastero INTEGER DEFAULT 0,
       urbanizacion INTEGER DEFAULT 0,
       piscina INTEGER DEFAULT 0,
@@ -132,6 +133,7 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE properties ADD COLUMN agente_telefono TEXT`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN emisiones_letra TEXT`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN energia_exento INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN garaje_tipo TEXT DEFAULT 'garaje'`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN num_plantas INTEGER`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN urbanizacion INTEGER DEFAULT 0`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN periodicidad_comunidad TEXT`); } catch {}
