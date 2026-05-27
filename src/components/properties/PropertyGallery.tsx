@@ -323,27 +323,31 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
       {/* ── YouTube video modal ── */}
       {showVideo && ytId && (
-        <div
-          className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center"
-          onClick={() => setShowVideo(false)}
-        >
-          <button
-            onClick={() => setShowVideo(false)}
-            className="absolute top-4 right-4 text-white hover:text-[#C9B99A] transition-colors z-10"
-          >
-            <X size={28} />
-          </button>
-          <div
-            className="relative w-full max-w-4xl aspect-video mx-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
-              title={title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
+        <div className="fixed inset-0 bg-black z-[100] flex flex-col">
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-5 h-12 shrink-0">
+            <div className="flex items-center gap-2 text-white/50 text-sm">
+              <Play size={14} className="text-[#C9B99A]" />
+              <span>{title}</span>
+            </div>
+            <button
+              onClick={() => setShowVideo(false)}
+              className="text-white hover:text-[#C9B99A] transition-colors p-1"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          {/* Video fills remaining space */}
+          <div className="flex-1 min-h-0 flex items-center justify-center px-0 pb-0">
+            <div className="relative w-full h-full">
+              <iframe
+                src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
+                title={title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
           </div>
         </div>
       )}
