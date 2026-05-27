@@ -7,7 +7,6 @@ import { formatPrice } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
 import PropertyDetails from "./PropertyDetails";
-import MortgageCalculator from "./MortgageCalculator";
 import AgentPhoto from "./AgentPhoto";
 import ShareModal from "./ShareModal";
 import type { Property } from "@/types/property";
@@ -246,8 +245,6 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
           {/* All property details */}
           <PropertyDetails property={property} />
 
-          {/* Mortgage calculator */}
-          <MortgageCalculator precio={property.precio} />
         </div>
 
         {/* Right — sidebar: order-1 on mobile to appear first (price+CTA visible early) */}
