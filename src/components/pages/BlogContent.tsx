@@ -48,39 +48,41 @@ export default function BlogContent({ posts }: Props) {
     <>
       {/* Category tabs + search bar */}
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between gap-4">
-          <nav
-            className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
-            style={{ touchAction: "pan-x" }}
-            aria-label="Categorías del blog"
-          >
-            <button
-              onClick={() => setActiveCategory(null)}
-              className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                !activeCategory
-                  ? "text-[#C9B99A] border-[#C9B99A]"
-                  : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
-              }`}
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          {/* Row 1: tabs */}
+          <div className="flex items-center justify-between gap-4">
+            <nav
+              className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
+              style={{ touchAction: "pan-x" }}
+              aria-label="Categorías del blog"
             >
-              {t("blogCategoryAll")}
-            </button>
-            {CATEGORIES.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                onClick={() => setActiveCategory(null)}
                 className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                  activeCategory === cat
+                  !activeCategory
                     ? "text-[#C9B99A] border-[#C9B99A]"
                     : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
                 }`}
               >
-                {cat}
+                {t("blogCategoryAll")}
               </button>
-            ))}
-          </nav>
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                  className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
+                    activeCategory === cat
+                      ? "text-[#C9B99A] border-[#C9B99A]"
+                      : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </nav>
 
-          {/* Search */}
-          <div className="relative shrink-0 hidden sm:block">
+            {/* Search — desktop only inline */}
+            <div className="relative shrink-0 hidden sm:block">
             <Search
               size={13}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444] pointer-events-none"
@@ -102,8 +104,36 @@ export default function BlogContent({ posts }: Props) {
               </button>
             )}
           </div>
+        </div>{/* end row 1 */}
+
+        {/* Row 2: search — mobile only */}
+        <div className="sm:hidden border-t border-[#111] px-4 py-2">
+          <div className="relative">
+            <Search
+              size={13}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444] pointer-events-none"
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("blogSearchPlaceholder")}
+              className="w-full bg-transparent border border-[#222] focus:border-[#C9B99A]/30 text-white placeholder-[#444] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#444] hover:text-[#C9B99A] transition-colors"
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+
+      </div>{/* end max-w-7xl */}
+      </div>{/* end sticky bar */}
 
       {/* Content */}
       <section className="py-12 lg:py-16">
