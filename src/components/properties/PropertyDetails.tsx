@@ -37,67 +37,157 @@ function FeatureBadge({ label }: { label: string }) {
   );
 }
 
-const energyColors: Record<string, string> = {
-  A: "#00a550",
-  B: "#4db848",
-  C: "#8dc63f",
-  D: "#f7ed00",
-  E: "#f7a600",
-  F: "#f05a22",
-  G: "#ed1c24",
+// ─── Energy certificate ───────────────────────────────────────────────────────
+
+const ENERGY_SCALE = [
+  { g: "A", bg: "#00A651", text: "#fff" },
+  { g: "B", bg: "#52B748", text: "#fff" },
+  { g: "C", bg: "#B6D235", text: "#333" },
+  { g: "D", bg: "#FEF101", text: "#333" },
+  { g: "E", bg: "#FDB913", text: "#333" },
+  { g: "F", bg: "#F37021", text: "#fff" },
+  { g: "G", bg: "#EE1C25", text: "#fff" },
+] as const;
+
+const NUM_MAP: Record<string, string> = {
+  "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G",
 };
 
-function EnergyCertificateVisual({
-  letra,
-  consumo,
-  emisiones,
-  labelEnergy,
-  labelCO2,
+function parseGrade(raw?: string): string | null {
+  if (!raw) return null;
+  const ch = raw.trim().charAt(0).toUpperCase();
+  const g = NUM_MAP[ch] ?? ch;
+  return ENERGY_SCALE.some((e) => e.g === g) ? g : null;
+}
+
+function EnergyPanel({
+  grade,
+  value,
+  unit,
+  label,
 }: {
-  letra: string;
-  consumo?: string;
-  emisiones?: string;
-  labelEnergy: string;
-  labelCO2: string;
+  grade: string;
+  value?: string;
+  unit: string;
+  label: string;
 }) {
-  const upper = letra.toUpperCase();
-  const grades = ["A", "B", "C", "D", "E", "F", "G"];
+  const entry = ENERGY_SCALE.find((e) => e.g === grade)!;
 
   return (
-    <div className="mt-6 pt-6 border-t border-[#1a1a1a]">
-      <h3 className="text-[#888] text-xs font-body tracking-widest uppercase mb-4">
-        {labelEnergy}
-      </h3>
-      <div className="space-y-1.5">
-        {grades.map((g, i) => (
-          <div key={g} className="flex items-center gap-2">
+    <div className="flex flex-col">
+      {/* Label */}
+      <p className="text-[#555] text-[10px] tracking-[0.22em] uppercase mb-4">{label}</p>
+
+      {/* Letter + value row */}
+      <div className="flex items-center gap-4 mb-4">
+        {/* Big letter badge */}
+        <div
+          style={{ backgroundColor: entry.bg, color: entry.text }}
+          className="w-16 h-16 flex items-center justify-center text-3xl font-bold shrink-0"
+        >
+          {grade}
+        </div>
+
+        {/* Value */}
+        {value && value !== "0" && (
+          <div>
+            <p className="text-white text-xl font-display font-light leading-tight">
+              {value}
+            </p>
+            <p className="text-[#555] text-xs mt-0.5">{unit}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Scale strip — chevron bars */}
+      <div className="flex items-end gap-[2px]">
+        {ENERGY_SCALE.map(({ g, bg }) => {
+          const isActive = g === grade;
+          return (
             <div
-              className="h-7 flex items-center justify-end pr-2 text-xs font-bold text-black shrink-0"
+              key={g}
               style={{
-                backgroundColor: energyColors[g],
-                width: `${20 + i * 8}%`,
-                opacity: g === upper ? 1 : 0.35,
+                backgroundColor: bg,
+                opacity: isActive ? 1 : 0.15,
+                height: isActive ? 10 : 6,
+                flex: 1,
+                transition: "height 0.2s, opacity 0.2s",
               }}
-            >
-              {g}
-            </div>
-            {g === upper && (
-              <div className="flex items-center gap-2">
-                <span className="text-white text-xs">◄</span>
-                {consumo && (
-                  <span className="text-[#888] text-xs">{consumo} kWh/m²·año</span>
-                )}
-              </div>
-            )}
+            />
+          );
+        })}
+      </div>
+
+      {/* Scale labels */}
+      <div className="flex gap-[2px] mt-1">
+        {ENERGY_SCALE.map(({ g }) => (
+          <div
+            key={g}
+            className="flex-1 text-center"
+            style={{
+              fontSize: 9,
+              color: g === grade ? "#fff" : "#333",
+              fontWeight: g === grade ? 700 : 400,
+            }}
+          >
+            {g}
           </div>
         ))}
       </div>
-      {emisiones && (
-        <p className="text-[#666] text-xs mt-3">{labelCO2}: {emisiones} kg/m²·año</p>
-      )}
     </div>
   );
 }
+
+function EnergyCertificateSection({ property }: { property: Property }) {
+  const { t } = useLanguage();
+  const gradeConsumo = parseGrade(property.certificadoEnergetico);
+  const gradeEmisiones = parseGrade(property.emisionesLetra);
+  const hasData = gradeConsumo || gradeEmisiones;
+
+  if (!hasData && !property.energiaExento) return null;
+
+  return (
+    <div>
+      <h2 className="font-display text-2xl text-white font-light mb-4">
+        {t("detailsEnergy")}
+      </h2>
+
+      <div className="bg-[#111] border border-[#1e1e1e] p-6">
+        {property.energiaExento ? (
+          <p className="text-[#555] text-sm tracking-wide">
+            Exento de certificado energético
+          </p>
+        ) : (
+          <div className={`grid gap-8 ${gradeConsumo && gradeEmisiones ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-xs"}`}>
+            {gradeConsumo && (
+              <EnergyPanel
+                grade={gradeConsumo}
+                value={property.consumoEnergetico}
+                unit="kWh/m²·año"
+                label="Consumo energético"
+              />
+            )}
+            {gradeEmisiones && (
+              <>
+                {gradeConsumo && (
+                  <div className="hidden sm:block w-px bg-[#1e1e1e] self-stretch" />
+                )}
+                <EnergyPanel
+                  grade={gradeEmisiones}
+                  value={property.emisionesEnergeticas}
+                  unit="kg CO₂/m²·año"
+                  label={t("detailsCO2")}
+                />
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function PropertyDetails({ property }: Props) {
   const { t } = useLanguage();
@@ -128,14 +218,12 @@ export default function PropertyDetails({ property }: Props) {
     (property.ibi && property.ibi > 0) ||
     (property.gastosComun && property.gastosComun > 0);
 
-  const hasEnergy = Boolean(property.certificadoEnergetico);
-
   return (
     <div className="space-y-8">
-      {/* Unified characteristics + equipment */}
-      {(hasAnyDetail || hasFeatures || hasEnergy) && (
+      {/* Características */}
+      {(hasAnyDetail || hasFeatures) && (
         <div>
-          <h2 className="font-display text-2xl text-white mb-4">{t("detailsTitle")}</h2>
+          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsTitle")}</h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             {hasAnyDetail && (
               <>
@@ -172,7 +260,6 @@ export default function PropertyDetails({ property }: Props) {
               </>
             )}
 
-            {/* Equipment */}
             {hasFeatures && (
               <div className={hasAnyDetail ? "mt-5 pt-5 border-t border-[#1a1a1a]" : ""}>
                 <p className="text-[#888] text-xs font-body tracking-widest uppercase mb-3">
@@ -190,25 +277,17 @@ export default function PropertyDetails({ property }: Props) {
                 </div>
               </div>
             )}
-
-            {/* Energy certificate visual */}
-            {hasEnergy && property.certificadoEnergetico && (
-              <EnergyCertificateVisual
-                letra={property.certificadoEnergetico}
-                consumo={property.consumoEnergetico}
-                emisiones={property.emisionesEnergeticas}
-                labelEnergy={t("detailsEnergy")}
-                labelCO2={t("detailsCO2")}
-              />
-            )}
           </div>
         </div>
       )}
 
-      {/* Costs */}
+      {/* Certificado de Eficiencia Energética — standalone */}
+      <EnergyCertificateSection property={property} />
+
+      {/* Gastos */}
       {hasCosts && (
         <div>
-          <h2 className="font-display text-2xl text-white mb-4">{t("detailsCosts")}</h2>
+          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsCosts")}</h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             {property.ibi && property.ibi > 0 && (
               <DetailRow label={t("detailsIbi")} value={formatPrice(property.ibi)} />
@@ -220,10 +299,10 @@ export default function PropertyDetails({ property }: Props) {
         </div>
       )}
 
-      {/* Location */}
+      {/* Ubicación */}
       {(property.ciudad || property.zona || property.cp) && (
         <div>
-          <h2 className="font-display text-2xl text-white mb-4">{t("detailsLocation")}</h2>
+          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsLocation")}</h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             {property.ciudad && (
               <DetailRow label={t("detailsCity")} value={property.ciudad} />

@@ -306,18 +306,6 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
             </button>
           </div>
 
-          {/* Energy certificate */}
-          {(property.certificadoEnergetico || property.emisionesLetra || property.energiaExento) && (
-            <EnergyCertificate
-              letra={property.certificadoEnergetico}
-              consumo={property.consumoEnergetico}
-              emisionesLetra={property.emisionesLetra}
-              emisiones={property.emisionesEnergeticas}
-              exento={property.energiaExento}
-              labelTitle={t("detailsEnergy")}
-              labelCO2={t("detailsCO2")}
-            />
-          )}
         </div>
       </div>
     </div>
