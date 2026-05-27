@@ -33,91 +33,43 @@ function TranslatedDescription({ text }: { text: string }) {
   );
 }
 
-const ENERGY_GRADES = [
-  { grade: "A", color: "#00A651", textColor: "#fff", width: 32 },
-  { grade: "B", color: "#52B748", textColor: "#fff", width: 41 },
-  { grade: "C", color: "#B6D235", textColor: "#333", width: 50 },
-  { grade: "D", color: "#FEF101", textColor: "#333", width: 59 },
-  { grade: "E", color: "#FDB913", textColor: "#333", width: 68 },
-  { grade: "F", color: "#F37021", textColor: "#fff", width: 77 },
-  { grade: "G", color: "#EE1C25", textColor: "#fff", width: 86 },
-];
+const ENERGY_COLORS: Record<string, { bg: string; text: string }> = {
+  A: { bg: "#00A651", text: "#fff" },
+  B: { bg: "#52B748", text: "#fff" },
+  C: { bg: "#B6D235", text: "#333" },
+  D: { bg: "#FEF101", text: "#333" },
+  E: { bg: "#FDB913", text: "#333" },
+  F: { bg: "#F37021", text: "#fff" },
+  G: { bg: "#EE1C25", text: "#fff" },
+};
 
-// Map numeric codes to letters (some XML feeds use 1-7)
 const NUM_TO_GRADE: Record<string, string> = {
   "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G",
 };
-
-function EnergyScale({
-  activeGrade,
-  value,
-  unit,
-}: {
-  activeGrade: string | null;
-  value?: string;
-  unit: string;
-}) {
-  return (
-    <div className="space-y-[3px]">
-      {ENERGY_GRADES.map(({ grade, color, textColor, width }) => {
-        const isActive = grade === activeGrade;
-        return (
-          <div key={grade} className="flex items-center gap-2">
-            <div
-              style={{
-                width: `${width}%`,
-                height: "26px",
-                backgroundColor: color,
-                opacity: isActive ? 1 : 0.25,
-                clipPath:
-                  "polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%)",
-                display: "flex",
-                alignItems: "center",
-                paddingLeft: "9px",
-                flexShrink: 0,
-                transition: "opacity 0.2s",
-              }}
-            >
-              <span style={{ color: textColor, fontSize: "11px", fontWeight: 700, lineHeight: 1 }}>
-                {grade}
-              </span>
-            </div>
-            {isActive && (
-              <div className="flex items-center gap-1.5 shrink-0">
-                <div
-                  style={{
-                    backgroundColor: color,
-                    color: textColor,
-                    width: "26px",
-                    height: "26px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                  }}
-                >
-                  {grade}
-                </div>
-                {value && value !== "0" && (
-                  <span className="text-[#aaa] text-xs whitespace-nowrap">
-                    {value} {unit}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 function normaliseGrade(raw?: string): string | null {
   if (!raw) return null;
   const ch = raw.trim().charAt(0).toUpperCase();
   const grade = NUM_TO_GRADE[ch] ?? ch;
-  return ENERGY_GRADES.some((g) => g.grade === grade) ? grade : null;
+  return grade in ENERGY_COLORS ? grade : null;
+}
+
+function EnergyBadge({ grade, label, value }: { grade: string; label: string; value?: string }) {
+  const { bg, text } = ENERGY_COLORS[grade] ?? { bg: "#444", text: "#fff" };
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-[#666] text-xs w-24 shrink-0">{label}</span>
+      <div
+        style={{ backgroundColor: bg, color: text, width: 28, height: 28, fontSize: 13, fontWeight: 700 }}
+        className="flex items-center justify-center shrink-0"
+      >
+        {grade}
+      </div>
+      {value && value !== "0" && (
+        <span className="text-[#888] text-xs">{value}</span>
+      )}
+    </div>
+  );
 }
 
 function EnergyCertificate({
@@ -137,40 +89,32 @@ function EnergyCertificate({
   labelTitle: string;
   labelCO2: string;
 }) {
-  const activeConsumo = normaliseGrade(letra);
-  const activeEmisiones = normaliseGrade(emisionesLetra);
+  const gradeConsumo = normaliseGrade(letra);
+  const gradeEmisiones = normaliseGrade(emisionesLetra);
 
   return (
     <div className="bg-[#111] border border-[#1e1e1e] p-6">
-      <h3 className="font-display text-xl text-white mb-5">{labelTitle}</h3>
+      <h3 className="font-display text-lg text-white mb-4">{labelTitle}</h3>
 
       {exento ? (
-        <div className="flex items-center gap-3 py-3 px-4 border border-[#2a2a2a] text-[#888] text-sm">
-          <span className="text-lg">⚡</span>
-          Inmueble exento de certificado energético
-        </div>
+        <p className="text-[#666] text-xs">Exento de certificado energético</p>
       ) : (
-        <>
-          {/* Consumption scale */}
-          {activeConsumo && (
-            <div className="mb-5">
-              <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
-                Consumo energético
-              </p>
-              <EnergyScale activeGrade={activeConsumo} value={consumo} unit="kWh/m²·año" />
-            </div>
+        <div className="space-y-3">
+          {gradeConsumo && (
+            <EnergyBadge
+              grade={gradeConsumo}
+              label="Consumo"
+              value={consumo && consumo !== "0" ? `${consumo} kWh/m²·año` : undefined}
+            />
           )}
-
-          {/* Emissions scale */}
-          {activeEmisiones && (
-            <div>
-              <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
-                {labelCO2}
-              </p>
-              <EnergyScale activeGrade={activeEmisiones} value={emisiones} unit="kg CO₂/m²·año" />
-            </div>
+          {gradeEmisiones && (
+            <EnergyBadge
+              grade={gradeEmisiones}
+              label={labelCO2}
+              value={emisiones && emisiones !== "0" ? `${emisiones} kg CO₂/m²·año` : undefined}
+            />
           )}
-        </>
+        </div>
       )}
     </div>
   );
