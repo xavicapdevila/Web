@@ -266,7 +266,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         m2Construidos: m2Construidos || undefined,
         m2Utiles: m2Utiles > 0 ? m2Utiles : undefined,
         m2Parcela: m2Parcela > 0 ? m2Parcela : undefined,
-        planta: planta || undefined,
+        planta: (planta && planta !== "0") ? planta : undefined,
         numPlantas,
         ascensor,
         garaje,
