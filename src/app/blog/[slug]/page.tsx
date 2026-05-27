@@ -12,7 +12,7 @@ const BASE_URL = "https://www.thevilahome.com";
 
 export async function generateStaticParams() {
   try {
-    const { posts } = await getBlogPosts(100, 0);
+    const { posts } = await getBlogPosts(1000, 0);
     return posts.map((p) => ({ slug: p.slug }));
   } catch {
     return [];
