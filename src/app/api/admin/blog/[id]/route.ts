@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   const { id } = await params;
-  const post = getBlogPostByIdAdmin(id);
+  const post = await getBlogPostByIdAdmin(id);
   if (!post) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   return NextResponse.json({ post });
 }
@@ -23,7 +23,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   try {
     const body = await req.json();
-    const post = updateBlogPost(id, body);
+    const post = await updateBlogPost(id, body);
     if (!post) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
     return NextResponse.json({ post });
   } catch (e: unknown) {
@@ -37,7 +37,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   const { id } = await params;
-  const ok = deleteBlogPost(id);
+  const ok = await deleteBlogPost(id);
   if (!ok) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

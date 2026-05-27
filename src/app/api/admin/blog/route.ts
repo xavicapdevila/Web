@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
   try {
-    const posts = getAllBlogPostsAdmin();
+    const posts = await getAllBlogPostsAdmin();
     return NextResponse.json({ posts });
   } catch (e) {
     return NextResponse.json({ error: "Error al obtener posts" }, { status: 500 });
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const post = createBlogPost(body);
+    const post = await createBlogPost(body);
     return NextResponse.json({ post }, { status: 201 });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Error al crear post";

@@ -15,7 +15,7 @@ const BASE_URL = "https://www.thevilahome.com";
 
 export async function generateStaticParams() {
   try {
-    const { posts } = getBlogPosts(100, 0);
+    const { posts } = await getBlogPosts(100, 0);
     return posts.map((p) => ({ slug: p.slug }));
   } catch {
     return [];
@@ -25,7 +25,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const post = getBlogPostBySlug(slug);
+    const post = await getBlogPostBySlug(slug);
     if (!post) return { title: "Artículo no encontrado" };
     const canonicalUrl = `${BASE_URL}/blog/${slug}`;
     const ogImage = post.imagen ?? `${BASE_URL}/og-image.jpg`;
@@ -76,13 +76,13 @@ export default async function BlogPostPage({ params }: Props) {
 
   let post;
   try {
-    post = getBlogPostBySlug(slug);
+    post = await getBlogPostBySlug(slug);
   } catch {
     notFound();
   }
   if (!post) notFound();
 
-  const related = getRelatedPosts(slug, post.etiquetas, post.categoria, 3);
+  const related = await getRelatedPosts(slug, post.etiquetas, post.categoria, 3);
   const canonicalUrl = `${BASE_URL}/blog/${slug}`;
   const ogImage = post.imagen ?? `${BASE_URL}/og-image.jpg`;
 

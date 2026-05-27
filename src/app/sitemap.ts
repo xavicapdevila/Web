@@ -4,7 +4,7 @@ import { getBlogPosts } from "@/lib/blog";
 
 const BASE_URL = "https://www.thevilahome.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
     { url: BASE_URL,                          lastModified: new Date(), priority: 1,   changeFrequency: "weekly"  },
     { url: `${BASE_URL}/propiedades`,          lastModified: new Date(), priority: 0.9, changeFrequency: "daily"   },
@@ -29,7 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }
 
   try {
-    const { posts } = getBlogPosts(100, 0);
+    const { posts } = await getBlogPosts(100, 0);
     for (const post of posts) {
       routes.push({
         url: `${BASE_URL}/blog/${post.slug}`,

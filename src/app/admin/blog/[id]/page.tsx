@@ -20,7 +20,7 @@ export default async function EditarPostPage({ params }: Props) {
   const { id } = await params;
   let post;
   try {
-    post = getBlogPostByIdAdmin(id);
+    post = await getBlogPostByIdAdmin(id);
   } catch {
     notFound();
   }

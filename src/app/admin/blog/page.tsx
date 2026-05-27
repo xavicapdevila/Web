@@ -16,9 +16,9 @@ export default async function AdminBlogPage() {
 
   let posts: import("@/lib/blog").BlogPost[] = [];
   try {
-    posts = getAllBlogPostsAdmin();
+    posts = await getAllBlogPostsAdmin();
   } catch {
-    // DB not ready
+    // store not ready
   }
 
   return <AdminBlogList initialPosts={posts} />;

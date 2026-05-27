@@ -29,13 +29,13 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function BlogPage() {
+export default async function BlogPage() {
   let posts: import("@/lib/blog").BlogPost[] = [];
   try {
-    const result = getBlogPosts(20, 0);
+    const result = await getBlogPosts(20, 0);
     posts = result.posts;
   } catch {
-    // DB not ready
+    // store not ready
   }
 
   const schemaBlog = {
@@ -54,7 +54,7 @@ export default function BlogPage() {
       logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.svg` },
     },
     ...(posts.length > 0 && {
-      blogPost: posts.slice(0, 5).map((p) => ({
+      blogPost: posts.slice(0, 5).map((p: import("@/lib/blog").BlogPost) => ({
         "@type": "BlogPosting",
         "@id": `${BASE_URL}/blog/${p.slug}`,
         headline: p.titulo,
