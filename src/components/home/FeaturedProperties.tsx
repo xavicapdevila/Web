@@ -15,7 +15,7 @@ export default function FeaturedProperties({ properties }: Props) {
   const { t } = useLanguage();
 
   return (
-    <section className="py-32 bg-[#080808]">
+    <section className="pt-16 pb-32 bg-[#080808]">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <AnimateIn>

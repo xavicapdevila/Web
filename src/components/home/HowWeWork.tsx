@@ -20,7 +20,7 @@ export default function HowWeWork() {
   ];
 
   return (
-    <section ref={ref} className="py-32 bg-[#0a0a0a]">
+    <section ref={ref} className="pt-32 pb-16 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <div
