@@ -20,12 +20,11 @@ function slugify(text: string): string {
 }
 
 const CATEGORIAS = [
-  "Vender",
-  "Comprar",
   "Mercado",
-  "Hipotecas",
+  "Procesos",
+  "Documentación",
   "Consejos",
-  "Noticias",
+  "Vivir en...",
 ];
 
 interface Props {
