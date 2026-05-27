@@ -8,7 +8,7 @@ const agents = [
   {
     name: "Ariadna Garcia",
     descKey: "aboutDesc1" as const,
-    roleKey: "aboutRoleAdvisor" as const,
+    roleKey: "aboutRoleManager" as const,
     photo: "/images/agents/ariadna.jpg",
   },
   {
