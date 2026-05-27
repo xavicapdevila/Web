@@ -31,7 +31,14 @@ function ArticleCard({ post }: { post: BlogPost }) {
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
 
   return (
-    <article className="group bg-[#0f0f0f] border border-[#1a1a1a] hover:border-[#C9B99A]/20 transition-all duration-300 overflow-hidden flex flex-col">
+    <article className="group relative bg-[#0f0f0f] border border-[#1a1a1a] hover:border-[#C9B99A]/20 transition-all duration-300 flex flex-col">
+      {/* Category badge — sticks out slightly to the left, offset from top */}
+      {post.categoria && (
+        <span className="absolute top-4 -left-px z-10 text-black bg-[#C9B99A] text-[10px] font-body tracking-widest uppercase px-3 py-1 shadow-[2px_2px_0_rgba(0,0,0,0.4)]">
+          {post.categoria}
+        </span>
+      )}
+
       {/* Image */}
       <Link href={`/blog/${post.slug}`} className="block relative h-56 overflow-hidden shrink-0">
         {post.imagen ? (
@@ -49,12 +56,6 @@ function ArticleCard({ post }: { post: BlogPost }) {
               {post.titulo.charAt(0)}
             </span>
           </div>
-        )}
-        {/* Category badge — top-left overlay */}
-        {post.categoria && (
-          <span className="absolute top-0 left-0 text-black bg-[#C9B99A] text-[10px] font-body tracking-widest uppercase px-3 py-1">
-            {post.categoria}
-          </span>
         )}
       </Link>
 
