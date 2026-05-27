@@ -193,6 +193,8 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const m2Utiles = safeNum(item["m_uties"] ?? item["m2utiles"] ?? 0);
       const m2Parcela = safeNum(item["m_parcela"] ?? item["m2parcela"] ?? 0);
       const planta = safeText(item["planta"] ?? "");
+      const numPlantasRaw = safeInt(item["numplanta"] ?? 0);
+      const numPlantas = numPlantasRaw > 0 ? numPlantasRaw : undefined;
 
       const ascensor = safeBool(item["ascensor"]);
       const garaje = safeBool(item["plaza_gara"] ?? item["parking"] ?? item["garaje"]);
@@ -202,6 +204,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const jardin = safeBool(item["jardin"]);
       const amueblado = safeBool(item["muebles"]);
       const aireCond = safeBool(item["aire_con"] ?? item["airecentral"]);
+      const urbanizacion = safeBool(item["urbanizacion"]);
 
       // Calefaccion: field is 0 or name
       const calefaccionRaw = safeText(item["calefaccion"] ?? "");
@@ -213,6 +216,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
 
       const ibi = safeNum(item["ibi"] ?? 0);
       const gastosComun = safeNum(item["gastos_com"] ?? 0);
+      const periodicidadComunidad = safeText(item["tipomensual"] ?? "");
 
       // Energy certificate — apinmo feed uses energialetra / energiavalor / emisionesletra / emisionesvalor
       // energiarecibido = 1 means the certificate has been received/is valid
@@ -260,9 +264,11 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         m2Utiles: m2Utiles > 0 ? m2Utiles : undefined,
         m2Parcela: m2Parcela > 0 ? m2Parcela : undefined,
         planta: planta || undefined,
+        numPlantas,
         ascensor,
         garaje,
         trastero,
+        urbanizacion,
         piscina,
         terraza,
         jardin,
@@ -274,6 +280,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         estado: estadoInmueble || undefined,
         ibi: ibi > 0 ? ibi : undefined,
         gastosComun: gastosComun > 0 ? gastosComun : undefined,
+        periodicidadComunidad: periodicidadComunidad || undefined,
         certificadoEnergetico: certEnergetico || undefined,
         consumoEnergetico: consumoEnergetico || undefined,
         emisionesLetra: emisionesLetra || undefined,

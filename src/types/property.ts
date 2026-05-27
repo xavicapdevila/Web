@@ -27,9 +27,11 @@ export interface Property {
   m2Utiles?: number;
   m2Parcela?: number;
   planta?: string;
+  numPlantas?: number;
   ascensor?: boolean;
   garaje?: boolean;
   trastero?: boolean;
+  urbanizacion?: boolean;
   piscina?: boolean;
   terraza?: boolean;
   jardin?: boolean;
@@ -41,6 +43,7 @@ export interface Property {
   estado?: string;
   ibi?: number;
   gastosComun?: number;
+  periodicidadComunidad?: string;
   certificadoEnergetico?: string; // letra A-G del consumo energético
   consumoEnergetico?: string;     // valor numérico kWh/m²·año
   emisionesLetra?: string;        // letra A-G de las emisiones CO₂

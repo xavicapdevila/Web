@@ -2,37 +2,47 @@
 
 import type { Property } from "@/types/property";
 import { formatPrice } from "@/lib/utils";
-import { Check } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface Props {
   property: Property;
 }
 
-function displayVal(val: string | number | undefined): string {
-  if (val === undefined || val === null) return "";
-  const s = String(val);
-  if (s === "1") return "Sí";
-  if (s === "0") return "No";
-  return s;
+// Maps XML period codes to display labels per language
+const PERIOD_MAP: Record<string, Record<string, string>> = {
+  MES:       { es: "Mensual",     ca: "Mensual",      en: "Monthly",    fr: "Mensuel" },
+  MENSUAL:   { es: "Mensual",     ca: "Mensual",      en: "Monthly",    fr: "Mensuel" },
+  AÑO:       { es: "Anual",       ca: "Anual",        en: "Annual",     fr: "Annuel"  },
+  ANUAL:     { es: "Anual",       ca: "Anual",        en: "Annual",     fr: "Annuel"  },
+  TRIMESTRE: { es: "Trimestral",  ca: "Trimestral",   en: "Quarterly",  fr: "Trimestriel" },
+  SEMESTRE:  { es: "Semestral",   ca: "Semestral",    en: "Half-yearly", fr: "Semestriel" },
+};
+
+function localisePeriod(raw: string | undefined, lang: string): string | null {
+  if (!raw) return null;
+  const map = PERIOD_MAP[raw.toUpperCase()];
+  return map ? (map[lang] ?? map["es"]) : raw;
 }
 
-function DetailRow({ label, value, raw = false }: { label: string; value: string | number; raw?: boolean }) {
-  const displayed = raw ? String(value) : displayVal(value);
-  if (!displayed) return null;
+// ─── Detail row ───────────────────────────────────────────────────────────────
+
+function DetailRow({ label, value }: { label: string; value: string | number }) {
+  const s = String(value).trim();
+  if (!s) return null;
   return (
     <div className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0">
       <span className="text-[#888] text-sm">{label}</span>
-      <span className="text-white text-sm font-body">{displayed}</span>
+      <span className="text-white text-sm font-body">{s}</span>
     </div>
   );
 }
 
-function FeatureBadge({ label }: { label: string }) {
+// "1" → "Sí", "0" → "No" — always renders (never returns null)
+function BoolRow({ label, value }: { label: string; value: boolean }) {
   return (
-    <div className="flex items-center gap-2 text-sm text-[#ccc] py-1.5">
-      <Check size={14} className="text-[#C9B99A] shrink-0" />
-      {label}
+    <div className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0">
+      <span className="text-[#888] text-sm">{label}</span>
+      <span className="text-white text-sm font-body">{value ? "Sí" : "No"}</span>
     </div>
   );
 }
@@ -75,10 +85,8 @@ function EnergyRow({
 
   return (
     <div className="space-y-2">
-      {/* Label */}
       <p className="text-[#555] text-[10px] tracking-[0.2em] uppercase">{label}</p>
 
-      {/* Segmented bar */}
       <div className="flex gap-px">
         {ENERGY_SCALE.map(({ g, bg }) => (
           <div
@@ -93,7 +101,6 @@ function EnergyRow({
         ))}
       </div>
 
-      {/* Grade badge + value */}
       <div className="flex items-center gap-2">
         <div
           style={{
@@ -160,119 +167,128 @@ function EnergyCertificateSection({ property }: { property: Property }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function PropertyDetails({ property }: Props) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
-  const hasAnyDetail =
+  // ── Características ──────────────────────────────────────────────────────
+  const hasCaracteristicas =
     property.m2Construidos ||
     property.m2Utiles ||
     property.m2Parcela ||
-    property.planta ||
     property.habitaciones ||
     property.banos ||
+    property.planta ||
+    property.numPlantas ||
     property.antiguedad ||
-    property.estado ||
-    property.orientacion ||
-    property.calefaccion;
+    property.estado;
 
-  const hasFeatures =
+  // ── Equipamiento ─────────────────────────────────────────────────────────
+  // Show when at least one feature is present or calefacción has a value
+  const hasEquipamiento =
     property.ascensor ||
     property.garaje ||
-    property.trastero ||
     property.piscina ||
-    property.terraza ||
-    property.jardin ||
-    property.amueblado ||
-    property.aireCond;
+    property.aireCond ||
+    property.calefaccion ||
+    property.trastero ||
+    property.urbanizacion;
 
+  // ── Gastos ───────────────────────────────────────────────────────────────
   const hasCosts =
     (property.ibi && property.ibi > 0) ||
     (property.gastosComun && property.gastosComun > 0);
 
+  const communityPeriod = localisePeriod(property.periodicidadComunidad, lang);
+
   return (
     <div className="space-y-8">
-      {/* Características */}
-      {(hasAnyDetail || hasFeatures) && (
-        <div>
-          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsTitle")}</h2>
-          <div className="bg-[#111] border border-[#1e1e1e] p-6">
-            {hasAnyDetail && (
-              <>
-                {property.m2Construidos && (
-                  <DetailRow label={t("detailsBuilt")} value={`${Math.round(property.m2Construidos)} m²`} />
-                )}
-                {property.m2Utiles && (
-                  <DetailRow label={t("detailsUsable")} value={`${Math.round(property.m2Utiles)} m²`} />
-                )}
-                {property.m2Parcela && (
-                  <DetailRow label={t("detailsPlot")} value={`${Math.round(property.m2Parcela)} m²`} />
-                )}
-                {property.habitaciones && (
-                  <DetailRow label={t("detailsRooms")} value={property.habitaciones} />
-                )}
-                {property.banos && (
-                  <DetailRow label={t("detailsBaths")} value={property.banos} />
-                )}
-                {property.planta && (
-                  <DetailRow label={t("detailsFloor")} value={property.planta} raw />
-                )}
-                {property.orientacion && (
-                  <DetailRow label={t("detailsOrientation")} value={property.orientacion} />
-                )}
-                {property.calefaccion && (
-                  <DetailRow label={t("detailsHeating")} value={property.calefaccion} />
-                )}
-                {property.antiguedad && (
-                  <DetailRow label={t("detailsAge")} value={property.antiguedad} />
-                )}
-                {property.estado && (
-                  <DetailRow label={t("detailsCondition")} value={property.estado} />
-                )}
-              </>
-            )}
 
-            {hasFeatures && (
-              <div className={hasAnyDetail ? "mt-5 pt-5 border-t border-[#1a1a1a]" : ""}>
-                <p className="text-[#888] text-xs font-body tracking-widest uppercase mb-3">
-                  {t("detailsEquipment")}
-                </p>
-                <div className="grid grid-cols-2 gap-x-4">
-                  {property.ascensor && <FeatureBadge label={t("detailsElevator")} />}
-                  {property.garaje && <FeatureBadge label={t("detailsGarage")} />}
-                  {property.trastero && <FeatureBadge label={t("detailsStorage")} />}
-                  {property.piscina && <FeatureBadge label={t("detailsPool")} />}
-                  {property.terraza && <FeatureBadge label={t("detailsTerrace")} />}
-                  {property.jardin && <FeatureBadge label={t("detailsGarden")} />}
-                  {property.amueblado && <FeatureBadge label={t("detailsFurnished")} />}
-                  {property.aireCond && <FeatureBadge label={t("detailsAirCon")} />}
-                </div>
-              </div>
+      {/* ── Características ── */}
+      {hasCaracteristicas && (
+        <div>
+          <h2 className="font-display text-2xl text-white font-light mb-4">
+            {t("detailsTitle")}
+          </h2>
+          <div className="bg-[#111] border border-[#1e1e1e] p-6">
+            {property.m2Construidos && (
+              <DetailRow label={t("detailsBuilt")} value={`${Math.round(property.m2Construidos)} m²`} />
+            )}
+            {property.m2Utiles && (
+              <DetailRow label={t("detailsUsable")} value={`${Math.round(property.m2Utiles)} m²`} />
+            )}
+            {property.m2Parcela && (
+              <DetailRow label={t("detailsPlot")} value={`${Math.round(property.m2Parcela)} m²`} />
+            )}
+            {property.habitaciones && (
+              <DetailRow label={t("detailsRooms")} value={property.habitaciones} />
+            )}
+            {property.banos && (
+              <DetailRow label={t("detailsBaths")} value={property.banos} />
+            )}
+            {property.planta && (
+              <DetailRow label={t("detailsFloor")} value={property.planta} />
+            )}
+            {property.numPlantas && (
+              <DetailRow label={t("detailsNumFloors")} value={property.numPlantas} />
+            )}
+            {property.antiguedad && (
+              <DetailRow label={t("detailsAge")} value={property.antiguedad} />
+            )}
+            {property.estado && (
+              <DetailRow label={t("detailsCondition")} value={property.estado} />
             )}
           </div>
         </div>
       )}
 
-      {/* Certificado de Eficiencia Energética — standalone */}
+      {/* ── Equipamiento ── */}
+      {hasEquipamiento && (
+        <div>
+          <h2 className="font-display text-2xl text-white font-light mb-4">
+            {t("detailsEquipment")}
+          </h2>
+          <div className="bg-[#111] border border-[#1e1e1e] p-6">
+            <BoolRow label={t("detailsElevator")} value={!!property.ascensor} />
+            <BoolRow label={t("detailsGarage")} value={!!property.garaje} />
+            <BoolRow label={t("detailsPool")} value={!!property.piscina} />
+            <BoolRow label={t("detailsAirCon")} value={!!property.aireCond} />
+            {property.calefaccion && (
+              <DetailRow label={t("detailsHeating")} value={property.calefaccion} />
+            )}
+            <BoolRow label={t("detailsStorage")} value={!!property.trastero} />
+            <BoolRow label={t("detailsUrbanizacion")} value={!!property.urbanizacion} />
+          </div>
+        </div>
+      )}
+
+      {/* ── Certificado de Eficiencia Energética ── */}
       <EnergyCertificateSection property={property} />
 
-      {/* Gastos */}
+      {/* ── Gastos ── */}
       {hasCosts && (
         <div>
-          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsCosts")}</h2>
+          <h2 className="font-display text-2xl text-white font-light mb-4">
+            {t("detailsCosts")}
+          </h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
-            {property.ibi && property.ibi > 0 && (
-              <DetailRow label={t("detailsIbi")} value={formatPrice(property.ibi)} />
-            )}
             {property.gastosComun && property.gastosComun > 0 && (
               <DetailRow label={t("detailsCommunity")} value={formatPrice(property.gastosComun)} />
             )}
+            {property.gastosComun && property.gastosComun > 0 && communityPeriod && (
+              <DetailRow label={t("detailsCommunityPeriod")} value={communityPeriod} />
+            )}
+            {property.ibi && property.ibi > 0 && (
+              <DetailRow label={t("detailsIbi")} value={formatPrice(property.ibi)} />
+            )}
           </div>
         </div>
       )}
 
-      {/* Ubicación */}
+      {/* ── Ubicación ── */}
       {(property.ciudad || property.zona || property.cp) && (
         <div>
-          <h2 className="font-display text-2xl text-white font-light mb-4">{t("detailsLocation")}</h2>
+          <h2 className="font-display text-2xl text-white font-light mb-4">
+            {t("detailsLocation")}
+          </h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             {property.ciudad && (
               <DetailRow label={t("detailsCity")} value={property.ciudad} />
