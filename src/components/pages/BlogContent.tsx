@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, Search, X } from "lucide-react";
+import { CalendarDays, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate } from "@/lib/utils";
 import type { BlogPost } from "@/lib/blog";
@@ -107,7 +107,8 @@ export default function BlogContent({ posts }: Props) {
   const { t, lang } = useLanguage();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const trimmed = query.trim().toLowerCase();
 
@@ -117,6 +118,7 @@ export default function BlogContent({ posts }: Props) {
       result = result.filter((p) => p.categoria === activeCategory);
     }
     if (trimmed) {
+      // Search across ALL posts regardless of page
       result = result.filter(
         (p) =>
           p.titulo.toLowerCase().includes(trimmed) ||
@@ -125,19 +127,36 @@ export default function BlogContent({ posts }: Props) {
           p.etiquetas.some((tag) => tag.toLowerCase().includes(trimmed))
       );
     }
-    // Most recent first
     return [...result].sort(
       (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
     );
   }, [posts, activeCategory, trimmed]);
 
-  // Reset page when filter/search changes
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const visible = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Reset to page 1 when filter/search changes
   useEffect(() => {
-    setPage(1);
+    setCurrentPage(1);
   }, [activeCategory, trimmed]);
 
-  const visible  = filtered.slice(0, page * PAGE_SIZE);
-  const hasMore  = filtered.length > page * PAGE_SIZE;
+  const goToPage = useCallback((p: number) => {
+    setCurrentPage(p);
+    gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  // Build the list of page tokens (numbers + ellipsis)
+  const pageTokens = useMemo((): (number | "…")[] => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const tokens: (number | "…")[] = [1];
+    if (currentPage > 3) tokens.push("…");
+    const lo = Math.max(2, currentPage - 1);
+    const hi = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = lo; i <= hi; i++) tokens.push(i);
+    if (currentPage < totalPages - 2) tokens.push("…");
+    tokens.push(totalPages);
+    return tokens;
+  }, [currentPage, totalPages]);
 
   return (
     <>
@@ -264,26 +283,63 @@ export default function BlogContent({ posts }: Props) {
           {/* Grid */}
           {visible.length > 0 && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+              <div
+                ref={gridRef}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
+              >
                 {visible.map((post) => (
                   <ArticleCard key={post.id} post={post} />
                 ))}
               </div>
 
-              {/* Article count + load more */}
-              <div className="flex flex-col items-center gap-4 mt-10">
-                <p className="text-[#333] text-xs font-body tracking-widest uppercase">
-                  {visible.length} / {filtered.length}
-                </p>
-                {hasMore && (
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <nav
+                  className="flex items-center justify-center gap-1 mt-12"
+                  aria-label="Paginación"
+                >
+                  {/* Prev */}
                   <button
-                    onClick={() => setPage((p) => p + 1)}
-                    className="text-xs font-body tracking-[0.2em] uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#1e1e1e] hover:border-[#C9B99A]/40 px-8 py-3"
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="flex items-center justify-center w-8 h-8 text-[#555] hover:text-[#C9B99A] disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página anterior"
                   >
-                    {t("blogLoadMore")}
+                    <ChevronLeft size={14} />
                   </button>
-                )}
-              </div>
+
+                  {pageTokens.map((token, i) =>
+                    token === "…" ? (
+                      <span key={`ellipsis-${i}`} className="w-8 h-8 flex items-center justify-center text-[#333] text-xs select-none">
+                        ···
+                      </span>
+                    ) : (
+                      <button
+                        key={token}
+                        onClick={() => goToPage(token)}
+                        aria-current={currentPage === token ? "page" : undefined}
+                        className={`w-8 h-8 text-xs font-body tracking-wide transition-all duration-150 ${
+                          currentPage === token
+                            ? "bg-[#C9B99A] text-black"
+                            : "text-[#555] hover:text-white border border-transparent hover:border-[#2a2a2a]"
+                        }`}
+                      >
+                        {token}
+                      </button>
+                    )
+                  )}
+
+                  {/* Next */}
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center justify-center w-8 h-8 text-[#555] hover:text-[#C9B99A] disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página siguiente"
+                  >
+                    <ChevronRight size={14} />
+                  </button>
+                </nav>
+              )}
             </>
           )}
 
