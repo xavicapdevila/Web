@@ -6,8 +6,14 @@ import { Search, ChevronDown, X, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TIPO_VALUES = ["", "piso", "casa", "ático", "terreno", "local"];
-const TIPO_LABELS_ES = ["Todos los tipos", "Piso", "Casa", "Ático", "Terreno", "Local"];
+const TIPO_VALUES = ["", "piso", "casa", "terreno", "local"];
+const TIPO_LABELS_ES = ["Todos los tipos", "Piso", "Casa", "Terreno", "Local"];
+
+const PISO_SUBTYPES = [
+  { val: "ático",       label: "Ático" },
+  { val: "planta baja", label: "Planta baja" },
+  { val: "dúplex",      label: "Dúplex" },
+];
 const HAB_VALUES = ["", "1", "2", "3", "4"];
 const HAB_LABELS = ["—", "1+", "2+", "3+", "4+"];
 
@@ -18,6 +24,9 @@ export default function PropertyFilters() {
   const searchParams = useSearchParams();
 
   const [tipo, setTipo] = useState(searchParams.get("tipo") ?? "");
+  const [subtipos, setSubtipos] = useState<string[]>(
+    searchParams.get("subtipo") ? searchParams.get("subtipo")!.split(",") : []
+  );
   const [precioMin, setPrecioMin] = useState(searchParams.get("precioMin") ?? "");
   const [precioMax, setPrecioMax] = useState(searchParams.get("precioMax") ?? "");
   const [habitaciones, setHabitaciones] = useState(searchParams.get("habitaciones") ?? "");
@@ -25,9 +34,16 @@ export default function PropertyFilters() {
   const [ciudad, setCiudad] = useState(searchParams.get("ciudad") ?? "");
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const toggleSubtipo = (val: string) => {
+    setSubtipos((prev) =>
+      prev.includes(val) ? prev.filter((s) => s !== val) : [...prev, val]
+    );
+  };
+
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams();
     if (tipo) params.set("tipo", tipo);
+    if (tipo === "piso" && subtipos.length > 0) params.set("subtipo", subtipos.join(","));
     if (precioMin) params.set("precioMin", precioMin);
     if (precioMax) params.set("precioMax", precioMax);
     if (habitaciones) params.set("habitaciones", habitaciones);
@@ -35,16 +51,17 @@ export default function PropertyFilters() {
     if (ciudad) params.set("ciudad", ciudad);
     params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
-  }, [tipo, precioMin, precioMax, habitaciones, m2Min, ciudad, router, pathname]);
+  }, [tipo, subtipos, precioMin, precioMax, habitaciones, m2Min, ciudad, router, pathname]);
 
   const clearFilters = () => {
-    setTipo(""); setPrecioMin(""); setPrecioMax("");
+    setTipo(""); setSubtipos([]); setPrecioMin(""); setPrecioMax("");
     setHabitaciones(""); setM2Min(""); setCiudad("");
     router.push(pathname);
   };
 
   const hasFilters = tipo || precioMin || precioMax || habitaciones || m2Min || ciudad;
-  const activeCount = [tipo, precioMin, precioMax, habitaciones, m2Min, ciudad].filter(Boolean).length;
+  const activeCount = [tipo, precioMin, precioMax, habitaciones, m2Min, ciudad].filter(Boolean).length
+    + (subtipos.length > 0 ? 1 : 0);
 
   return (
     <aside className="w-full lg:w-72 shrink-0">
@@ -114,7 +131,7 @@ export default function PropertyFilters() {
             <div className="relative">
               <select
                 value={tipo}
-                onChange={(e) => setTipo(e.target.value)}
+                onChange={(e) => { setTipo(e.target.value); setSubtipos([]); }}
                 className="w-full bg-[#0a0a0a] border border-[#2a2a2a] text-white text-sm px-4 py-2.5 appearance-none focus:outline-none focus:border-[#C9B99A]/50 transition-colors"
               >
                 {TIPO_VALUES.map((val, i) => (
@@ -126,6 +143,32 @@ export default function PropertyFilters() {
               <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none" />
             </div>
           </div>
+
+          {/* Subtipo — only visible when Piso is selected */}
+          {tipo === "piso" && (
+            <div>
+              <label className="block text-[#888] text-xs font-body tracking-wide uppercase mb-2">
+                Subtipo
+              </label>
+              <div className="flex flex-wrap gap-1.5">
+                {PISO_SUBTYPES.map(({ val, label }) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => toggleSubtipo(val)}
+                    className={cn(
+                      "px-3 py-1.5 text-xs border transition-colors",
+                      subtipos.includes(val)
+                        ? "bg-[#C9B99A] border-[#C9B99A] text-black font-medium"
+                        : "border-[#2a2a2a] text-[#888] hover:border-[#C9B99A]/50 hover:text-white"
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Precio */}
           <div>

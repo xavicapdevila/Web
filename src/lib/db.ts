@@ -136,6 +136,10 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE properties ADD COLUMN garaje_tipo TEXT DEFAULT 'garaje'`); } catch {}
   // Merge all house variants into "casa"
   try { db.exec(`UPDATE properties SET tipo = 'casa' WHERE tipo IN ('chalet', 'adosado', 'pareado', 'bungalow', 'duplex', 'dúplex')`); } catch {}
+  // Merge piso variants (ático, planta baja, dúplex) into "piso", preserve subtipo
+  try { db.exec(`UPDATE properties SET subtipo = 'ático',      tipo = 'piso' WHERE tipo = 'ático'`); } catch {}
+  try { db.exec(`UPDATE properties SET subtipo = 'planta baja', tipo = 'piso' WHERE tipo IN ('planta baja', 'bajo')`); } catch {}
+  try { db.exec(`UPDATE properties SET subtipo = 'dúplex',     tipo = 'piso' WHERE tipo IN ('dúplex', 'duplex')`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN num_plantas INTEGER`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN urbanizacion INTEGER DEFAULT 0`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN periodicidad_comunidad TEXT`); } catch {}

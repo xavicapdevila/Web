@@ -39,10 +39,24 @@ function buildSlug(ref: string, tipo: string, ciudad: string): string {
   return `${normalize(ref)}-${normalize(tipo)}-${normalize(ciudad)}`;
 }
 
+function mapSubtipo(tipoRaw: string): string | undefined {
+  const t = tipoRaw.toLowerCase();
+  if (t.includes("ático") || t.includes("atico")) return "ático";
+  if (t.includes("planta baja") || t.startsWith("bajo")) return "planta baja";
+  if (t.includes("dúplex") || t.includes("duplex")) return "dúplex";
+  if (t.includes("semisótano") || t.includes("semisotan") || t.includes("semisotano")) return "semisótano";
+  return undefined;
+}
+
 function mapTipo(tipo: string): string {
   const t = tipo.toLowerCase();
-  if (t.includes("piso") || t.includes("apartamento") || t.includes("flat")) return "piso";
-  if (t.includes("ático") || t.includes("atico")) return "ático";
+  if (
+    t.includes("piso") || t.includes("apartamento") || t.includes("flat") ||
+    t.includes("ático") || t.includes("atico") ||
+    t.includes("planta baja") || t.startsWith("bajo") ||
+    t.includes("dúplex") || t.includes("duplex") ||
+    t.includes("semisótano") || t.includes("semisotan") || t.includes("semisotano")
+  ) return "piso";
   if (
     t.includes("casa") || t.includes("house") ||
     t.includes("chalet") || t.includes("villa") ||
@@ -130,6 +144,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       // Type — field is tipo_ofer in Inmovilla
       const tipoRaw = safeText(item["tipo_ofer"] ?? item["tipovivienda"] ?? item["tipo"] ?? "");
       const tipo = mapTipo(tipoRaw);
+      const subtipo = mapSubtipo(tipoRaw);
 
       // Operation — field is accion in Inmovilla
       const operacionRaw = safeText(item["accion"] ?? item["operacion"] ?? "Vender");
@@ -251,7 +266,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         id,
         ref,
         tipo,
-        subtipo: undefined,
+        subtipo,
         operacion,
         precio,
         precioAnterior,

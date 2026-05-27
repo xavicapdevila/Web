@@ -22,6 +22,7 @@ export const dynamic = "force-dynamic";
 interface Props {
   searchParams: Promise<{
     tipo?: string;
+    subtipo?: string;
     precioMin?: string;
     precioMax?: string;
     habitaciones?: string;
@@ -44,6 +45,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   try {
     const result = getPropertiesFromDb({
       tipo: params.tipo,
+      subtipo: params.subtipo,
       precioMin: params.precioMin ? Number(params.precioMin) : undefined,
       precioMax: params.precioMax ? Number(params.precioMax) : undefined,
       habitaciones: params.habitaciones ? Number(params.habitaciones) : undefined,

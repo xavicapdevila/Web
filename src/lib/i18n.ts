@@ -962,20 +962,28 @@ export function getTranslations(lang: Lang): Translations {
 
 // Property type labels per language
 const TIPO_MAP: Record<string, Record<Lang, string>> = {
-  piso:     { es: "Piso",    ca: "Pis",      en: "Apartment",  fr: "Appartement" },
-  casa:     { es: "Casa",    ca: "Casa",      en: "House",      fr: "Maison" },
-  chalet:   { es: "Chalet",  ca: "Xalet",     en: "Villa",      fr: "Villa" },
-  ático:    { es: "Ático",   ca: "Àtic",      en: "Penthouse",  fr: "Penthouse" },
-  atico:    { es: "Ático",   ca: "Àtic",      en: "Penthouse",  fr: "Penthouse" },
+  piso:          { es: "Piso",        ca: "Pis",        en: "Apartment",   fr: "Appartement" },
+  casa:          { es: "Casa",        ca: "Casa",        en: "House",       fr: "Maison" },
+  chalet:        { es: "Casa",        ca: "Casa",        en: "House",       fr: "Maison" },
+  ático:         { es: "Ático",       ca: "Àtic",        en: "Penthouse",   fr: "Penthouse" },
+  atico:         { es: "Ático",       ca: "Àtic",        en: "Penthouse",   fr: "Penthouse" },
+  "planta baja": { es: "Planta baja", ca: "Planta baixa", en: "Ground floor", fr: "Rez-de-chaussée" },
+  "dúplex":      { es: "Dúplex",      ca: "Dúplex",       en: "Duplex",      fr: "Duplex" },
+  "semisótano":  { es: "Semisótano",  ca: "Semisoterrani", en: "Semi-basement", fr: "Semi-sous-sol" },
   terreno:  { es: "Terreno", ca: "Terreny",   en: "Land",       fr: "Terrain" },
   local:    { es: "Local",   ca: "Local",     en: "Commercial", fr: "Local commercial" },
   garaje:   { es: "Garaje",  ca: "Garatge",   en: "Garage",     fr: "Garage" },
   oficina:  { es: "Oficina", ca: "Oficina",   en: "Office",     fr: "Bureau" },
 };
 
-export function getTipoLabel(tipo: string, lang: Lang): string {
+export function getTipoLabel(tipo: string, lang: Lang, subtipo?: string): string {
+  // If there's a subtipo with its own label, use that (e.g. "ático", "planta baja")
+  if (subtipo) {
+    const subKey = subtipo.toLowerCase();
+    const subEntry = TIPO_MAP[subKey];
+    if (subEntry) return subEntry[lang];
+  }
   const key = tipo.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  // Try with accent (ático) first, then without (atico)
   const entry = TIPO_MAP[tipo.toLowerCase()] ?? TIPO_MAP[key];
   return entry?.[lang] ?? tipo;
 }

@@ -182,7 +182,7 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase border border-[#C9B99A]/40 px-3 py-1">
-                {getTipoLabel(property.tipo, lang)}
+                {getTipoLabel(property.tipo, lang, property.subtipo)}
               </span>
               {isReserved && (
                 <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase border border-[#C9B99A] px-3 py-1 bg-[#C9B99A]/10">

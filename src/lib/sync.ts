@@ -220,6 +220,7 @@ export async function syncProperties(): Promise<SyncResult> {
 
 export function getPropertiesFromDb(filters?: {
   tipo?: string;
+  subtipo?: string;   // comma-separated, e.g. "ático,planta baja"
   precioMin?: number;
   precioMax?: number;
   habitaciones?: number;
@@ -236,6 +237,16 @@ export function getPropertiesFromDb(filters?: {
   if (filters?.tipo) {
     conditions.push("tipo = ?");
     params.push(filters.tipo);
+  }
+  if (filters?.subtipo) {
+    const vals = filters.subtipo.split(",").map((v) => v.trim()).filter(Boolean);
+    if (vals.length === 1) {
+      conditions.push("subtipo = ?");
+      params.push(vals[0]);
+    } else if (vals.length > 1) {
+      conditions.push(`subtipo IN (${vals.map(() => "?").join(",")})`);
+      params.push(...vals);
+    }
   }
   if (filters?.precioMin) {
     conditions.push("precio >= ?");

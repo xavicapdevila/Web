@@ -93,7 +93,7 @@ export default function PropertyCard({ property }: Props) {
         {/* Tipo badge */}
         <div className="absolute top-3 left-3">
           <span className="bg-[#0a0a0a]/80 backdrop-blur-sm text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
-            {getTipoLabel(property.tipo, lang)}
+            {getTipoLabel(property.tipo, lang, property.subtipo)}
           </span>
         </div>
 
