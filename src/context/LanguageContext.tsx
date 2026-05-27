@@ -81,9 +81,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     )
       .then((res) => res.json())
       .then((data) => {
-        const result: string = data?.responseData?.translatedText ?? text;
-        // MyMemory sometimes returns HTML entities — decode them
-        const decoded = result
+        // Validate response: 200 = success, 206 = partial match; anything else = fall back
+        const status: number = data?.responseStatus ?? 0;
+        if (status !== 200 && status !== 206) {
+          pending.current.delete(cacheKey);
+          return text;
+        }
+        const raw: string = data?.responseData?.translatedText ?? "";
+        // MyMemory returns warning/error messages as translatedText on soft failures
+        if (!raw || raw.startsWith("[MYMEMORY") || raw.startsWith("PLEASE SELECT")) {
+          pending.current.delete(cacheKey);
+          return text;
+        }
+        // Decode basic HTML entities the API sometimes adds
+        const decoded = raw
           .replace(/&amp;/g, "&")
           .replace(/&lt;/g, "<")
           .replace(/&gt;/g, ">")

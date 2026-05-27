@@ -8,51 +8,77 @@ interface Props {
   className?: string;
 }
 
+// Block-level tags whose text content we translate as a single unit
+const BLOCK_TAG_RE =
+  /<(p|h[1-6]|li|blockquote|td|th|dt|dd)(\s[^>]*)?>[\s\S]*?<\/\1>/gi;
+
 /**
- * Splits HTML into tag segments and text node segments.
- * Translates only the text nodes (preserving all HTML tags and inline markup).
- * Identical text nodes are deduplicated so the API is only called once per unique string.
+ * Translate block elements one request per block.
+ * This is far cheaper on the MyMemory free tier than translating individual
+ * text nodes (which produced 15–20 calls per article).
+ *
+ * The inner HTML of each block is replaced with its plain-text translation;
+ * inline tags (strong, em, a…) are lost in the translated version — an
+ * acceptable trade-off when the goal is readability in another language.
  */
-async function translateHtmlNodes(
+async function translateHtmlBlocks(
   html: string,
   translateFn: (text: string) => Promise<string>
 ): Promise<string> {
-  // Split alternating: tag (<...>) vs text
-  const parts = html.split(/(<[^>]+>)/);
+  type BlockMatch = {
+    index: number;
+    end: number;
+    tag: string;
+    attrs: string;
+    inner: string;
+    plainText: string;
+  };
 
-  // Collect unique non-whitespace text segments
-  const uniqueTexts = new Map<string, string>(); // original → translated (starts as identity)
-  const textIndices: number[] = [];
+  const matches: BlockMatch[] = [];
+  let m: RegExpExecArray | null;
+  const re = new RegExp(BLOCK_TAG_RE.source, "gi"); // fresh lastIndex
 
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
-    if (!part.startsWith("<") && part.trim().length > 0) {
-      uniqueTexts.set(part, part);
-      textIndices.push(i);
+  while ((m = re.exec(html)) !== null) {
+    const tag   = m[1];
+    const attrs = m[2] ?? "";
+    const inner = m[0].slice(`<${tag}${attrs}>`.length, -`</${tag}>`.length);
+    // Strip inner HTML to get plain text for translation
+    const plainText = inner.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+    if (plainText.length > 2) {
+      matches.push({
+        index: m.index,
+        end: m.index + m[0].length,
+        tag,
+        attrs,
+        inner,
+        plainText,
+      });
     }
   }
 
-  if (uniqueTexts.size === 0) return html;
+  if (matches.length === 0) return html;
 
-  // Translate all unique segments in parallel
+  // Deduplicate and translate
+  const uniqueTexts = [...new Set(matches.map((b) => b.plainText))];
+  const translations = new Map<string, string>();
+
   await Promise.all(
-    Array.from(uniqueTexts.keys()).map(async (text) => {
-      try {
-        const translated = await translateFn(text);
-        uniqueTexts.set(text, translated);
-      } catch {
-        // keep original on error
-      }
+    uniqueTexts.map(async (text) => {
+      const translated = await translateFn(text);
+      translations.set(text, translated);
     })
   );
 
-  // Reconstruct HTML with translated text nodes
-  const result = [...parts];
-  for (const i of textIndices) {
-    result[i] = uniqueTexts.get(parts[i]) ?? parts[i];
+  // Rebuild HTML from end to start so indices stay valid
+  let result = html;
+  for (const block of [...matches].reverse()) {
+    const translated = translations.get(block.plainText) ?? block.plainText;
+    const newBlock = `<${block.tag}${block.attrs}>${translated}</${block.tag}>`;
+    result = result.slice(0, block.index) + newBlock + result.slice(block.end);
   }
 
-  return result.join("");
+  return result;
 }
 
 export default function TranslatableHTML({ html, className }: Props) {
@@ -65,7 +91,7 @@ export default function TranslatableHTML({ html, className }: Props) {
       return;
     }
     let cancelled = false;
-    translateHtmlNodes(html, translate).then((translated) => {
+    translateHtmlBlocks(html, translate).then((translated) => {
       if (!cancelled) setOutput(translated);
     });
     return () => {
