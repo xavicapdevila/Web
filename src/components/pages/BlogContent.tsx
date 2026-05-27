@@ -33,7 +33,7 @@ function ArticleCard({ post }: { post: BlogPost }) {
   return (
     <article className="group bg-[#0f0f0f] border border-[#1a1a1a] hover:border-[#C9B99A]/20 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Image */}
-      <Link href={`/blog/${post.slug}`} className="block relative h-52 overflow-hidden shrink-0">
+      <Link href={`/blog/${post.slug}`} className="block relative h-56 overflow-hidden shrink-0">
         {post.imagen ? (
           <Image
             src={post.imagen}
@@ -50,31 +50,45 @@ function ArticleCard({ post }: { post: BlogPost }) {
             </span>
           </div>
         )}
-        {/* Category badge */}
-        {post.categoria && (
-          <span className="absolute top-3 left-3 text-black bg-[#C9B99A] text-[9px] font-body tracking-[0.14em] uppercase px-2 py-0.5 leading-tight">
-            {post.categoria}
-          </span>
-        )}
       </Link>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
-        <Link href={`/blog/${post.slug}`} className="flex-1">
-          <h2 className="font-display text-base leading-snug text-[#ddd] group-hover:text-[#C9B99A] transition-colors duration-200 line-clamp-2 mb-2">
+        {/* Category + tags */}
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {post.categoria && (
+            <span className="text-black bg-[#C9B99A] text-[10px] font-body tracking-widest uppercase px-2.5 py-0.5">
+              {post.categoria}
+            </span>
+          )}
+          {post.etiquetas.slice(0, 2).map((tag) => (
+            <span
+              key={tag}
+              className="text-[#C9B99A]/60 text-[10px] font-body tracking-wide uppercase border border-[#C9B99A]/15 px-2 py-0.5"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Title */}
+        <Link href={`/blog/${post.slug}`} className="mb-3">
+          <h2 className="font-display text-lg leading-snug text-white group-hover:text-[#C9B99A] transition-colors duration-200">
             {translatedTitle}
           </h2>
         </Link>
 
+        {/* Full excerpt */}
         {post.extracto && (
-          <p className="text-[#555] text-xs leading-relaxed line-clamp-2 mb-4">
+          <p className="text-[#666] text-sm leading-relaxed flex-1">
             {translatedExcerpt}
           </p>
         )}
 
-        <div className="flex items-center gap-2 mt-auto pt-3 border-t border-[#191919]">
-          <CalendarDays size={10} className="text-[#444] shrink-0" />
-          <span className="text-[#444] text-[11px] tabular-nums">
+        {/* Date footer */}
+        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-[#191919]">
+          <CalendarDays size={11} className="text-[#C9B99A]/50 shrink-0" />
+          <span className="text-[#555] text-xs tabular-nums">
             {formatBlogDate(post.fecha)}
           </span>
         </div>
