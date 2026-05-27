@@ -261,6 +261,17 @@ const dict = {
     cookieManage: "Gestionar cookies",
     cookieAlwaysOn: "Siempre activas",
     cookiePolicyLink: "Política de cookies",
+
+    // Blog post page
+    blogBackToList: "Volver al blog",
+    blogRelatedTitle: "También te puede interesar",
+    blogCtaTitle: "¿Tienes alguna pregunta?",
+    blogCtaText: "Nuestro equipo está disponible para resolver cualquier duda sobre el mercado inmobiliario en Vilanova.",
+    blogCtaCall: "Llamar: 936 061 800",
+    blogCtaContact: "Más formas de contacto",
+    blogMoreArticlesOne: "artículo más",
+    blogMoreArticlesMany: "artículos más",
+    blogSeeAll: "Ver todos los artículos",
   },
 
   ca: {
@@ -496,6 +507,17 @@ const dict = {
     cookieManage: "Gestionar cookies",
     cookieAlwaysOn: "Sempre actives",
     cookiePolicyLink: "Política de cookies",
+
+    // Blog post page
+    blogBackToList: "Tornar al blog",
+    blogRelatedTitle: "També et pot interessar",
+    blogCtaTitle: "Tens alguna pregunta?",
+    blogCtaText: "El nostre equip està disponible per resoldre qualsevol dubte sobre el mercat immobiliari a Vilanova.",
+    blogCtaCall: "Trucar: 936 061 800",
+    blogCtaContact: "Més formes de contacte",
+    blogMoreArticlesOne: "article més",
+    blogMoreArticlesMany: "articles més",
+    blogSeeAll: "Veure tots els articles",
   },
 
   en: {
@@ -731,6 +753,17 @@ const dict = {
     cookieManage: "Cookie settings",
     cookieAlwaysOn: "Always on",
     cookiePolicyLink: "Cookie policy",
+
+    // Blog post page
+    blogBackToList: "Back to blog",
+    blogRelatedTitle: "You might also like",
+    blogCtaTitle: "Do you have a question?",
+    blogCtaText: "Our team is available to answer any questions about the real estate market in Vilanova.",
+    blogCtaCall: "Call: 936 061 800",
+    blogCtaContact: "More ways to contact us",
+    blogMoreArticlesOne: "more article",
+    blogMoreArticlesMany: "more articles",
+    blogSeeAll: "See all articles",
   },
 
   fr: {
@@ -966,6 +999,17 @@ const dict = {
     cookieManage: "Gérer les cookies",
     cookieAlwaysOn: "Toujours actifs",
     cookiePolicyLink: "Politique de cookies",
+
+    // Blog post page
+    blogBackToList: "Retour au blog",
+    blogRelatedTitle: "Vous pourriez aussi aimer",
+    blogCtaTitle: "Vous avez une question ?",
+    blogCtaText: "Notre équipe est disponible pour répondre à toutes vos questions sur le marché immobilier de Vilanova.",
+    blogCtaCall: "Appeler : 936 061 800",
+    blogCtaContact: "Plus de façons de nous contacter",
+    blogMoreArticlesOne: "article de plus",
+    blogMoreArticlesMany: "articles de plus",
+    blogSeeAll: "Voir tous les articles",
   },
 } as const;
 
