@@ -50,26 +50,29 @@ function ArticleCard({ post }: { post: BlogPost }) {
             </span>
           </div>
         )}
+        {/* Category badge — top-left overlay */}
+        {post.categoria && (
+          <span className="absolute top-0 left-0 text-black bg-[#C9B99A] text-[10px] font-body tracking-widest uppercase px-3 py-1">
+            {post.categoria}
+          </span>
+        )}
       </Link>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
-        {/* Category + tags */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          {post.categoria && (
-            <span className="text-black bg-[#C9B99A] text-[10px] font-body tracking-widest uppercase px-2.5 py-0.5">
-              {post.categoria}
-            </span>
-          )}
-          {post.etiquetas.slice(0, 2).map((tag) => (
-            <span
-              key={tag}
-              className="text-[#C9B99A]/60 text-[10px] font-body tracking-wide uppercase border border-[#C9B99A]/15 px-2 py-0.5"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        {/* Tags */}
+        {post.etiquetas.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {post.etiquetas.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="text-[#C9B99A]/60 text-[10px] font-body tracking-wide uppercase border border-[#C9B99A]/15 px-2 py-0.5"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Title */}
         <Link href={`/blog/${post.slug}`} className="mb-3">
