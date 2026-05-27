@@ -107,7 +107,10 @@ export default function BlogContent({ posts }: Props) {
           p.etiquetas.some((tag) => tag.toLowerCase().includes(trimmed))
       );
     }
-    return result;
+    // Most recent first
+    return [...result].sort(
+      (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+    );
   }, [posts, activeCategory, trimmed]);
 
   // Reset page when filter/search changes

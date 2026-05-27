@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
 export default async function BlogPage() {
   let posts: import("@/lib/blog").BlogPost[] = [];
   try {
-    const result = await getBlogPosts(20, 0);
+    const result = await getBlogPosts(500, 0);
     posts = result.posts;
   } catch {
     // store not ready
