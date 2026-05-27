@@ -25,7 +25,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex flex-col leading-none items-start">
-              <img src="/logo.svg" alt="The Vila Home" className="h-10 w-auto" />
+              <img src="/logo.svg" alt="The Vila Home" className="h-10 w-auto -ml-[9px]" />
               <span className="text-[#555] text-[10px] tracking-[0.3em] uppercase font-body mt-2">
                 Human Real Estate
               </span>
