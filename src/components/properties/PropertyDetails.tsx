@@ -60,7 +60,7 @@ function parseGrade(raw?: string): string | null {
   return ENERGY_SCALE.some((e) => e.g === g) ? g : null;
 }
 
-function EnergyPanel({
+function EnergyRow({
   grade,
   value,
   unit,
@@ -74,65 +74,43 @@ function EnergyPanel({
   const entry = ENERGY_SCALE.find((e) => e.g === grade)!;
 
   return (
-    <div className="flex flex-col">
+    <div className="space-y-2">
       {/* Label */}
-      <p className="text-[#555] text-[10px] tracking-[0.22em] uppercase mb-4">{label}</p>
+      <p className="text-[#555] text-[10px] tracking-[0.2em] uppercase">{label}</p>
 
-      {/* Letter + value row */}
-      <div className="flex items-center gap-4 mb-4">
-        {/* Big letter badge */}
+      {/* Segmented bar */}
+      <div className="flex gap-px">
+        {ENERGY_SCALE.map(({ g, bg }) => (
+          <div
+            key={g}
+            style={{
+              flex: 1,
+              height: 4,
+              backgroundColor: bg,
+              opacity: g === grade ? 1 : 0.15,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Grade badge + value */}
+      <div className="flex items-center gap-2">
         <div
-          style={{ backgroundColor: entry.bg, color: entry.text }}
-          className="w-16 h-16 flex items-center justify-center text-3xl font-bold shrink-0"
+          style={{
+            backgroundColor: entry.bg,
+            color: entry.text,
+            width: 22,
+            height: 22,
+            fontSize: 11,
+            fontWeight: 700,
+          }}
+          className="flex items-center justify-center shrink-0"
         >
           {grade}
         </div>
-
-        {/* Value */}
         {value && value !== "0" && (
-          <div>
-            <p className="text-white text-xl font-display font-light leading-tight">
-              {value}
-            </p>
-            <p className="text-[#555] text-xs mt-0.5">{unit}</p>
-          </div>
+          <span className="text-[#666] text-xs">{value} {unit}</span>
         )}
-      </div>
-
-      {/* Scale strip — chevron bars */}
-      <div className="flex items-end gap-[2px]">
-        {ENERGY_SCALE.map(({ g, bg }) => {
-          const isActive = g === grade;
-          return (
-            <div
-              key={g}
-              style={{
-                backgroundColor: bg,
-                opacity: isActive ? 1 : 0.15,
-                height: isActive ? 10 : 6,
-                flex: 1,
-                transition: "height 0.2s, opacity 0.2s",
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Scale labels */}
-      <div className="flex gap-[2px] mt-1">
-        {ENERGY_SCALE.map(({ g }) => (
-          <div
-            key={g}
-            className="flex-1 text-center"
-            style={{
-              fontSize: 9,
-              color: g === grade ? "#fff" : "#333",
-              fontWeight: g === grade ? 700 : 400,
-            }}
-          >
-            {g}
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -142,9 +120,8 @@ function EnergyCertificateSection({ property }: { property: Property }) {
   const { t } = useLanguage();
   const gradeConsumo = parseGrade(property.certificadoEnergetico);
   const gradeEmisiones = parseGrade(property.emisionesLetra);
-  const hasData = gradeConsumo || gradeEmisiones;
 
-  if (!hasData && !property.energiaExento) return null;
+  if (!gradeConsumo && !gradeEmisiones && !property.energiaExento) return null;
 
   return (
     <div>
@@ -154,31 +131,27 @@ function EnergyCertificateSection({ property }: { property: Property }) {
 
       <div className="bg-[#111] border border-[#1e1e1e] p-6">
         {property.energiaExento ? (
-          <p className="text-[#555] text-sm tracking-wide">
-            Exento de certificado energético
-          </p>
+          <p className="text-[#555] text-sm">Exento de certificado energético</p>
         ) : (
-          <div className={`grid gap-8 ${gradeConsumo && gradeEmisiones ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-xs"}`}>
+          <div className="space-y-6">
             {gradeConsumo && (
-              <EnergyPanel
+              <EnergyRow
                 grade={gradeConsumo}
                 value={property.consumoEnergetico}
                 unit="kWh/m²·año"
                 label="Consumo energético"
               />
             )}
+            {gradeConsumo && gradeEmisiones && (
+              <div className="border-t border-[#1a1a1a]" />
+            )}
             {gradeEmisiones && (
-              <>
-                {gradeConsumo && (
-                  <div className="hidden sm:block w-px bg-[#1e1e1e] self-stretch" />
-                )}
-                <EnergyPanel
-                  grade={gradeEmisiones}
-                  value={property.emisionesEnergeticas}
-                  unit="kg CO₂/m²·año"
-                  label={t("detailsCO2")}
-                />
-              </>
+              <EnergyRow
+                grade={gradeEmisiones}
+                value={property.emisionesEnergeticas}
+                unit="kg CO₂/m²·año"
+                label={t("detailsCO2")}
+              />
             )}
           </div>
         )}
