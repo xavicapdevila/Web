@@ -33,6 +33,21 @@ function TranslatedDescription({ text }: { text: string }) {
   );
 }
 
+const ENERGY_GRADES = [
+  { grade: "A", color: "#00A651", textColor: "#fff", width: 32 },
+  { grade: "B", color: "#52B748", textColor: "#fff", width: 41 },
+  { grade: "C", color: "#B6D235", textColor: "#333", width: 50 },
+  { grade: "D", color: "#FEF101", textColor: "#333", width: 59 },
+  { grade: "E", color: "#FDB913", textColor: "#333", width: 68 },
+  { grade: "F", color: "#F37021", textColor: "#fff", width: 77 },
+  { grade: "G", color: "#EE1C25", textColor: "#fff", width: 86 },
+];
+
+// Map numeric codes to letters (some XML feeds use 1-7)
+const NUM_TO_GRADE: Record<string, string> = {
+  "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G",
+};
+
 function EnergyCertificate({
   letra,
   emisiones,
@@ -46,37 +61,82 @@ function EnergyCertificate({
   labelTitle: string;
   labelCO2: string;
 }) {
-  const colors: Record<string, string> = {
-    A: "#00a550", B: "#4db848", C: "#8dc63f", D: "#f7ed00",
-    E: "#f7a600", F: "#f05a22", G: "#ed1c24",
-  };
-  const upper = letra?.toUpperCase();
-  const grades = ["A", "B", "C", "D", "E", "F", "G"];
+  // Normalise: extract first char, handle numeric codes
+  const raw = letra?.trim().charAt(0).toUpperCase() ?? "";
+  const active = NUM_TO_GRADE[raw] ?? raw; // "G", "F", etc.
+  const validGrades = ENERGY_GRADES.map((g) => g.grade);
+  const activeGrade = validGrades.includes(active) ? active : null;
 
   return (
     <div className="bg-[#111] border border-[#1e1e1e] p-6">
-      <h3 className="font-display text-xl text-white mb-4">{labelTitle}</h3>
-      <div className="space-y-1.5">
-        {grades.map((g, i) => (
-          <div key={g} className="flex items-center gap-2">
-            <div
-              className="h-7 flex items-center justify-end pr-2 text-xs font-bold text-black shrink-0"
-              style={{
-                backgroundColor: colors[g],
-                width: `${20 + i * 8}%`,
-                opacity: g === upper ? 1 : 0.35,
-              }}
-            >
-              {g}
+      <h3 className="font-display text-xl text-white mb-5">{labelTitle}</h3>
+
+      <div className="space-y-[3px]">
+        {ENERGY_GRADES.map(({ grade, color, textColor, width }) => {
+          const isActive = grade === activeGrade;
+          return (
+            <div key={grade} className="flex items-center gap-2">
+              {/* Arrow bar */}
+              <div
+                style={{
+                  width: `${width}%`,
+                  height: "28px",
+                  backgroundColor: color,
+                  opacity: isActive ? 1 : 0.28,
+                  clipPath:
+                    "polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  paddingLeft: "10px",
+                  flexShrink: 0,
+                }}
+              >
+                <span
+                  style={{
+                    color: textColor,
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    lineHeight: 1,
+                  }}
+                >
+                  {grade}
+                </span>
+              </div>
+
+              {/* Active grade label */}
+              {isActive && (
+                <div className="flex items-center gap-2 shrink-0">
+                  <div
+                    style={{
+                      backgroundColor: color,
+                      color: textColor,
+                      width: "28px",
+                      height: "28px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {grade}
+                  </div>
+                  {consumo && (
+                    <span className="text-[#aaa] text-xs whitespace-nowrap">
+                      {consumo} kWh/m²·año
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
-            {g === upper && (
-              <span className="text-white text-xs">◄ {consumo ? `${consumo} kWh/m²·año` : ""}</span>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
+
       {emisiones && (
-        <p className="text-[#666] text-xs mt-3">{labelCO2}: {emisiones} kg/m²·año</p>
+        <p className="text-[#666] text-xs mt-4">
+          {labelCO2}: {emisiones} kg CO₂/m²·año
+        </p>
       )}
     </div>
   );
