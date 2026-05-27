@@ -12,9 +12,10 @@ import ShareModal from "./ShareModal";
 
 interface Props {
   property: Property;
+  priority?: boolean;
 }
 
-export default function PropertyCard({ property }: Props) {
+export default function PropertyCard({ property, priority = false }: Props) {
   const { t, lang } = useLanguage();
   const titulo = useAutoTranslate(property.titulo);
   const mainImage = property.imagenes[0]?.url;
@@ -70,8 +71,10 @@ export default function PropertyCard({ property }: Props) {
         {mainImage ? (
           <Image
             src={mainImage}
-            alt={titulo}
+            alt={`${property.tipo} en ${property.ciudad} — ${titulo}`}
             fill
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
             className="object-cover group-hover:scale-105 transition-transform duration-700"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />

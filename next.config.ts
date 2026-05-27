@@ -6,11 +6,16 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["better-sqlite3", "sharp"],
 
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 86400, // Cache optimised images for 24 h on CDN
     remotePatterns: [
       { protocol: "https", hostname: "**" },
       { protocol: "http",  hostname: "**" },
     ],
   },
+
+  // Compress responses
+  compress: true,
 
   async headers() {
     return [

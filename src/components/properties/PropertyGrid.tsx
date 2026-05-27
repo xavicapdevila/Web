@@ -52,8 +52,8 @@ export default function PropertyGrid({ properties, total, page, totalPages }: Pr
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {properties.map((property) => (
-          <PropertyCard key={property.id} property={property} />
+        {properties.map((property, i) => (
+          <PropertyCard key={property.id} property={property} priority={i < 2} />
         ))}
       </div>
 

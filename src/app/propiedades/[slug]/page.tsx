@@ -79,7 +79,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export const dynamic = "force-dynamic";
+// ISR: revalidate every hour so price/status changes propagate quickly
+export const revalidate = 3600;
+// Allow on-demand generation for slugs not in generateStaticParams
+export const dynamicParams = true;
 
 export default async function PropertyPage({ params }: Props) {
   const { slug } = await params;

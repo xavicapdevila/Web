@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowDown } from "lucide-react";
 import CountUp from "@/components/ui/CountUp";
 import { useLanguage } from "@/context/LanguageContext";
@@ -31,10 +32,15 @@ export default function Hero() {
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
       {/* Photo background */}
       <div className="absolute inset-0">
-        <img
+        <Image
           src="/hero.jpg"
-          alt="The Vila Home team"
-          className="w-full h-full object-cover object-center"
+          alt="The Vila Home — equipo inmobiliario en Vilanova i la Geltrú"
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="object-cover object-center"
+          quality={85}
         />
         {/* Dark overlay — 42% so faces are clearly visible */}
         <div className="absolute inset-0 bg-black/[0.42]" />
