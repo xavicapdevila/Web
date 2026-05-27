@@ -94,7 +94,7 @@ const dict = {
     propAgent: "Agente The Vila Home",
     propCall: "Llamar · 936 061 800",
     propEmail: "Enviar email",
-    propWhatsapp: "WhatsApp",
+    propWhatsapp: "Contactar por WhatsApp",
     propShare: "Compartir propiedad",
 
     // Property details section
@@ -329,7 +329,7 @@ const dict = {
     propAgent: "Agent The Vila Home",
     propCall: "Trucar · 936 061 800",
     propEmail: "Enviar correu",
-    propWhatsapp: "WhatsApp",
+    propWhatsapp: "Contactar per WhatsApp",
     propShare: "Compartir propietat",
 
     detailsTitle: "Característiques",
@@ -555,7 +555,7 @@ const dict = {
     propAgent: "The Vila Home Agent",
     propCall: "Call · 936 061 800",
     propEmail: "Send email",
-    propWhatsapp: "WhatsApp",
+    propWhatsapp: "Contact via WhatsApp",
     propShare: "Share property",
 
     detailsTitle: "Features",
@@ -781,7 +781,7 @@ const dict = {
     propAgent: "Agent The Vila Home",
     propCall: "Appeler · 936 061 800",
     propEmail: "Envoyer un email",
-    propWhatsapp: "WhatsApp",
+    propWhatsapp: "Contacter par WhatsApp",
     propShare: "Partager le bien",
 
     detailsTitle: "Caractéristiques",
