@@ -139,7 +139,7 @@ function EnergyCertificateSection({ property }: { property: Property }) {
                 grade={gradeConsumo}
                 value={property.consumoEnergetico}
                 unit="kWh/m²·año"
-                label="Consumo energético"
+                label={t("detailsConsumption")}
               />
             )}
             {gradeEmisiones && (
