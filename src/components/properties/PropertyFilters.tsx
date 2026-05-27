@@ -6,8 +6,8 @@ import { Search, ChevronDown, X, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TIPO_VALUES = ["", "piso", "casa", "chalet", "ático", "terreno", "local"];
-const TIPO_LABELS_ES = ["Todos los tipos", "Piso", "Casa", "Chalet", "Ático", "Terreno", "Local"];
+const TIPO_VALUES = ["", "piso", "casa", "ático", "terreno", "local"];
+const TIPO_LABELS_ES = ["Todos los tipos", "Piso", "Casa", "Ático", "Terreno", "Local"];
 const HAB_VALUES = ["", "1", "2", "3", "4"];
 const HAB_LABELS = ["—", "1+", "2+", "3+", "4+"];
 

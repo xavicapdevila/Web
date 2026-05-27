@@ -134,6 +134,8 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE properties ADD COLUMN emisiones_letra TEXT`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN energia_exento INTEGER DEFAULT 0`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN garaje_tipo TEXT DEFAULT 'garaje'`); } catch {}
+  // Merge all house variants into "casa"
+  try { db.exec(`UPDATE properties SET tipo = 'casa' WHERE tipo IN ('chalet', 'adosado', 'pareado', 'bungalow', 'duplex', 'dúplex')`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN num_plantas INTEGER`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN urbanizacion INTEGER DEFAULT 0`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN periodicidad_comunidad TEXT`); } catch {}

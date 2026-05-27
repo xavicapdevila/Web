@@ -43,8 +43,12 @@ function mapTipo(tipo: string): string {
   const t = tipo.toLowerCase();
   if (t.includes("piso") || t.includes("apartamento") || t.includes("flat")) return "piso";
   if (t.includes("ático") || t.includes("atico")) return "ático";
-  if (t.includes("chalet") || t.includes("villa")) return "chalet";
-  if (t.includes("casa") || t.includes("house")) return "casa";
+  if (
+    t.includes("casa") || t.includes("house") ||
+    t.includes("chalet") || t.includes("villa") ||
+    t.includes("adosado") || t.includes("pareado") ||
+    t.includes("bungalow") || t.includes("duplex") || t.includes("dúplex")
+  ) return "casa";
   if (t.includes("terreno") || t.includes("solar") || t.includes("parcela")) return "terreno";
   if (t.includes("local") || t.includes("comercial")) return "local";
   if (t.includes("oficina")) return "oficina";
