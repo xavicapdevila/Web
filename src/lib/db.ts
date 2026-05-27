@@ -83,8 +83,9 @@ function initSchema(db: Database.Database): void {
       ibi REAL,
       gastos_comun REAL,
       certificado_energetico TEXT,
-      emisiones_energeticas TEXT,
       consumo_energetico TEXT,
+      emisiones_letra TEXT,
+      emisiones_energeticas TEXT,
       imagenes TEXT DEFAULT '[]',
       video1 TEXT,
       tour TEXT,
@@ -125,6 +126,7 @@ function initSchema(db: Database.Database): void {
   `);
   try { db.exec(`ALTER TABLE properties ADD COLUMN tour TEXT`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN agente_telefono TEXT`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN emisiones_letra TEXT`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN categoria TEXT DEFAULT ''`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);

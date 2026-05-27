@@ -41,9 +41,10 @@ export interface Property {
   estado?: string;
   ibi?: number;
   gastosComun?: number;
-  certificadoEnergetico?: string;
-  emisionesEnergeticas?: string;
-  consumoEnergetico?: string;
+  certificadoEnergetico?: string; // letra A-G del consumo energético
+  consumoEnergetico?: string;     // valor numérico kWh/m²·año
+  emisionesLetra?: string;        // letra A-G de las emisiones CO₂
+  emisionesEnergeticas?: string;  // valor numérico kg CO₂/m²·año
   imagenes: PropertyImage[];
   video1?: string;
   tour?: string;

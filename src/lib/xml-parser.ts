@@ -214,10 +214,15 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const ibi = safeNum(item["ibi"] ?? 0);
       const gastosComun = safeNum(item["gastos_com"] ?? 0);
 
-      // Energy certificate — look for califica_e, consum_e, emision_e (may not exist in this feed)
-      const certEnergetico = safeText(item["califica_e"] ?? item["certificadoenergetico"] ?? "");
-      const emisionesEnergeticas = safeText(item["emision_e"] ?? "");
-      const consumoEnergetico = safeText(item["consum_e"] ?? "");
+      // Energy certificate — apinmo feed uses energialetra / energiavalor / emisionesletra / emisionesvalor
+      // energiarecibido = 1 means the certificate has been received/is valid
+      const energiaRecibido = safeInt(item["energiarecibido"] ?? 0);
+      const certEnergetico = energiaRecibido === 1
+        ? safeText(item["energialetra"] ?? item["califica_e"] ?? item["certificadoenergetico"] ?? "")
+        : safeText(item["califica_e"] ?? item["certificadoenergetico"] ?? "");
+      const consumoEnergetico = safeText(item["energiavalor"] ?? item["consum_e"] ?? "");
+      const emisionesLetra = safeText(item["emisionesletra"] ?? "");
+      const emisionesEnergeticas = safeText(item["emisionesvalor"] ?? item["emision_e"] ?? "");
 
       const agente = safeText(item["agente"] ?? "");
       const agenteEmail = safeText(item["email_agente"] ?? "");
@@ -268,8 +273,9 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         ibi: ibi > 0 ? ibi : undefined,
         gastosComun: gastosComun > 0 ? gastosComun : undefined,
         certificadoEnergetico: certEnergetico || undefined,
-        emisionesEnergeticas: emisionesEnergeticas || undefined,
         consumoEnergetico: consumoEnergetico || undefined,
+        emisionesLetra: emisionesLetra || undefined,
+        emisionesEnergeticas: emisionesEnergeticas || undefined,
         imagenes,
         video1,
         tour,

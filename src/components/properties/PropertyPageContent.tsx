@@ -48,95 +48,118 @@ const NUM_TO_GRADE: Record<string, string> = {
   "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G",
 };
 
+function EnergyScale({
+  activeGrade,
+  value,
+  unit,
+}: {
+  activeGrade: string | null;
+  value?: string;
+  unit: string;
+}) {
+  return (
+    <div className="space-y-[3px]">
+      {ENERGY_GRADES.map(({ grade, color, textColor, width }) => {
+        const isActive = grade === activeGrade;
+        return (
+          <div key={grade} className="flex items-center gap-2">
+            <div
+              style={{
+                width: `${width}%`,
+                height: "26px",
+                backgroundColor: color,
+                opacity: isActive ? 1 : 0.25,
+                clipPath:
+                  "polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%)",
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: "9px",
+                flexShrink: 0,
+                transition: "opacity 0.2s",
+              }}
+            >
+              <span style={{ color: textColor, fontSize: "11px", fontWeight: 700, lineHeight: 1 }}>
+                {grade}
+              </span>
+            </div>
+            {isActive && (
+              <div className="flex items-center gap-1.5 shrink-0">
+                <div
+                  style={{
+                    backgroundColor: color,
+                    color: textColor,
+                    width: "26px",
+                    height: "26px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {grade}
+                </div>
+                {value && value !== "0" && (
+                  <span className="text-[#aaa] text-xs whitespace-nowrap">
+                    {value} {unit}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function normaliseGrade(raw?: string): string | null {
+  if (!raw) return null;
+  const ch = raw.trim().charAt(0).toUpperCase();
+  const grade = NUM_TO_GRADE[ch] ?? ch;
+  return ENERGY_GRADES.some((g) => g.grade === grade) ? grade : null;
+}
+
 function EnergyCertificate({
   letra,
-  emisiones,
   consumo,
+  emisionesLetra,
+  emisiones,
   labelTitle,
   labelCO2,
 }: {
-  letra: string;
-  emisiones?: string;
+  letra?: string;
   consumo?: string;
+  emisionesLetra?: string;
+  emisiones?: string;
   labelTitle: string;
   labelCO2: string;
 }) {
-  // Normalise: extract first char, handle numeric codes
-  const raw = letra?.trim().charAt(0).toUpperCase() ?? "";
-  const active = NUM_TO_GRADE[raw] ?? raw; // "G", "F", etc.
-  const validGrades = ENERGY_GRADES.map((g) => g.grade);
-  const activeGrade = validGrades.includes(active) ? active : null;
+  const activeConsumo = normaliseGrade(letra);
+  const activeEmisiones = normaliseGrade(emisionesLetra);
 
   return (
     <div className="bg-[#111] border border-[#1e1e1e] p-6">
       <h3 className="font-display text-xl text-white mb-5">{labelTitle}</h3>
 
-      <div className="space-y-[3px]">
-        {ENERGY_GRADES.map(({ grade, color, textColor, width }) => {
-          const isActive = grade === activeGrade;
-          return (
-            <div key={grade} className="flex items-center gap-2">
-              {/* Arrow bar */}
-              <div
-                style={{
-                  width: `${width}%`,
-                  height: "28px",
-                  backgroundColor: color,
-                  opacity: isActive ? 1 : 0.28,
-                  clipPath:
-                    "polygon(0 0, calc(100% - 9px) 0, 100% 50%, calc(100% - 9px) 100%, 0 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  paddingLeft: "10px",
-                  flexShrink: 0,
-                }}
-              >
-                <span
-                  style={{
-                    color: textColor,
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    lineHeight: 1,
-                  }}
-                >
-                  {grade}
-                </span>
-              </div>
+      {/* Consumption scale */}
+      {activeConsumo && (
+        <div className="mb-5">
+          <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
+            Consumo energético
+          </p>
+          <EnergyScale activeGrade={activeConsumo} value={consumo} unit="kWh/m²·año" />
+        </div>
+      )}
 
-              {/* Active grade label */}
-              {isActive && (
-                <div className="flex items-center gap-2 shrink-0">
-                  <div
-                    style={{
-                      backgroundColor: color,
-                      color: textColor,
-                      width: "28px",
-                      height: "28px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {grade}
-                  </div>
-                  {consumo && (
-                    <span className="text-[#aaa] text-xs whitespace-nowrap">
-                      {consumo} kWh/m²·año
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {emisiones && (
-        <p className="text-[#666] text-xs mt-4">
-          {labelCO2}: {emisiones} kg CO₂/m²·año
-        </p>
+      {/* Emissions scale */}
+      {activeEmisiones && (
+        <div>
+          <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
+            {labelCO2}
+          </p>
+          <EnergyScale activeGrade={activeEmisiones} value={emisiones} unit="kg CO₂/m²·año" />
+        </div>
       )}
     </div>
   );
@@ -308,11 +331,12 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
           </div>
 
           {/* Energy certificate */}
-          {property.certificadoEnergetico && (
+          {(property.certificadoEnergetico || property.emisionesLetra) && (
             <EnergyCertificate
               letra={property.certificadoEnergetico}
-              emisiones={property.emisionesEnergeticas}
               consumo={property.consumoEnergetico}
+              emisionesLetra={property.emisionesLetra}
+              emisiones={property.emisionesEnergeticas}
               labelTitle={t("detailsEnergy")}
               labelCO2={t("detailsCO2")}
             />

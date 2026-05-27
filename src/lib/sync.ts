@@ -61,8 +61,8 @@ export async function syncProperties(): Promise<SyncResult> {
         cp, zona, direccion, habitaciones, banos, m2_construidos, m2_utiles,
         m2_parcela, planta, ascensor, garaje, trastero, piscina, terraza,
         jardin, amueblado, calefaccion, aire_cond, orientacion, antiguedad,
-        estado, ibi, gastos_comun, certificado_energetico, emisiones_energeticas,
-        consumo_energetico, imagenes, video1, tour, fecha, agente, agente_email,
+        estado, ibi, gastos_comun, certificado_energetico, consumo_energetico,
+        emisiones_letra, emisiones_energeticas, imagenes, video1, tour, fecha, agente, agente_email,
         agente_foto, agente_telefono, slug, updated_at
       ) VALUES (
         @id, @ref, @tipo, @subtipo, @operacion, @precio, @precioAnterior, @outlet,
@@ -70,8 +70,8 @@ export async function syncProperties(): Promise<SyncResult> {
         @cp, @zona, @direccion, @habitaciones, @banos, @m2Construidos, @m2Utiles,
         @m2Parcela, @planta, @ascensor, @garaje, @trastero, @piscina, @terraza,
         @jardin, @amueblado, @calefaccion, @aireCond, @orientacion, @antiguedad,
-        @estado, @ibi, @gastosComun, @certificadoEnergetico, @emisionesEnergeticas,
-        @consumoEnergetico, @imagenes, @video1, @tour, @fecha, @agente, @agenteEmail,
+        @estado, @ibi, @gastosComun, @certificadoEnergetico, @consumoEnergetico,
+        @emisionesLetra, @emisionesEnergeticas, @imagenes, @video1, @tour, @fecha, @agente, @agenteEmail,
         @agenteFoto, @agenteTelefono, @slug, datetime('now')
       )
       ON CONFLICT(ref) DO UPDATE SET
@@ -111,8 +111,9 @@ export async function syncProperties(): Promise<SyncResult> {
         ibi = excluded.ibi,
         gastos_comun = excluded.gastos_comun,
         certificado_energetico = excluded.certificado_energetico,
-        emisiones_energeticas = excluded.emisiones_energeticas,
         consumo_energetico = excluded.consumo_energetico,
+        emisiones_letra = excluded.emisiones_letra,
+        emisiones_energeticas = excluded.emisiones_energeticas,
         imagenes = excluded.imagenes,
         video1 = excluded.video1,
         tour = excluded.tour,
@@ -166,8 +167,9 @@ export async function syncProperties(): Promise<SyncResult> {
           ibi: p.ibi ?? null,
           gastosComun: p.gastosComun ?? null,
           certificadoEnergetico: p.certificadoEnergetico ?? null,
-          emisionesEnergeticas: p.emisionesEnergeticas ?? null,
           consumoEnergetico: p.consumoEnergetico ?? null,
+          emisionesLetra: p.emisionesLetra ?? null,
+          emisionesEnergeticas: p.emisionesEnergeticas ?? null,
           imagenes: JSON.stringify(p.imagenes),
           video1: p.video1 ?? null,
           tour: p.tour ?? null,
@@ -336,11 +338,14 @@ function rowToProperty(row: Record<string, unknown>): Property {
     certificadoEnergetico: row.certificado_energetico
       ? String(row.certificado_energetico)
       : undefined,
-    emisionesEnergeticas: row.emisiones_energeticas
-      ? String(row.emisiones_energeticas)
-      : undefined,
     consumoEnergetico: row.consumo_energetico
       ? String(row.consumo_energetico)
+      : undefined,
+    emisionesLetra: row.emisiones_letra
+      ? String(row.emisiones_letra)
+      : undefined,
+    emisionesEnergeticas: row.emisiones_energeticas
+      ? String(row.emisiones_energeticas)
       : undefined,
     imagenes: JSON.parse(String(row.imagenes ?? "[]")),
     video1: row.video1 ? String(row.video1) : undefined,
