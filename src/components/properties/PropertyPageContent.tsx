@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Phone, Mail, BedDouble, Bath, Maximize2 } from "lucide-react";
+import { useState } from "react";
+import { Phone, Mail, BedDouble, Bath, Maximize2, Share2, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
@@ -83,6 +84,22 @@ function EnergyCertificate({
 export default function PropertyPageContent({ property, agentInfo, contactEmail, waUrl, isReserved }: Props) {
   const { t, lang } = useLanguage();
   const titulo = useAutoTranslate(property.titulo);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/propiedades/${property.slug}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: titulo, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      // cancelled or error
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
@@ -212,6 +229,15 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
               </svg>
               {t("propWhatsapp")}
             </a>
+
+            {/* Share */}
+            <button
+              onClick={handleShare}
+              className="flex items-center justify-center gap-2 w-full mt-2 py-2.5 border border-[#2a2a2a] text-[#888] text-sm hover:border-[#C9B99A]/40 hover:text-[#C9B99A] transition-colors"
+            >
+              {copied ? <Check size={15} className="text-[#C9B99A]" /> : <Share2 size={15} />}
+              {copied ? "¡Enlace copiado!" : t("propShare")}
+            </button>
           </div>
 
           {/* Energy certificate */}

@@ -95,6 +95,7 @@ const dict = {
     propCall: "Llamar · 936 061 800",
     propEmail: "Enviar email",
     propWhatsapp: "WhatsApp",
+    propShare: "Compartir propiedad",
 
     // Property details section
     detailsTitle: "Características",
@@ -329,6 +330,7 @@ const dict = {
     propCall: "Trucar · 936 061 800",
     propEmail: "Enviar correu",
     propWhatsapp: "WhatsApp",
+    propShare: "Compartir propietat",
 
     detailsTitle: "Característiques",
     detailsEquipment: "Equipament",
@@ -554,6 +556,7 @@ const dict = {
     propCall: "Call · 936 061 800",
     propEmail: "Send email",
     propWhatsapp: "WhatsApp",
+    propShare: "Share property",
 
     detailsTitle: "Features",
     detailsEquipment: "Equipment",
@@ -779,6 +782,7 @@ const dict = {
     propCall: "Appeler · 936 061 800",
     propEmail: "Envoyer un email",
     propWhatsapp: "WhatsApp",
+    propShare: "Partager le bien",
 
     detailsTitle: "Caractéristiques",
     detailsEquipment: "Équipements",

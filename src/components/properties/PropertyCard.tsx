@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images } from "lucide-react";
+import { useState } from "react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2, Check } from "lucide-react";
 import { formatPrice, formatM2 } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
@@ -16,6 +17,22 @@ export default function PropertyCard({ property }: Props) {
   const { t, lang } = useLanguage();
   const titulo = useAutoTranslate(property.titulo);
   const mainImage = property.imagenes[0]?.url;
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/propiedades/${property.slug}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: titulo, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      // cancelled or error
+    }
+  };
   const isReserved = property.estadoFicha === 7;
   const hasDiscount = property.outlet && property.precioAnterior;
 
@@ -152,6 +169,13 @@ export default function PropertyCard({ property }: Props) {
             >
               <Mail size={13} />
             </a>
+            <button
+              onClick={handleShare}
+              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
+              title={copied ? "¡Copiado!" : "Compartir"}
+            >
+              {copied ? <Check size={13} className="text-[#C9B99A]" /> : <Share2 size={13} />}
+            </button>
           </div>
         </div>
       </div>
