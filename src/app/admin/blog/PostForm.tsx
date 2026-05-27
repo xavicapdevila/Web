@@ -6,6 +6,9 @@ import Link from "next/link";
 import { ArrowLeft, Save, Eye, EyeOff, X, CalendarDays, Tag, Upload, Loader2 } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 import { formatBlogDate } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const RichTextEditor = dynamic(() => import("@/components/admin/RichTextEditor"), { ssr: false });
 
 function slugify(text: string): string {
   return text
@@ -292,16 +295,10 @@ export default function PostForm({ post, mode }: Props) {
                 {/* Contenido */}
                 <div>
                   <label className={labelClass}>Contenido</label>
-                  <textarea
+                  <RichTextEditor
                     value={form.contenido}
-                    onChange={(e) => setForm((f) => ({ ...f, contenido: e.target.value }))}
-                    placeholder="Escribe el artículo aquí. Separa los párrafos con una línea en blanco."
-                    rows={20}
-                    className={`${fieldClass} resize-y font-mono leading-relaxed`}
+                    onChange={(html) => setForm((f) => ({ ...f, contenido: html }))}
                   />
-                  <p className="text-[#3a3a3a] text-xs mt-1.5">
-                    Separa párrafos con líneas en blanco.
-                  </p>
                 </div>
               </div>
 

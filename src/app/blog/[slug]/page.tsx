@@ -220,16 +220,19 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Content */}
         {post.contenido && (
-          <div className="space-y-5">
-            {post.contenido
-              .split("\n\n")
-              .filter(Boolean)
-              .map((para, i) => (
-                <p key={i} className="text-[#aaa] leading-relaxed text-base">
-                  {para}
-                </p>
-              ))}
-          </div>
+          <div
+            className="prose prose-invert prose-base max-w-none
+              prose-p:text-[#aaa] prose-p:leading-relaxed
+              prose-headings:text-white prose-headings:font-display prose-headings:font-light
+              prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+              prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+              prose-strong:text-white prose-em:text-[#ccc]
+              prose-ul:text-[#aaa] prose-ol:text-[#aaa]
+              prose-li:marker:text-[#C9B99A]
+              prose-a:text-[#C9B99A] prose-a:no-underline hover:prose-a:underline
+              prose-hr:border-[#2a2a2a]"
+            dangerouslySetInnerHTML={{ __html: post.contenido }}
+          />
         )}
 
         {/* Tags footer */}
