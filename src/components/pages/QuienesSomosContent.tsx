@@ -102,7 +102,7 @@ export default function QuienesSomosContent() {
       <section className="py-12 bg-[#080808] border-t border-[#1a1a1a]">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="font-display text-2xl text-white font-light mb-3">{t("aboutCTATitle")}</h2>
-          <p className="text-[#888] mb-6 text-sm">{t("aboutCTASubtitle")}</p>
+          <p className="text-[#888] mb-6 text-sm text-center">{t("aboutCTASubtitle")}</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/contacto"
