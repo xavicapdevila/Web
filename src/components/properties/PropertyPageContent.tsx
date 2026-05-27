@@ -33,15 +33,15 @@ function TranslatedDescription({ text }: { text: string }) {
   );
 }
 
-const ENERGY_COLORS: Record<string, { bg: string; text: string }> = {
-  A: { bg: "#00A651", text: "#fff" },
-  B: { bg: "#52B748", text: "#fff" },
-  C: { bg: "#B6D235", text: "#333" },
-  D: { bg: "#FEF101", text: "#333" },
-  E: { bg: "#FDB913", text: "#333" },
-  F: { bg: "#F37021", text: "#fff" },
-  G: { bg: "#EE1C25", text: "#fff" },
-};
+const ENERGY_GRADES = [
+  { g: "A", bg: "#00A651", text: "#fff" },
+  { g: "B", bg: "#52B748", text: "#fff" },
+  { g: "C", bg: "#B6D235", text: "#333" },
+  { g: "D", bg: "#FEF101", text: "#333" },
+  { g: "E", bg: "#FDB913", text: "#333" },
+  { g: "F", bg: "#F37021", text: "#fff" },
+  { g: "G", bg: "#EE1C25", text: "#fff" },
+] as const;
 
 const NUM_TO_GRADE: Record<string, string> = {
   "1": "A", "2": "B", "3": "C", "4": "D", "5": "E", "6": "F", "7": "G",
@@ -51,23 +51,39 @@ function normaliseGrade(raw?: string): string | null {
   if (!raw) return null;
   const ch = raw.trim().charAt(0).toUpperCase();
   const grade = NUM_TO_GRADE[ch] ?? ch;
-  return grade in ENERGY_COLORS ? grade : null;
+  return ENERGY_GRADES.some((e) => e.g === grade) ? grade : null;
 }
 
-function EnergyBadge({ grade, label, value }: { grade: string; label: string; value?: string }) {
-  const { bg, text } = ENERGY_COLORS[grade] ?? { bg: "#444", text: "#fff" };
+function EnergyRow({ grade, label, value }: { grade: string; label: string; value?: string }) {
+  const active = ENERGY_GRADES.find((e) => e.g === grade)!;
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-[#666] text-xs w-24 shrink-0">{label}</span>
-      <div
-        style={{ backgroundColor: bg, color: text, width: 28, height: 28, fontSize: 13, fontWeight: 700 }}
-        className="flex items-center justify-center shrink-0"
-      >
-        {grade}
+    <div>
+      <p className="text-[#555] text-[10px] tracking-[0.18em] uppercase mb-1.5">{label}</p>
+      <div className="flex items-end gap-[2px]">
+        {ENERGY_GRADES.map(({ g, bg }) => {
+          const isActive = g === grade;
+          return (
+            <div
+              key={g}
+              style={{
+                backgroundColor: bg,
+                opacity: isActive ? 1 : 0.18,
+                height: isActive ? 28 : 20,
+                flex: 1,
+              }}
+            />
+          );
+        })}
       </div>
-      {value && value !== "0" && (
-        <span className="text-[#888] text-xs">{value}</span>
-      )}
+      <div className="flex items-center gap-2 mt-1.5">
+        <div
+          style={{ backgroundColor: active.bg, color: active.text, fontSize: 11, fontWeight: 700 }}
+          className="w-5 h-5 flex items-center justify-center shrink-0"
+        >
+          {grade}
+        </div>
+        {value && <span className="text-[#777] text-xs">{value}</span>}
+      </div>
     </div>
   );
 }
@@ -94,21 +110,26 @@ function EnergyCertificate({
 
   return (
     <div className="bg-[#111] border border-[#1e1e1e] p-6">
-      <h3 className="font-display text-lg text-white mb-4">{labelTitle}</h3>
+      <div className="flex items-center gap-3 mb-5">
+        <span className="h-px w-6 bg-[#C9B99A]" />
+        <h3 className="font-body text-[10px] tracking-[0.25em] uppercase text-[#C9B99A]">
+          {labelTitle}
+        </h3>
+      </div>
 
       {exento ? (
-        <p className="text-[#666] text-xs">Exento de certificado energético</p>
+        <p className="text-[#555] text-xs tracking-wide">Exento de certificado energético</p>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-5">
           {gradeConsumo && (
-            <EnergyBadge
+            <EnergyRow
               grade={gradeConsumo}
-              label="Consumo"
+              label="Consumo energético"
               value={consumo && consumo !== "0" ? `${consumo} kWh/m²·año` : undefined}
             />
           )}
           {gradeEmisiones && (
-            <EnergyBadge
+            <EnergyRow
               grade={gradeEmisiones}
               label={labelCO2}
               value={emisiones && emisiones !== "0" ? `${emisiones} kg CO₂/m²·año` : undefined}

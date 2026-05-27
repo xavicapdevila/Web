@@ -126,7 +126,7 @@ const dict = {
     detailsZone: "Zona / Barrio",
     detailsProvince: "Provincia",
     detailsPostal: "Código postal",
-    detailsEnergy: "Certificado energético",
+    detailsEnergy: "Certificado de Eficiencia Energética",
     detailsCO2: "Emisiones CO₂",
 
     // Mortgage
@@ -360,7 +360,7 @@ const dict = {
     detailsZone: "Zona / Barri",
     detailsProvince: "Província",
     detailsPostal: "Codi postal",
-    detailsEnergy: "Certificat energètic",
+    detailsEnergy: "Certificat d'Eficiència Energètica",
     detailsCO2: "Emissions CO₂",
 
     mortgageTitle: "Calculadora d'hipoteca",
@@ -586,7 +586,7 @@ const dict = {
     detailsZone: "Area / Neighbourhood",
     detailsProvince: "Province",
     detailsPostal: "Postal code",
-    detailsEnergy: "Energy certificate",
+    detailsEnergy: "Energy Efficiency Certificate",
     detailsCO2: "CO₂ emissions",
 
     mortgageTitle: "Mortgage calculator",
@@ -812,7 +812,7 @@ const dict = {
     detailsZone: "Zone / Quartier",
     detailsProvince: "Province",
     detailsPostal: "Code postal",
-    detailsEnergy: "Certificat énergétique",
+    detailsEnergy: "Certificat de Performance Énergétique",
     detailsCO2: "Émissions CO₂",
 
     mortgageTitle: "Calculateur de prêt",
