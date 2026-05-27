@@ -1,6 +1,40 @@
+import { unstable_cache } from "next/cache";
 import { getDb } from "./db";
 import { fetchAndParseXML } from "./xml-parser";
 import type { Property } from "@/types/property";
+
+// ---------------------------------------------------------------------------
+// XML-backed cache — stored in Vercel's Data Cache, shared across all Lambda
+// instances. No SQLite / cold-start dependency for property detail pages.
+// ---------------------------------------------------------------------------
+
+const _getCachedXmlProperties = unstable_cache(
+  async (): Promise<Property[]> => {
+    return fetchAndParseXML();
+  },
+  ["xml-properties"],
+  { revalidate: 3600, tags: ["properties"] }
+);
+
+/** Returns a single property by slug using the Vercel Data Cache. */
+export async function getCachedPropertyBySlug(slug: string): Promise<Property | null> {
+  try {
+    const properties = await _getCachedXmlProperties();
+    return properties.find((p) => p.slug === slug) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Returns all slugs+dates using the Vercel Data Cache (for generateStaticParams). */
+export async function getCachedSlugs(): Promise<{ slug: string; fecha: string }[]> {
+  try {
+    const properties = await _getCachedXmlProperties();
+    return properties.map((p) => ({ slug: p.slug, fecha: p.fecha }));
+  } catch {
+    return [];
+  }
+}
 
 export interface SyncResult {
   added: number;

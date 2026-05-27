@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import { getPropertyBySlug, getAllPropertySlugs, ensureDbSeeded } from "@/lib/sync";
+import { getCachedPropertyBySlug, getCachedSlugs } from "@/lib/sync";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import PropertyPageContent from "@/components/properties/PropertyPageContent";
 import { formatPrice } from "@/lib/utils";
@@ -13,20 +13,14 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  try {
-    await ensureDbSeeded();
-    const slugs = getAllPropertySlugs();
-    return slugs.map((s) => ({ slug: s.slug }));
-  } catch {
-    return [];
-  }
+  const slugs = await getCachedSlugs();
+  return slugs.map((s) => ({ slug: s.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
-    await ensureDbSeeded();
-    const property = getPropertyBySlug(slug);
+    const property = await getCachedPropertyBySlug(slug);
     if (!property) return { title: "Propiedad no encontrada" };
 
     const features: string[] = [];
@@ -87,15 +81,7 @@ export const dynamicParams = true;
 
 export default async function PropertyPage({ params }: Props) {
   const { slug } = await params;
-  await ensureDbSeeded();
-
-  let property;
-  try {
-    property = getPropertyBySlug(slug);
-  } catch {
-    notFound();
-  }
-
+  const property = await getCachedPropertyBySlug(slug);
   if (!property) notFound();
 
   const isReserved = property.estadoFicha === 7;
