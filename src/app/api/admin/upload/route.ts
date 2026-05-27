@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Imagen demasiado grande (máx. 10 MB)" }, { status: 400 });
     }
 
-    const timestamp = new Date().toISOString().slice(0, 10);
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
     const safeName = file.name
       .replace(/\.[^.]+$/, "")
@@ -32,13 +31,16 @@ export async function POST(req: NextRequest) {
       .replace(/[̀-ͯ]/g, "")
       .replace(/[^a-z0-9]/g, "-")
       .replace(/-+/g, "-")
-      .slice(0, 60);
+      .slice(0, 40);
 
-    const blobName = `blog/${timestamp}-${safeName}.${ext}`;
+    // Use timestamp in ms + random suffix to guarantee unique filenames
+    const uid = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const blobName = `blog/${uid}-${safeName}.${ext}`;
 
     const blob = await put(blobName, file, {
       access: "public",
       contentType: file.type,
+      allowOverwrite: false,
     });
 
     return NextResponse.json({ url: blob.url });
