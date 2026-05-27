@@ -251,18 +251,30 @@ export default function PropertyDetails({ property }: Props) {
             {t("detailsEquipment")}
           </h2>
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
+            {/* Ascensor always shows Sí / No */}
             <BoolRow label={t("detailsElevator")} value={!!property.ascensor} />
-            <BoolRow
-              label={property.garajeTipo === "parking" ? t("detailsGarage") : t("detailsGaraje")}
-              value={!!property.garaje}
-            />
-            <BoolRow label={t("detailsPool")} value={!!property.piscina} />
-            <BoolRow label={t("detailsAirCon")} value={!!property.aireCond} />
+            {/* Rest only appear when true */}
+            {property.garaje && (
+              <DetailRow
+                label={property.garajeTipo === "parking" ? t("detailsGarage") : t("detailsGaraje")}
+                value="Sí"
+              />
+            )}
+            {property.piscina && (
+              <DetailRow label={t("detailsPool")} value="Sí" />
+            )}
+            {property.aireCond && (
+              <DetailRow label={t("detailsAirCon")} value="Sí" />
+            )}
             {property.calefaccion && (
               <DetailRow label={t("detailsHeating")} value={property.calefaccion} />
             )}
-            <BoolRow label={t("detailsStorage")} value={!!property.trastero} />
-            <BoolRow label={t("detailsUrbanizacion")} value={!!property.urbanizacion} />
+            {property.trastero && (
+              <DetailRow label={t("detailsStorage")} value="Sí" />
+            )}
+            {property.urbanizacion && (
+              <DetailRow label={t("detailsUrbanizacion")} value="Sí" />
+            )}
           </div>
         </div>
       )}
