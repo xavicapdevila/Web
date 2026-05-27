@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Phone, Mail, BedDouble, Bath, Maximize2, Share2, Check } from "lucide-react";
+import { Phone, Mail, BedDouble, Bath, Maximize2, Share2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
 import PropertyDetails from "./PropertyDetails";
 import MortgageCalculator from "./MortgageCalculator";
 import AgentPhoto from "./AgentPhoto";
+import ShareModal from "./ShareModal";
 import type { Property } from "@/types/property";
 
 interface Props {
@@ -84,7 +85,7 @@ function EnergyCertificate({
 export default function PropertyPageContent({ property, agentInfo, contactEmail, waUrl, isReserved }: Props) {
   const { t, lang } = useLanguage();
   const titulo = useAutoTranslate(property.titulo);
-  const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleShare = async () => {
     const url = `${window.location.origin}/propiedades/${property.slug}`;
@@ -92,16 +93,28 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
       if (navigator.share) {
         await navigator.share({ title: titulo, url });
       } else {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setShowShareModal(true);
       }
     } catch {
-      // cancelled or error
+      // cancelled
     }
   };
 
+  const shareUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/propiedades/${property.slug}`
+    : `https://www.thevilahome.com/propiedades/${property.slug}`;
+
   return (
+    <>
+    {showShareModal && (
+      <ShareModal
+        url={shareUrl}
+        titulo={titulo}
+        price={formatPrice(property.precio)}
+        waUrl={waUrl}
+        onClose={() => setShowShareModal(false)}
+      />
+    )}
     <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Left — main info: order-2 on mobile so sidebar shows first */}
@@ -235,8 +248,8 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
               onClick={handleShare}
               className="flex items-center justify-center gap-2 w-full mt-2 py-2.5 border border-[#2a2a2a] text-[#888] text-sm hover:border-[#C9B99A]/40 hover:text-[#C9B99A] transition-colors"
             >
-              {copied ? <Check size={15} className="text-[#C9B99A]" /> : <Share2 size={15} />}
-              {copied ? "¡Enlace copiado!" : t("propShare")}
+              <Share2 size={15} />
+              {t("propShare")}
             </button>
           </div>
 
@@ -253,5 +266,6 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
         </div>
       </div>
     </div>
+    </>
   );
 }

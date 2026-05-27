@@ -3,11 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2, Check } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2 } from "lucide-react";
 import { formatPrice, formatM2 } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
+import ShareModal from "./ShareModal";
 
 interface Props {
   property: Property;
@@ -17,7 +18,7 @@ export default function PropertyCard({ property }: Props) {
   const { t, lang } = useLanguage();
   const titulo = useAutoTranslate(property.titulo);
   const mainImage = property.imagenes[0]?.url;
-  const [copied, setCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const handleShare = async () => {
     const url = `${window.location.origin}/propiedades/${property.slug}`;
@@ -25,14 +26,23 @@ export default function PropertyCard({ property }: Props) {
       if (navigator.share) {
         await navigator.share({ title: titulo, url });
       } else {
-        await navigator.clipboard.writeText(url);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setShowShareModal(true);
       }
     } catch {
-      // cancelled or error
+      // cancelled
     }
   };
+
+  const agentMobiles: Record<string, string> = {
+    "a.garcia@thevilahome.com": "34680526196",
+    "x.capdevila@thevilahome.com": "34638359612",
+    "s.pascual@thevilahome.com": "34679876331",
+  };
+  const waNumber = agentMobiles[property.agenteEmail ?? ""] ?? "34638359612";
+  const waMessage = encodeURIComponent(
+    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.`
+  );
+  const cardWaUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
   const isReserved = property.estadoFicha === 7;
   const hasDiscount = property.outlet && property.precioAnterior;
 
@@ -42,6 +52,16 @@ export default function PropertyCard({ property }: Props) {
   const hasTour = Boolean(property.tour);
 
   return (
+    <>
+    {showShareModal && (
+      <ShareModal
+        url={`${window.location.origin}/propiedades/${property.slug}`}
+        titulo={titulo}
+        price={formatPrice(property.precio)}
+        waUrl={cardWaUrl}
+        onClose={() => setShowShareModal(false)}
+      />
+    )}
     <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/40 transition-all duration-500 overflow-hidden">
       {/* Image */}
       <Link href={`/propiedades/${property.slug}`} className="block relative aspect-[4/3] overflow-hidden">
@@ -172,13 +192,14 @@ export default function PropertyCard({ property }: Props) {
             <button
               onClick={handleShare}
               className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
-              title={copied ? "¡Copiado!" : "Compartir"}
+              title="Compartir"
             >
-              {copied ? <Check size={13} className="text-[#C9B99A]" /> : <Share2 size={13} />}
+              <Share2 size={13} />
             </button>
           </div>
         </div>
       </div>
     </article>
+    </>
   );
 }
