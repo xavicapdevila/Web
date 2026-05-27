@@ -50,7 +50,8 @@ export default function BlogContent({ posts }: Props) {
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between gap-4">
           <nav
-            className="flex items-center overflow-x-auto scrollbar-hide"
+            className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
+            style={{ touchAction: "pan-x" }}
             aria-label="Categorías del blog"
           >
             <button
