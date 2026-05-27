@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, Eye, EyeOff, X, CalendarDays, Tag } from "lucide-react";
+import { ArrowLeft, Save, Eye, EyeOff, X, CalendarDays, Tag, Upload, Loader2 } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 import { formatBlogDate } from "@/lib/utils";
 
@@ -38,6 +38,9 @@ export default function PostForm({ post, mode }: Props) {
   const [error, setError] = useState("");
   const [slugManual, setSlugManual] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     titulo: post?.titulo ?? "",
@@ -63,6 +66,63 @@ export default function PostForm({ post, mode }: Props) {
   function handleSlugChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSlugManual(true);
     setForm((f) => ({ ...f, slug: slugify(e.target.value) }));
+  }
+
+  async function handleImageUpload(file: File) {
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Imagen demasiado grande (máx. 10 MB)");
+      return;
+    }
+
+    setUploading(true);
+    setError("");
+
+    try {
+      // Compress client-side first (max 1400px wide, 80% quality)
+      const compressed = await compressImage(file, 0.80);
+      const fd = new FormData();
+      fd.append("file", compressed, file.name);
+
+      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+      const data = await res.json();
+
+      if (res.ok && data.url) {
+        setForm((f) => ({ ...f, imagen: data.url }));
+      } else {
+        setError(data.error ?? "Error al subir la imagen");
+      }
+    } catch {
+      setError("Error al subir la imagen");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function compressImage(file: File, quality: number): Promise<File> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1400;
+          let w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d")!.drawImage(img, 0, 0, w, h);
+
+          canvas.toBlob(
+            (blob) => resolve(new File([blob!], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" })),
+            "image/jpeg",
+            quality
+          );
+        };
+        img.src = e.target!.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -300,22 +360,79 @@ export default function PostForm({ post, mode }: Props) {
 
                 {/* Imagen */}
                 <div className="bg-[#0d0d0d] border border-[#1a1a1a] p-5">
-                  <label className={labelClass}>URL imagen destacada</label>
+                  <label className={labelClass}>Imagen destacada</label>
+
+                  {/* Drop zone */}
+                  <div
+                    className={`relative border-2 border-dashed rounded-sm text-center py-6 px-4 cursor-pointer transition-colors mb-3 ${
+                      dragOver
+                        ? "border-[#C9B99A]/60 bg-[#C9B99A]/5"
+                        : "border-[#2a2a2a] hover:border-[#444]"
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOver(false);
+                      const f = e.dataTransfer.files[0];
+                      if (f) handleImageUpload(f);
+                    }}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f); e.target.value = ""; }}
+                    />
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 size={20} className="text-[#C9B99A] animate-spin" />
+                        <p className="text-[#666] text-xs">Subiendo imagen...</p>
+                      </div>
+                    ) : form.imagen ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload size={16} className="text-[#444]" />
+                        <p className="text-[#555] text-xs">Arrastra otra imagen para reemplazar</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <Upload size={20} className="text-[#444]" />
+                        <p className="text-[#888] text-xs font-body">Arrastra o haz clic para subir</p>
+                        <p className="text-[#444] text-xs">JPG, PNG, WEBP · máx. 10 MB</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Preview */}
+                  {form.imagen && !uploading && (
+                    <div className="relative mb-3 group">
+                      <img
+                        src={form.imagen}
+                        alt=""
+                        className="w-full aspect-video object-cover border border-[#2a2a2a]"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, imagen: "" }))}
+                        className="absolute top-2 right-2 bg-[#0a0a0a]/80 text-[#888] hover:text-white p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Eliminar imagen"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* URL manual fallback */}
                   <input
                     type="url"
                     value={form.imagen}
                     onChange={(e) => setForm((f) => ({ ...f, imagen: e.target.value }))}
-                    placeholder="https://..."
-                    className={fieldClass}
+                    placeholder="O pega una URL directamente..."
+                    className={`${fieldClass} text-xs text-[#666] placeholder-[#333]`}
                   />
-                  {form.imagen && (
-                    <img
-                      src={form.imagen}
-                      alt=""
-                      className="mt-3 w-full aspect-video object-cover border border-[#2a2a2a]"
-                      onError={(e) => { e.currentTarget.style.display = "none"; }}
-                    />
-                  )}
                   <p className="text-[#3a3a3a] text-xs mt-1.5">También se usa como og:image</p>
                 </div>
 
