@@ -216,6 +216,10 @@ const dict = {
     blogTitle2: "inmobiliaria",
     blogSubtitle: "Consejos para vender bien, guías para compradores y análisis del mercado en Vilanova y El Garraf.",
     blogComingSoon: "Próximamente...",
+    blogSearchPlaceholder: "Buscar artículos...",
+    blogSearchNoResults: "No se han encontrado artículos para",
+    blogCategoryAll: "Todos",
+    blogCategoryEmpty: "Sin artículos en esta categoría",
 
     // Contact page
     contactLabel: "Contacto",
@@ -448,6 +452,10 @@ const dict = {
     blogTitle2: "immobiliària",
     blogSubtitle: "Consells per vendre bé, guies per a compradors i anàlisi del mercat a Vilanova i El Garraf.",
     blogComingSoon: "Pròximament...",
+    blogSearchPlaceholder: "Cercar articles...",
+    blogSearchNoResults: "No s'han trobat articles per a",
+    blogCategoryAll: "Tots",
+    blogCategoryEmpty: "Sense articles en aquesta categoria",
 
     contactLabel: "Contacte",
     contactTitle: "Parlem",
@@ -679,6 +687,10 @@ const dict = {
     blogTitle2: "news",
     blogSubtitle: "Tips for selling well, buyer guides and market analysis in Vilanova and El Garraf.",
     blogComingSoon: "Coming soon...",
+    blogSearchPlaceholder: "Search articles...",
+    blogSearchNoResults: "No articles found for",
+    blogCategoryAll: "All",
+    blogCategoryEmpty: "No articles in this category",
 
     contactLabel: "Contact",
     contactTitle: "Let's talk",
@@ -910,6 +922,10 @@ const dict = {
     blogTitle2: "immobilière",
     blogSubtitle: "Conseils pour bien vendre, guides pour acheteurs et analyse du marché à Vilanova et El Garraf.",
     blogComingSoon: "Bientôt disponible...",
+    blogSearchPlaceholder: "Rechercher des articles...",
+    blogSearchNoResults: "Aucun article trouvé pour",
+    blogCategoryAll: "Tous",
+    blogCategoryEmpty: "Aucun article dans cette catégorie",
 
     contactLabel: "Contact",
     contactTitle: "Parlons",
