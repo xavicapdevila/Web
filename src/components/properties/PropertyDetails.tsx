@@ -178,6 +178,7 @@ export default function PropertyDetails({ property }: Props) {
     property.banos ||
     property.planta ||
     property.numPlantas ||
+    property.orientacion ||
     property.antiguedad ||
     property.estado;
 
@@ -229,6 +230,9 @@ export default function PropertyDetails({ property }: Props) {
             )}
             {property.numPlantas && (
               <DetailRow label={t("detailsNumFloors")} value={property.numPlantas} />
+            )}
+            {property.orientacion && (
+              <DetailRow label={t("detailsOrientation")} value={property.orientacion} />
             )}
             {property.antiguedad && (
               <DetailRow label={t("detailsAge")} value={property.antiguedad} />
