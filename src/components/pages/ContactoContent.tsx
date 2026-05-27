@@ -16,7 +16,7 @@ export default function ContactoContent() {
   return (
     <>
       {/* Header */}
-      <section className="py-24 bg-[#0a0a0a] relative overflow-hidden">
+      <section className="py-14 lg:py-20 bg-[#0a0a0a] relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C9B99A]/3 rounded-full blur-[120px]" />
         </div>
@@ -31,7 +31,7 @@ export default function ContactoContent() {
           <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight mb-4">
             {t("contactTitle")}
           </h1>
-          <p className="text-[#aaa] text-lg max-w-xl leading-relaxed">
+          <p className="text-[#aaa] text-base max-w-xl leading-relaxed">
             {t("contactSubtitle")}
           </p>
         </div>
