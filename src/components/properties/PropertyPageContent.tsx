@@ -147,11 +147,6 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
               <span className="font-display text-4xl text-[#C9B99A]">
                 {formatPrice(property.precio)}
               </span>
-              {property.porcentajeBajada && (
-                <span className="bg-[#C9B99A] text-black text-sm font-bold px-2 py-1 mb-1">
-                  -{property.porcentajeBajada}%
-                </span>
-              )}
             </div>
 
             {/* Quick features */}

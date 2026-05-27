@@ -97,14 +97,6 @@ export default function PropertyCard({ property }: Props) {
           </span>
         </div>
 
-        {/* Discount badge */}
-        {hasDiscount && property.porcentajeBajada && (
-          <div className="absolute top-3 right-3">
-            <span className="bg-[#C9B99A] text-black text-xs font-bold px-2 py-1">
-              -{property.porcentajeBajada}%
-            </span>
-          </div>
-        )}
 
         {/* Media icons — bottom left */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10">
