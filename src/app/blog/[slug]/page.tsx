@@ -157,7 +157,7 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="relative aspect-video overflow-hidden mb-10 border border-[#1a1a1a]">
             <Image
               src={post.imagen}
-              alt={post.titulo}
+              alt={post.imagenAlt || post.titulo}
               fill
               className="object-cover"
               priority
@@ -221,7 +221,7 @@ export default async function BlogPostPage({ params }: Props) {
                     {rel.imagen ? (
                       <Image
                         src={rel.imagen}
-                        alt={rel.titulo}
+                        alt={rel.imagenAlt || rel.titulo}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="300px"

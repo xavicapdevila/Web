@@ -48,6 +48,7 @@ export default function PostForm({ post, mode }: Props) {
     extracto: post?.extracto ?? "",
     contenido: post?.contenido ?? "",
     imagen: post?.imagen ?? "",
+    imagenAlt: post?.imagenAlt ?? "",
     categoria: post?.categoria ?? "",
     fecha: post?.fecha ?? new Date().toISOString().split("T")[0],
     etiquetas: post?.etiquetas.join(", ") ?? "",
@@ -140,6 +141,7 @@ export default function PostForm({ post, mode }: Props) {
       extracto: form.extracto || undefined,
       contenido: form.contenido || undefined,
       imagen: form.imagen || undefined,
+      imagenAlt: form.imagenAlt || undefined,
       categoria: form.categoria || undefined,
       fecha: form.fecha,
       etiquetas: form.etiquetas
@@ -433,7 +435,18 @@ export default function PostForm({ post, mode }: Props) {
                     placeholder="O pega una URL directamente..."
                     className={`${fieldClass} text-xs text-[#666] placeholder-[#333]`}
                   />
-                  <p className="text-[#3a3a3a] text-xs mt-1.5">También se usa como og:image</p>
+                  <p className="text-[#3a3a3a] text-xs mt-1.5 mb-4">También se usa como og:image</p>
+
+                  {/* Alt text */}
+                  <label className={labelClass}>Texto alternativo (ALT)</label>
+                  <input
+                    type="text"
+                    value={form.imagenAlt}
+                    onChange={(e) => setForm((f) => ({ ...f, imagenAlt: e.target.value }))}
+                    placeholder="Ej: Vista aérea del centro de Vilanova i la Geltrú"
+                    className={fieldClass}
+                  />
+                  <p className="text-[#3a3a3a] text-xs mt-1.5">Describe la imagen para accesibilidad y SEO</p>
                 </div>
 
                 {/* Etiquetas */}

@@ -152,7 +152,7 @@ export default function BlogContent({ posts }: Props) {
                     {hero.imagen ? (
                       <Image
                         src={hero.imagen}
-                        alt={hero.titulo}
+                        alt={hero.imagenAlt || hero.titulo}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                         sizes="100vw"
@@ -243,7 +243,7 @@ export default function BlogContent({ posts }: Props) {
                           {post.imagen ? (
                             <Image
                               src={post.imagen}
-                              alt={post.titulo}
+                              alt={post.imagenAlt || post.titulo}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-700"
                               sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"

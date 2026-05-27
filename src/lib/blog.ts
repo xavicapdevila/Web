@@ -7,6 +7,7 @@ export interface BlogPost {
   extracto?: string;
   contenido?: string;
   imagen?: string;
+  imagenAlt?: string;
   autor: string;
   categoria: string;
   fecha: string;
@@ -20,6 +21,7 @@ export interface BlogPostInput {
   extracto?: string;
   contenido?: string;
   imagen?: string;
+  imagenAlt?: string;
   categoria?: string;
   fecha: string;
   etiquetas?: string[];
@@ -36,6 +38,7 @@ function rowToPost(row: Record<string, unknown>): BlogPost {
     extracto: row.extracto ? String(row.extracto) : undefined,
     contenido: row.contenido ? String(row.contenido) : undefined,
     imagen: row.imagen ? String(row.imagen) : undefined,
+    imagenAlt: row.imagen_alt ? String(row.imagen_alt) : undefined,
     autor: "The Vila Home", // always fixed
     categoria: row.categoria ? String(row.categoria) : "",
     fecha: String(row.fecha),
@@ -104,8 +107,8 @@ export function createBlogPost(input: BlogPostInput): BlogPost {
   const db = getDb();
   const id = `post_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
   db.prepare(`
-    INSERT INTO blog_posts (id, slug, titulo, extracto, contenido, imagen, autor, categoria, fecha, etiquetas, publicado)
-    VALUES (@id, @slug, @titulo, @extracto, @contenido, @imagen, @autor, @categoria, @fecha, @etiquetas, @publicado)
+    INSERT INTO blog_posts (id, slug, titulo, extracto, contenido, imagen, imagen_alt, autor, categoria, fecha, etiquetas, publicado)
+    VALUES (@id, @slug, @titulo, @extracto, @contenido, @imagen, @imagen_alt, @autor, @categoria, @fecha, @etiquetas, @publicado)
   `).run({
     id,
     slug: input.slug,
@@ -113,6 +116,7 @@ export function createBlogPost(input: BlogPostInput): BlogPost {
     extracto: input.extracto ?? null,
     contenido: input.contenido ?? null,
     imagen: input.imagen ?? null,
+    imagen_alt: input.imagenAlt ?? null,
     autor: "The Vila Home",
     categoria: input.categoria ?? "",
     fecha: input.fecha,
@@ -134,6 +138,7 @@ export function updateBlogPost(id: string, input: Partial<BlogPostInput>): BlogP
       extracto = @extracto,
       contenido = @contenido,
       imagen = @imagen,
+      imagen_alt = @imagen_alt,
       autor = @autor,
       categoria = @categoria,
       fecha = @fecha,
@@ -147,6 +152,7 @@ export function updateBlogPost(id: string, input: Partial<BlogPostInput>): BlogP
     extracto: input.extracto ?? existing.extracto ?? null,
     contenido: input.contenido ?? existing.contenido ?? null,
     imagen: input.imagen ?? existing.imagen ?? null,
+    imagen_alt: input.imagenAlt ?? existing.imagenAlt ?? null,
     autor: "The Vila Home",
     categoria: input.categoria ?? existing.categoria ?? "",
     fecha: input.fecha ?? existing.fecha,
