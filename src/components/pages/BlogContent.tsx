@@ -46,49 +46,9 @@ export default function BlogContent({ posts }: Props) {
 
   return (
     <>
-      {/* Header */}
-      <section className="pt-12 pb-14 border-b border-[#1a1a1a]">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <div>
-              <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight">
-                {t("blogTitle1")}
-                <br />
-                <span className="text-[#C9B99A] italic">{t("blogTitle2")}</span>
-              </h1>
-              <p className="text-[#aaa] text-base mt-4 max-w-xl">{t("blogSubtitle")}</p>
-            </div>
-
-            {/* Search */}
-            <div className="w-full lg:max-w-xs relative">
-              <Search
-                size={14}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555] pointer-events-none"
-              />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("blogSearchPlaceholder")}
-                className="w-full bg-[#0d0d0d] border border-[#2a2a2a] focus:border-[#C9B99A]/40 text-white placeholder-[#444] text-sm font-body py-3 pl-10 pr-10 outline-none transition-colors"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555] hover:text-[#C9B99A] transition-colors"
-                  aria-label="Limpiar búsqueda"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Category tabs */}
+      {/* Category tabs + search bar */}
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10 flex items-center justify-between gap-4">
           <nav
             className="flex items-center overflow-x-auto scrollbar-hide"
             aria-label="Categorías del blog"
@@ -117,6 +77,30 @@ export default function BlogContent({ posts }: Props) {
               </button>
             ))}
           </nav>
+
+          {/* Search */}
+          <div className="relative shrink-0 hidden sm:block">
+            <Search
+              size={13}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444] pointer-events-none"
+            />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("blogSearchPlaceholder")}
+              className="w-48 lg:w-64 bg-transparent border border-[#222] focus:border-[#C9B99A]/30 text-white placeholder-[#444] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#444] hover:text-[#C9B99A] transition-colors"
+                aria-label="Limpiar búsqueda"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
