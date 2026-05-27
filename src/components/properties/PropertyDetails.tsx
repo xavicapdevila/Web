@@ -17,8 +17,8 @@ function displayVal(val: string | number | undefined): string {
   return s;
 }
 
-function DetailRow({ label, value }: { label: string; value: string | number }) {
-  const displayed = displayVal(value);
+function DetailRow({ label, value, raw = false }: { label: string; value: string | number; raw?: boolean }) {
+  const displayed = raw ? String(value) : displayVal(value);
   if (!displayed) return null;
   return (
     <div className="flex items-center justify-between py-3 border-b border-[#1a1a1a] last:border-0">
@@ -213,7 +213,7 @@ export default function PropertyDetails({ property }: Props) {
                   <DetailRow label={t("detailsBaths")} value={property.banos} />
                 )}
                 {property.planta && (
-                  <DetailRow label={t("detailsFloor")} value={property.planta} />
+                  <DetailRow label={t("detailsFloor")} value={property.planta} raw />
                 )}
                 {property.orientacion && (
                   <DetailRow label={t("detailsOrientation")} value={property.orientacion} />
