@@ -49,13 +49,6 @@ export default function BlogContent({ posts }: Props) {
       {/* Header */}
       <section className="pt-12 pb-14 border-b border-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="flex items-center gap-4 mb-6">
-            <span className="h-px w-10 bg-[#C9B99A]" />
-            <span className="text-[#C9B99A] text-xs font-body tracking-[0.3em] uppercase">
-              {t("blogLabel")}
-            </span>
-          </div>
-
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
             <div>
               <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight">
