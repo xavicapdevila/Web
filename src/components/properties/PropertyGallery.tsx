@@ -132,7 +132,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
         <div className="max-w-7xl mx-auto">
           {/* Primary image — carousel */}
           <div
-            className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden select-none"
+            className="relative aspect-[16/9] lg:aspect-[21/9] max-h-[80vh] overflow-hidden select-none"
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
