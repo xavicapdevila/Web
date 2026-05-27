@@ -76,8 +76,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (pending.current.has(cacheKey)) return pending.current.get(cacheKey)!;
 
     const target = MYMEMORY_LANG[lang];
+    const email = process.env.NEXT_PUBLIC_MYMEMORY_EMAIL ?? "";
+    const deParam = email ? `&de=${encodeURIComponent(email)}` : "";
     const promise = fetch(
-      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=es|${target}`
+      `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=es|${target}${deParam}`
     )
       .then((res) => res.json())
       .then((data) => {
