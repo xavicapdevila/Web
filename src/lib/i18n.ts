@@ -272,6 +272,7 @@ const dict = {
     blogMoreArticlesOne: "artículo más",
     blogMoreArticlesMany: "artículos más",
     blogSeeAll: "Ver todos los artículos",
+    blogLoadMore: "Ver más artículos",
   },
 
   ca: {
@@ -518,6 +519,7 @@ const dict = {
     blogMoreArticlesOne: "article més",
     blogMoreArticlesMany: "articles més",
     blogSeeAll: "Veure tots els articles",
+    blogLoadMore: "Veure més articles",
   },
 
   en: {
@@ -764,6 +766,7 @@ const dict = {
     blogMoreArticlesOne: "more article",
     blogMoreArticlesMany: "more articles",
     blogSeeAll: "See all articles",
+    blogLoadMore: "Load more articles",
   },
 
   fr: {
@@ -1010,6 +1013,7 @@ const dict = {
     blogMoreArticlesOne: "article de plus",
     blogMoreArticlesMany: "articles de plus",
     blogSeeAll: "Voir tous les articles",
+    blogLoadMore: "Voir plus d'articles",
   },
 } as const;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CalendarDays, Search, X } from "lucide-react";
@@ -13,6 +13,8 @@ interface Props {
   posts: BlogPost[];
 }
 
+const PAGE_SIZE = 12;
+
 const CATEGORIES = ["Mercado", "Procesos", "Documentación", "Consejos", "Vivir en..."];
 
 const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
@@ -23,188 +25,59 @@ const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
   "Vivir en...":    { es: "Vivir en...",    ca: "Viure a...",    en: "Living in...",  fr: "Vivre à..." },
 };
 
-// ── Featured card — horizontal, compact ──────────────────────────────────────
-function FeaturedCard({ post }: { post: BlogPost }) {
-  const translatedTitle   = useAutoTranslate(post.titulo);
-  const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
-
-  return (
-    <article className="group h-full bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/25 transition-colors duration-500 overflow-hidden">
-      <Link
-        href={`/blog/${post.slug}`}
-        className="flex flex-col sm:flex-row h-full min-h-[260px] lg:min-h-[320px]"
-      >
-        {/* Image */}
-        <div className="relative h-52 sm:h-auto sm:w-[50%] lg:w-[52%] shrink-0 overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d]">
-          {post.imagen ? (
-            <Image
-              src={post.imagen}
-              alt={post.imagenAlt || post.titulo}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 40vw"
-              priority
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-display text-[5rem] text-[#C9B99A]/8 leading-none select-none">
-                {post.titulo.charAt(0)}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Text */}
-        <div className="flex flex-col justify-between p-6 lg:p-8 flex-1 min-w-0">
-          <div>
-            {post.categoria && (
-              <span className="inline-block text-black bg-[#C9B99A] text-xs font-body tracking-widest uppercase px-2.5 py-0.5 mb-4">
-                {post.categoria}
-              </span>
-            )}
-            <h2 className="font-display text-xl lg:text-2xl xl:text-[1.65rem] text-white font-light leading-snug mb-3 group-hover:text-[#C9B99A] transition-colors duration-300">
-              {translatedTitle}
-            </h2>
-            {post.extracto && (
-              <p className="text-[#888] text-sm leading-relaxed line-clamp-3">
-                {translatedExcerpt}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-xs mt-6 pt-4 border-t border-[#1a1a1a]">
-            <span className="text-[#C9B99A]/70 font-body tracking-widest uppercase">
-              The Vila Home
-            </span>
-            <span className="flex items-center gap-1.5 text-[#666]">
-              <CalendarDays size={11} />
-              {formatBlogDate(post.fecha)}
-            </span>
-            {post.etiquetas.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="hidden lg:inline text-[#C9B99A]/50 border border-[#C9B99A]/15 px-2 py-0.5 font-body tracking-wide uppercase"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      </Link>
-    </article>
-  );
-}
-
-// ── Side card — compact thumbnail + title ─────────────────────────────────────
-function SideCard({ post }: { post: BlogPost }) {
+// ── Article card — compact, uniform ──────────────────────────────────────────
+function ArticleCard({ post }: { post: BlogPost }) {
   const translatedTitle = useAutoTranslate(post.titulo);
 
   return (
-    <article className="group h-full bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/25 transition-colors duration-300 overflow-hidden">
-      <Link href={`/blog/${post.slug}`} className="flex h-full min-h-[120px]">
-        {/* Thumbnail */}
-        <div className="relative w-28 lg:w-36 shrink-0 overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#111]">
-          {post.imagen ? (
-            <Image
-              src={post.imagen}
-              alt={post.imagenAlt || post.titulo}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="144px"
-              loading="lazy"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-display text-3xl text-[#C9B99A]/15">
-                {post.titulo.charAt(0)}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Text */}
-        <div className="flex flex-col justify-between p-4 lg:p-5 flex-1 min-w-0">
-          {post.categoria && (
-            <span className="text-[#C9B99A]/60 text-[10px] font-body tracking-widest uppercase mb-1.5">
-              {post.categoria}
-            </span>
-          )}
-          <h3 className="font-display text-sm lg:text-[15px] text-white group-hover:text-[#C9B99A] transition-colors leading-snug line-clamp-3 flex-1">
-            {translatedTitle}
-          </h3>
-          <span className="flex items-center gap-1.5 text-[#555] text-[10px] mt-3 shrink-0">
-            <CalendarDays size={9} />
-            {formatBlogDate(post.fecha)}
-          </span>
-        </div>
-      </Link>
-    </article>
-  );
-}
-
-// ── Grid card ─────────────────────────────────────────────────────────────────
-function PostCard({ post }: { post: BlogPost }) {
-  const translatedTitle   = useAutoTranslate(post.titulo);
-  const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
-
-  return (
-    <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/30 transition-all duration-300 overflow-hidden flex flex-col">
-      <Link
-        href={`/blog/${post.slug}`}
-        className="block relative h-48 overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#111] border-b border-[#1e1e1e]"
-      >
+    <article className="group bg-[#0f0f0f] border border-[#1a1a1a] hover:border-[#C9B99A]/20 transition-all duration-300 overflow-hidden flex flex-col">
+      {/* Image */}
+      <Link href={`/blog/${post.slug}`} className="block relative h-36 overflow-hidden shrink-0">
         {post.imagen ? (
           <Image
             src={post.imagen}
             alt={post.imagenAlt || post.titulo}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             loading="lazy"
           />
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <span className="font-display text-5xl text-[#C9B99A]/15">
+          <div className="absolute inset-0 bg-[#141414] flex items-center justify-center">
+            <span className="font-display text-4xl text-[#C9B99A]/10 select-none">
               {post.titulo.charAt(0)}
             </span>
           </div>
         )}
+        {/* Category badge */}
+        {post.categoria && (
+          <span className="absolute top-2.5 left-2.5 text-black bg-[#C9B99A] text-[9px] font-body tracking-[0.14em] uppercase px-2 py-0.5 leading-tight">
+            {post.categoria}
+          </span>
+        )}
       </Link>
 
-      <div className="p-5 flex flex-col flex-1">
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          {post.categoria && (
-            <span className="text-black bg-[#C9B99A] text-xs font-body tracking-widest uppercase px-2.5 py-0.5">
-              {post.categoria}
-            </span>
-          )}
-          {post.etiquetas.slice(0, 1).map((tag) => (
-            <span
-              key={tag}
-              className="text-[#C9B99A] text-xs font-body tracking-wide uppercase border border-[#C9B99A]/20 px-2 py-0.5"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4">
         <Link href={`/blog/${post.slug}`} className="flex-1">
-          <h2 className="font-display text-lg text-white group-hover:text-[#C9B99A] transition-colors leading-snug mb-2">
+          <h2 className="font-display text-[14px] leading-snug text-[#ddd] group-hover:text-[#C9B99A] transition-colors duration-200 line-clamp-2">
             {translatedTitle}
           </h2>
         </Link>
 
-        {post.extracto && (
-          <p className="text-[#666] text-sm leading-relaxed mb-4 line-clamp-2">
-            {translatedExcerpt}
-          </p>
-        )}
-
-        <div className="flex items-center justify-between text-[#555] text-xs pt-3 border-t border-[#1a1a1a] mt-auto">
-          <span className="text-[#C9B99A]/60 font-body tracking-wide">The Vila Home</span>
-          <span className="flex items-center gap-1.5">
-            <CalendarDays size={11} />
+        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#191919]">
+          <CalendarDays size={9} className="text-[#444] shrink-0" />
+          <span className="text-[#444] text-[10px] tabular-nums">
             {formatBlogDate(post.fecha)}
           </span>
+          {post.etiquetas[0] && (
+            <>
+              <span className="text-[#2e2e2e]">·</span>
+              <span className="text-[#3a3a3a] text-[10px] font-body tracking-wide uppercase truncate">
+                {post.etiquetas[0]}
+              </span>
+            </>
+          )}
         </div>
       </div>
     </article>
@@ -217,6 +90,7 @@ export default function BlogContent({ posts }: Props) {
   const { t, lang } = useLanguage();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const trimmed = query.trim().toLowerCase();
 
@@ -237,12 +111,19 @@ export default function BlogContent({ posts }: Props) {
     return result;
   }, [posts, activeCategory, trimmed]);
 
+  // Reset page when filter/search changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeCategory, trimmed]);
+
+  const visible  = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore  = filtered.length > page * PAGE_SIZE;
+
   return (
     <>
       {/* ── Category tabs + search ── */}
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          {/* Row 1: tabs */}
           <div className="flex items-center justify-between gap-4">
             <nav
               className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
@@ -285,7 +166,7 @@ export default function BlogContent({ posts }: Props) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("blogSearchPlaceholder")}
-                className="w-48 lg:w-64 bg-transparent border border-[#222] focus:border-[#C9B99A]/30 text-white placeholder-[#444] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
+                className="w-48 lg:w-60 bg-transparent border border-[#1e1e1e] focus:border-[#C9B99A]/30 text-white placeholder-[#3a3a3a] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
               />
               {query && (
                 <button
@@ -299,8 +180,8 @@ export default function BlogContent({ posts }: Props) {
             </div>
           </div>
 
-          {/* Row 2: search — mobile */}
-          <div className="sm:hidden border-t border-[#111] px-4 py-2">
+          {/* Search — mobile */}
+          <div className="sm:hidden border-t border-[#111] py-2">
             <div className="relative">
               <Search
                 size={13}
@@ -311,7 +192,7 @@ export default function BlogContent({ posts }: Props) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t("blogSearchPlaceholder")}
-                className="w-full bg-transparent border border-[#222] focus:border-[#C9B99A]/30 text-white placeholder-[#444] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
+                className="w-full bg-transparent border border-[#1e1e1e] focus:border-[#C9B99A]/30 text-white placeholder-[#3a3a3a] text-xs font-body py-2 pl-8 pr-7 outline-none transition-colors"
               />
               {query && (
                 <button
@@ -328,8 +209,8 @@ export default function BlogContent({ posts }: Props) {
       </div>
 
       {/* ── Content ── */}
-      <section className="py-10 lg:py-14">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 space-y-8 lg:space-y-10">
+      <section className="py-10 lg:py-12">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
 
           {/* No posts at all */}
           {posts.length === 0 && (
@@ -338,7 +219,7 @@ export default function BlogContent({ posts }: Props) {
             </p>
           )}
 
-          {/* Filter/search yields nothing */}
+          {/* Filter/search empty */}
           {posts.length > 0 && filtered.length === 0 && (
             <div className="text-center py-24">
               {trimmed ? (
@@ -353,48 +234,37 @@ export default function BlogContent({ posts }: Props) {
               )}
               <button
                 onClick={() => { setQuery(""); setActiveCategory(null); }}
-                className="mt-6 text-xs font-body tracking-widest uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#2a2a2a] hover:border-[#C9B99A] px-5 py-2.5"
+                className="mt-6 text-xs font-body tracking-widest uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#222] hover:border-[#C9B99A] px-5 py-2.5"
               >
                 {t("blogSeeAll")}
               </button>
             </div>
           )}
 
-          {/* ── Magazine layout: 3+ posts ── */}
-          {filtered.length >= 3 && (
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-5">
-              {/* Featured */}
-              <div className="lg:col-span-3">
-                <FeaturedCard post={filtered[0]} />
+          {/* Grid */}
+          {visible.length > 0 && (
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+                {visible.map((post) => (
+                  <ArticleCard key={post.id} post={post} />
+                ))}
               </div>
-              {/* Side stack */}
-              <div className="lg:col-span-2 flex flex-col gap-4 lg:gap-5">
-                <SideCard post={filtered[1]} />
-                <SideCard post={filtered[2]} />
+
+              {/* Article count + load more */}
+              <div className="flex flex-col items-center gap-4 mt-10">
+                <p className="text-[#333] text-xs font-body tracking-widest uppercase">
+                  {visible.length} / {filtered.length}
+                </p>
+                {hasMore && (
+                  <button
+                    onClick={() => setPage((p) => p + 1)}
+                    className="text-xs font-body tracking-[0.2em] uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#1e1e1e] hover:border-[#C9B99A]/40 px-8 py-3"
+                  >
+                    {t("blogLoadMore")}
+                  </button>
+                )}
               </div>
-            </div>
-          )}
-
-          {/* ── Single post ── */}
-          {filtered.length === 1 && (
-            <FeaturedCard post={filtered[0]} />
-          )}
-
-          {/* ── Two posts ── */}
-          {filtered.length === 2 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-5">
-              <FeaturedCard post={filtered[0]} />
-              <FeaturedCard post={filtered[1]} />
-            </div>
-          )}
-
-          {/* ── Grid: posts after the first 3 ── */}
-          {filtered.length > 3 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-              {filtered.slice(3).map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            </>
           )}
 
         </div>
