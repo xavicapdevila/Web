@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X, LayoutGrid, RotateCcw, Play, Globe, Maximize, Minimize } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, LayoutGrid, RotateCcw, Play, Globe } from "lucide-react";
 import type { PropertyImage } from "@/types/property";
 import { getYouTubeId } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -23,8 +23,6 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const [showGrid, setShowGrid] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showTour, setShowTour] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const lightboxRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
   const { t } = useLanguage();
 
@@ -46,21 +44,6 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
     touchStartX.current = null;
   };
 
-  // Track fullscreen state changes (e.g. user presses Esc)
-  useEffect(() => {
-    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
-  }, []);
-
-  const toggleFullscreen = useCallback(async () => {
-    if (!document.fullscreenElement) {
-      await lightboxRef.current?.requestFullscreen();
-    } else {
-      await document.exitFullscreen();
-    }
-  }, []);
-
   const hasPlano = images.some((img) => img.eti === "plano");
   const has360 = images.some((img) => img.eti === "360");
   const hasVideo = Boolean(video);
@@ -71,10 +54,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const ytId = video ? getYouTubeId(video) : null;
 
   const openLightbox = (index: number) => setLightboxIndex(index);
-  const closeLightbox = useCallback(() => {
-    if (document.fullscreenElement) document.exitFullscreen();
-    setLightboxIndex(null);
-  }, []);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
   const prevImage = useCallback(() => {
     setLightboxIndex((i) => (i === null ? 0 : (i - 1 + images.length) % images.length));
@@ -84,8 +64,20 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
     setLightboxIndex((i) => (i === null ? 0 : (i + 1) % images.length));
   }, [images.length]);
 
-  const MediaIcons = ({ className = "" }: { className?: string }) => (
-    <div className={`flex items-center gap-2 ${className}`}>
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") prevImage();
+      if (e.key === "ArrowRight") nextImage();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxIndex, closeLightbox, prevImage, nextImage]);
+
+  const MediaIcons = () => (
+    <div className="flex items-center gap-2">
       {hasPlano && (
         <button
           onClick={(e) => {
@@ -94,10 +86,9 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             if (planoIdx >= 0) openLightbox(planoIdx);
           }}
           className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
-          title={t("galleryPlan")}
         >
           <LayoutGrid size={12} />
-          <span className="hidden sm:inline">{t("galleryPlan")}</span>
+          <span>{t("galleryPlan")}</span>
         </button>
       )}
       {has360 && (
@@ -108,36 +99,27 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             if (idx360 >= 0) openLightbox(idx360);
           }}
           className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
-          title={t("gallery360")}
         >
           <RotateCcw size={12} />
-          <span className="hidden sm:inline">{t("gallery360")}</span>
+          <span>{t("gallery360")}</span>
         </button>
       )}
       {hasVideo && ytId && (
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowVideo(true);
-          }}
+          onClick={(e) => { e.stopPropagation(); setShowVideo(true); }}
           className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
-          title={t("galleryVideo")}
         >
           <Play size={12} />
-          <span className="hidden sm:inline">{t("galleryVideo")}</span>
+          <span>{t("galleryVideo")}</span>
         </button>
       )}
       {hasTour && (
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowTour(true);
-          }}
+          onClick={(e) => { e.stopPropagation(); setShowTour(true); }}
           className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
-          title={t("galleryVirtualTour")}
         >
           <Globe size={12} />
-          <span className="hidden sm:inline">{t("galleryVirtualTour")}</span>
+          <span>{t("galleryVirtualTour")}</span>
         </button>
       )}
     </div>
@@ -145,7 +127,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
   return (
     <>
-      {/* Main gallery layout */}
+      {/* ── Main gallery ── */}
       <div className="relative bg-black">
         <div className="max-w-7xl mx-auto">
           {/* Primary image — carousel */}
@@ -173,7 +155,6 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
-            {/* Prev arrow */}
             {images.length > 1 && (
               <button
                 onClick={goPrev}
@@ -183,8 +164,6 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
                 <ChevronLeft size={22} />
               </button>
             )}
-
-            {/* Next arrow */}
             {images.length > 1 && (
               <button
                 onClick={goNext}
@@ -200,12 +179,12 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
               <MediaIcons />
             </div>
 
-            {/* Image counter */}
+            {/* Counter */}
             <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5">
               {currentIndex + 1} / {totalMedia}
             </div>
 
-            {/* View all button */}
+            {/* View all */}
             {images.length > 1 && (
               <button
                 onClick={() => setShowGrid(true)}
@@ -238,83 +217,86 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* ── Lightbox — nearly full screen ── */}
       {lightboxIndex !== null && (
-        <div ref={lightboxRef} className="fixed inset-0 bg-black/97 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 bg-black z-[100] flex flex-col">
+
           {/* Top bar */}
-          <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-            {/* Counter */}
-            <span className="text-white text-sm font-body">
-              {lightboxIndex + 1} / {totalMedia}
+          <div className="flex items-center justify-between px-5 h-12 shrink-0">
+            <span className="text-white/50 text-sm tabular-nums">
+              {lightboxIndex + 1} / {images.length}
             </span>
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleFullscreen}
-                className="text-white hover:text-[#C9B99A] transition-colors p-1"
-                title={isFullscreen ? t("galleryExitFullscreen") : t("galleryFullscreen")}
-              >
-                {isFullscreen ? <Minimize size={22} /> : <Maximize size={22} />}
-              </button>
-              <button
-                onClick={closeLightbox}
-                className="text-white hover:text-[#C9B99A] transition-colors p-1"
-              >
-                <X size={26} />
-              </button>
-            </div>
-          </div>
-
-          {/* Media icons in lightbox — bottom left */}
-          <div className="absolute bottom-20 left-4 z-10">
-            <MediaIcons />
-          </div>
-
-          {images.length > 1 && (
             <button
-              onClick={prevImage}
-              className="absolute left-1 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/50 p-1.5 sm:p-2 z-10"
+              onClick={closeLightbox}
+              className="text-white hover:text-[#C9B99A] transition-colors p-1"
+              aria-label="Cerrar"
             >
-              <ChevronLeft size={24} className="sm:hidden" />
-              <ChevronLeft size={32} className="hidden sm:block" />
+              <X size={24} />
             </button>
-          )}
+          </div>
 
-          <div className={`relative ${isFullscreen ? "w-screen h-screen" : "w-full max-w-5xl max-h-[85vh] aspect-video mx-2 sm:mx-8 lg:mx-16"}`}>
+          {/* Image — fills all remaining vertical space */}
+          <div className="relative flex-1 min-h-0">
             <Image
               src={images[lightboxIndex].url}
               alt={`${altBase} — foto ${lightboxIndex + 1} de ${images.length}`}
               fill
-              className={isFullscreen ? "object-contain" : "object-contain"}
+              className="object-contain"
               sizes="100vw"
+              priority
             />
+
+            {/* Prev arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={prevImage}
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeft size={30} />
+              </button>
+            )}
+
+            {/* Next arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={nextImage}
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                aria-label="Foto siguiente"
+              >
+                <ChevronRight size={30} />
+              </button>
+            )}
           </div>
 
-          {images.length > 1 && (
-            <button
-              onClick={nextImage}
-              className="absolute right-1 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/50 p-1.5 sm:p-2 z-10"
-            >
-              <ChevronRight size={24} className="sm:hidden" />
-              <ChevronRight size={32} className="hidden sm:block" />
-            </button>
-          )}
+          {/* Bottom: media icons + thumbnails */}
+          <div className="shrink-0 bg-black">
+            {/* Media icons */}
+            {(hasPlano || has360 || hasVideo || hasTour) && (
+              <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+                <MediaIcons />
+              </div>
+            )}
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 max-w-xl overflow-x-auto px-4">
-            {images.slice(0, 10).map((img, i) => (
-              <button
-                key={i}
-                onClick={() => setLightboxIndex(i)}
-                className={`relative w-16 h-12 shrink-0 overflow-hidden transition-opacity ${lightboxIndex === i ? "ring-1 ring-[#C9B99A] opacity-100" : "opacity-50 hover:opacity-80"}`}
-              >
-                <Image src={img.url} alt={`${altBase} — miniatura ${i + 1}`} fill className="object-cover" sizes="64px" />
-              </button>
-            ))}
+            {/* Thumbnail strip */}
+            {images.length > 1 && (
+              <div className="flex gap-1 px-3 py-2 overflow-x-auto">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setLightboxIndex(i)}
+                    className={`relative w-16 h-11 shrink-0 overflow-hidden transition-opacity ${lightboxIndex === i ? "ring-1 ring-[#C9B99A] opacity-100" : "opacity-45 hover:opacity-80"}`}
+                  >
+                    <Image src={img.url} alt={`${altBase} — miniatura ${i + 1}`} fill className="object-cover" sizes="64px" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Grid view */}
+      {/* ── Grid view ── */}
       {showGrid && (
         <div className="fixed inset-0 bg-[#0a0a0a] z-[100] overflow-y-auto">
           <div className="max-w-7xl mx-auto px-6 py-8">
@@ -339,7 +321,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
         </div>
       )}
 
-      {/* YouTube video modal */}
+      {/* ── YouTube video modal ── */}
       {showVideo && ytId && (
         <div
           className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center"
@@ -366,21 +348,21 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
         </div>
       )}
 
-      {/* Tour virtual modal */}
+      {/* ── Tour virtual modal ── */}
       {showTour && tour && (
         <div
-          className="fixed inset-0 bg-black/97 z-[100] flex flex-col"
+          className="fixed inset-0 bg-black z-[100] flex flex-col"
           onClick={() => setShowTour(false)}
         >
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e1e]" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e1e]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center gap-3">
               <Globe size={16} className="text-[#C9B99A]" />
               <span className="text-white text-sm font-body">Tour virtual — {title}</span>
             </div>
-            <button
-              onClick={() => setShowTour(false)}
-              className="text-white hover:text-[#C9B99A] transition-colors"
-            >
+            <button onClick={() => setShowTour(false)} className="text-white hover:text-[#C9B99A] transition-colors">
               <X size={24} />
             </button>
           </div>
