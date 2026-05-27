@@ -47,8 +47,8 @@ export default function PropertyCard({ property, priority = false }: Props) {
   );
   // WA button in card → contact the agent
   const cardWaUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
-  // WA button in share modal → open WhatsApp without recipient so user chooses who to send to
-  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`${property.titulo} — ${propertyUrl}`)}`;
+  // WA button in share modal → open WhatsApp without recipient so user chooses who to forward to
+  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${property.titulo}\n${propertyUrl}`)}`;
   const isReserved = property.estadoFicha === 7;
   const hasDiscount = property.outlet && property.precioAnterior;
 

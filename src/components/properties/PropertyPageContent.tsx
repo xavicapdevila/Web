@@ -163,6 +163,9 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
     ? `${window.location.origin}/propiedades/${property.slug}`
     : `https://www.thevilahome.com/propiedades/${property.slug}`;
 
+  // WA share modal → no preset recipient, user chooses who to forward to
+  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${titulo}\n${shareUrl}`)}`;
+
   return (
     <>
     {showShareModal && (
@@ -170,7 +173,7 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
         url={shareUrl}
         titulo={titulo}
         price={formatPrice(property.precio)}
-        waUrl={waUrl}
+        waUrl={shareWaUrl}
         onClose={() => setShowShareModal(false)}
       />
     )}
