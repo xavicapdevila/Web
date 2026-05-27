@@ -28,7 +28,7 @@ export default function ContactoContent() {
               {t("contactLabel")}
             </span>
           </div>
-          <h1 className="font-display text-5xl lg:text-7xl text-white font-light leading-tight mb-4">
+          <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight mb-4">
             {t("contactTitle")}
           </h1>
           <p className="text-[#aaa] text-lg max-w-xl leading-relaxed">
