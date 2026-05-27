@@ -34,8 +34,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       routes.push({
         url: `${BASE_URL}/blog/${post.slug}`,
         lastModified: new Date(post.fecha),
-        priority: 0.6,
-        changeFrequency: "monthly",
+        priority: 0.7,
+        changeFrequency: "weekly",
       });
     }
   } catch {

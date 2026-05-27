@@ -51,6 +51,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         type: "website",
         url: canonicalUrl,
+        siteName: "The Vila Home",
+        locale: "es_ES",
         title,
         description,
         images: [
@@ -64,6 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       twitter: {
         card: "summary_large_image",
+        site: "@thevilahome",
         title,
         description,
         images: [ogImage],
@@ -166,12 +169,27 @@ export default async function PropertyPage({ params }: Props) {
     };
   }
 
+  const schemaBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio",      item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Propiedades", item: `${BASE_URL}/propiedades` },
+      { "@type": "ListItem", position: 3, name: property.titulo, item: canonicalUrl },
+    ],
+  };
+
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
       <Script
         id="schema-property"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <Script
+        id="schema-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
       />
       <PropertyGallery
         images={property.imagenes}

@@ -10,9 +10,19 @@ export const metadata: Metadata = {
     "Contacta con The Vila Home en Vilanova i la Geltrú. Teléfono 936 061 800, WhatsApp, email y oficina en Av. Francesc Macià 48. Lunes a viernes 10–14h y 16:30–19:30h.",
   alternates: { canonical: `${BASE_URL}/contacto` },
   openGraph: {
+    type: "website",
     title: "Contacto — The Vila Home",
     description: "Llámanos, escríbenos o visítanos en Vilanova i la Geltrú. Estamos aquí para ayudarte sin compromiso.",
     url: `${BASE_URL}/contacto`,
+    siteName: "The Vila Home",
+    locale: "es_ES",
+    images: [{ url: `${BASE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "Contacta con The Vila Home" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contacto — The Vila Home",
+    description: "Llámanos al 936 061 800 o visítanos en Vilanova i la Geltrú. Sin compromiso.",
+    images: [`${BASE_URL}/og-image.jpg`],
   },
 };
 

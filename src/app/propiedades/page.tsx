@@ -11,9 +11,19 @@ export const metadata: Metadata = {
     "Explora el catálogo completo de propiedades en venta de The Vila Home: pisos, casas, chalets, áticos y terrenos en Vilanova i la Geltrú, Sitges, Cubelles, Garraf y Penedès.",
   alternates: { canonical: "https://www.thevilahome.com/propiedades" },
   openGraph: {
+    type: "website",
     title: "Propiedades en venta — The Vila Home",
     description: "Pisos, casas, chalets y áticos en el Garraf y Penedès. Catálogo actualizado con las últimas propiedades.",
     url: "https://www.thevilahome.com/propiedades",
+    siteName: "The Vila Home",
+    locale: "es_ES",
+    images: [{ url: "https://www.thevilahome.com/og-image.jpg", width: 1200, height: 630, alt: "Propiedades en venta — The Vila Home" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Propiedades en venta — The Vila Home",
+    description: "Pisos, casas, chalets y áticos en el Garraf y Penedès.",
+    images: ["https://www.thevilahome.com/og-image.jpg"],
   },
 };
 

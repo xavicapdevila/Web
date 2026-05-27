@@ -39,15 +39,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         type: "article",
         url: canonicalUrl,
+        siteName: "The Vila Home",
+        locale: "es_ES",
         title: post.titulo,
         description: post.extracto,
         publishedTime: post.fecha,
+        modifiedTime: post.fecha,
         authors: ["The Vila Home"],
         tags: post.etiquetas,
-        images: [{ url: ogImage, alt: post.titulo }],
+        images: [{ url: ogImage, width: 1200, height: 630, alt: post.imagenAlt ?? post.titulo }],
       },
       twitter: {
         card: "summary_large_image",
+        site: "@thevilahome",
+        creator: "@thevilahome",
         title: post.titulo,
         description: post.extracto,
         images: [ogImage],
@@ -75,6 +80,9 @@ export default async function BlogPostPage({ params }: Props) {
   const canonicalUrl = `${BASE_URL}/blog/${slug}`;
   const ogImage = post.imagen ?? `${BASE_URL}/og-image.jpg`;
 
+  const wordCount = post.contenido ? post.contenido.split(/\s+/).filter(Boolean).length : 0;
+  const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+
   const schemaBlogPosting = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -84,21 +92,42 @@ export default async function BlogPostPage({ params }: Props) {
     url: canonicalUrl,
     datePublished: post.fecha,
     dateModified: post.fecha,
-    image: ogImage,
+    image: {
+      "@type": "ImageObject",
+      url: ogImage,
+      ...(post.imagenAlt && { caption: post.imagenAlt }),
+    },
     author: {
       "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
       name: "The Vila Home",
       url: BASE_URL,
     },
     publisher: {
       "@type": "Organization",
+      "@id": `${BASE_URL}/#organization`,
       name: "The Vila Home",
+      url: BASE_URL,
       logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.svg` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
-    keywords: post.etiquetas.join(", "),
-    ...(post.categoria ? { articleSection: post.categoria } : {}),
+    ...(post.etiquetas.length > 0 && { keywords: post.etiquetas.join(", ") }),
+    ...(post.categoria && { articleSection: post.categoria }),
     inLanguage: "es-ES",
+    ...(wordCount > 0 && {
+      wordCount,
+      timeRequired: `PT${readingMinutes}M`,
+    }),
+  };
+
+  const schemaBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio",  item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Blog",    item: `${BASE_URL}/blog` },
+      { "@type": "ListItem", position: 3, name: post.titulo, item: canonicalUrl },
+    ],
   };
 
   return (
@@ -107,6 +136,11 @@ export default async function BlogPostPage({ params }: Props) {
         id="schema-blog-posting"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBlogPosting) }}
+      />
+      <Script
+        id="schema-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
       />
 
       <article className="max-w-3xl mx-auto px-6 lg:px-0 py-16">
