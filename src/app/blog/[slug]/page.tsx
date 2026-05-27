@@ -34,6 +34,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description:
         post.extracto ??
         `Artículo sobre el mercado inmobiliario en Vilanova i la Geltrú. Publicado por The Vila Home.`,
+      ...(post.palabraClave || post.etiquetas.length > 0) && {
+        keywords: [
+          ...(post.palabraClave ? [post.palabraClave] : []),
+          ...post.etiquetas,
+        ].join(", "),
+      },
       authors: [{ name: "The Vila Home", url: BASE_URL }],
       alternates: { canonical: canonicalUrl },
       openGraph: {
@@ -111,7 +117,12 @@ export default async function BlogPostPage({ params }: Props) {
       logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.svg` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
-    ...(post.etiquetas.length > 0 && { keywords: post.etiquetas.join(", ") }),
+    ...((post.palabraClave || post.etiquetas.length > 0) && {
+      keywords: [
+        ...(post.palabraClave ? [post.palabraClave] : []),
+        ...post.etiquetas,
+      ].join(", "),
+    }),
     ...(post.categoria && { articleSection: post.categoria }),
     inLanguage: "es-ES",
     ...(wordCount > 0 && {

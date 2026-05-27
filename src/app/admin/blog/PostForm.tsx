@@ -49,6 +49,7 @@ export default function PostForm({ post, mode }: Props) {
     contenido: post?.contenido ?? "",
     imagen: post?.imagen ?? "",
     imagenAlt: post?.imagenAlt ?? "",
+    palabraClave: post?.palabraClave ?? "",
     categoria: post?.categoria ?? "",
     fecha: post?.fecha ?? new Date().toISOString().split("T")[0],
     etiquetas: post?.etiquetas.join(", ") ?? "",
@@ -142,6 +143,7 @@ export default function PostForm({ post, mode }: Props) {
       contenido: form.contenido || undefined,
       imagen: form.imagen || undefined,
       imagenAlt: form.imagenAlt || undefined,
+      palabraClave: form.palabraClave || undefined,
       categoria: form.categoria || undefined,
       fecha: form.fecha,
       etiquetas: form.etiquetas
@@ -447,6 +449,35 @@ export default function PostForm({ post, mode }: Props) {
                     className={fieldClass}
                   />
                   <p className="text-[#3a3a3a] text-xs mt-1.5">Describe la imagen para accesibilidad y SEO</p>
+                </div>
+
+                {/* Palabra clave objetivo */}
+                <div className="bg-[#0d0d0d] border border-[#1a1a1a] p-5">
+                  <label className={labelClass}>Palabra clave objetivo</label>
+                  <input
+                    type="text"
+                    value={form.palabraClave}
+                    onChange={(e) => setForm((f) => ({ ...f, palabraClave: e.target.value }))}
+                    placeholder="Ej: comprar piso Vilanova"
+                    className={fieldClass}
+                  />
+                  <p className="text-[#3a3a3a] text-xs mt-1.5">
+                    Keyword principal que quieres posicionar. Se añade al meta keywords del artículo.
+                  </p>
+                  {form.palabraClave && (
+                    <div className="mt-3 space-y-1.5 text-[11px]">
+                      {[
+                        { label: "En el título", ok: form.titulo.toLowerCase().includes(form.palabraClave.toLowerCase()) },
+                        { label: "En el extracto", ok: form.extracto.toLowerCase().includes(form.palabraClave.toLowerCase()) },
+                        { label: "En el slug", ok: form.slug.includes(form.palabraClave.toLowerCase().replace(/\s+/g, "-")) },
+                      ].map(({ label, ok }) => (
+                        <div key={label} className="flex items-center gap-2">
+                          <span className={ok ? "text-green-500" : "text-[#555]"}>{ok ? "✓" : "○"}</span>
+                          <span className={ok ? "text-[#aaa]" : "text-[#444]"}>{label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Etiquetas */}

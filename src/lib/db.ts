@@ -145,6 +145,7 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE properties ADD COLUMN periodicidad_comunidad TEXT`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN categoria TEXT DEFAULT ''`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN imagen_alt TEXT DEFAULT ''`); } catch {}
+  try { db.exec(`ALTER TABLE blog_posts ADD COLUMN palabra_clave TEXT DEFAULT ''`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);
     CREATE INDEX IF NOT EXISTS idx_properties_ciudad ON properties(ciudad);
