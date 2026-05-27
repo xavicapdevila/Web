@@ -119,18 +119,15 @@
   }
 }
 
-/*
-  Global text justification — unlayered so it wins over @layer utilities
-  (text-center / text-left / text-right utility classes live in @layer utilities,
-  which has LOWER cascade priority than unlayered declarations)
-*/
-p {
-  text-align: justify;
-}
+@layer base {
+  /* Default justify for body text — utilities (text-center, text-left…) override this */
+  p {
+    text-align: justify;
+  }
 
-/* Display heading line-height — unlayered to win over leading-tight / leading-snug utilities */
-h1, h2 {
-  line-height: 1.05;
+  h1, h2 {
+    line-height: 1.05;
+  }
 }
 
 @keyframes fadeUp {
