@@ -14,6 +14,7 @@ interface Props {
 
 export async function generateStaticParams() {
   try {
+    await ensureDbSeeded();
     const slugs = getAllPropertySlugs();
     return slugs.map((s) => ({ slug: s.slug }));
   } catch {
