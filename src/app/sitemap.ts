@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { getAllPropertySlugs } from "@/lib/sync";
 import { getBlogPosts } from "@/lib/blog";
 
+// Force dynamic so sitemap reflects new blog posts and properties without a redeploy
+export const dynamic = "force-dynamic";
+
 const BASE_URL = "https://www.thevilahome.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
