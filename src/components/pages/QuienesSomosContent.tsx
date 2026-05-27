@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 
+const bulletKeys = ["aboutBullet1", "aboutBullet2", "aboutBullet3", "aboutBullet4"] as const;
+
 const agents = [
   {
     name: "Ariadna Garcia",
@@ -30,18 +32,32 @@ export default function QuienesSomosContent() {
 
   return (
     <>
-      {/* Intro — compact strip */}
-      <section className="py-10 lg:py-12 border-b border-[#1a1a1a]">
+      {/* Intro */}
+      <section className="py-10 lg:py-14 border-b border-[#1a1a1a]">
         <div className="max-w-5xl mx-auto px-6 lg:px-10">
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center gap-3 mb-7">
             <span className="h-px w-8 bg-[#C9B99A]" />
             <span className="text-[#C9B99A] text-xs font-body tracking-[0.3em] uppercase">
               {t("aboutLabel")}
             </span>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 max-w-3xl">
-            <p className="text-[#999] text-sm leading-relaxed">{t("aboutIntro1")}</p>
-            <p className="text-[#999] text-sm leading-relaxed">{t("aboutIntro2")}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+            {/* Paragraphs */}
+            <div className="flex flex-col gap-4">
+              <p className="text-[#999] text-sm leading-relaxed">{t("aboutIntro1")}</p>
+              <p className="text-[#999] text-sm leading-relaxed">{t("aboutIntro2")}</p>
+            </div>
+            {/* Bullets */}
+            <ul className="flex flex-col gap-4 border-t lg:border-t-0 lg:border-l border-[#1e1e1e] pt-6 lg:pt-0 lg:pl-10">
+              {bulletKeys.map((key, i) => (
+                <li key={key} className="flex items-start gap-3">
+                  <span className="shrink-0 font-display text-[#C9B99A]/40 text-xs leading-relaxed tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-[#888] text-sm leading-relaxed">{t(key)}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
