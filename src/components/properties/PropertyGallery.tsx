@@ -18,13 +18,33 @@ interface Props {
 
 export default function PropertyGallery({ images, video, tour, title, ciudad, tipo }: Props) {
   const altBase = [tipo, ciudad].filter(Boolean).join(" en ") || title;
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showGrid, setShowGrid] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const lightboxRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
   const { t } = useLanguage();
+
+  const goPrev = useCallback(() => {
+    setCurrentIndex((i) => (i - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  const goNext = useCallback(() => {
+    setCurrentIndex((i) => (i + 1) % images.length);
+  }, [images.length]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 40) delta > 0 ? goNext() : goPrev();
+    touchStartX.current = null;
+  };
 
   // Track fullscreen state changes (e.g. user presses Esc)
   useEffect(() => {
@@ -47,7 +67,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const hasTour = Boolean(tour);
   const totalMedia = images.length + (hasVideo ? 1 : 0);
 
-  const mainImage = images[0];
+  const mainImage = images[currentIndex] ?? images[0];
   const ytId = video ? getYouTubeId(video) : null;
 
   const openLightbox = (index: number) => setLightboxIndex(index);
@@ -128,19 +148,22 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
       {/* Main gallery layout */}
       <div className="relative bg-black">
         <div className="max-w-7xl mx-auto">
-          {/* Primary image */}
+          {/* Primary image — carousel */}
           <div
-            className="relative aspect-[16/9] lg:aspect-[21/9] cursor-pointer overflow-hidden"
-            onClick={() => openLightbox(0)}
+            className="relative aspect-[16/9] lg:aspect-[21/9] overflow-hidden select-none"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
             {mainImage ? (
               <Image
+                key={currentIndex}
                 src={mainImage.url}
-                alt={`${altBase} — foto principal`}
+                alt={`${altBase} — foto ${currentIndex + 1} de ${images.length}`}
                 fill
-                className="object-cover"
-                priority
+                className="object-cover cursor-pointer"
+                priority={currentIndex === 0}
                 sizes="100vw"
+                onClick={() => openLightbox(currentIndex)}
               />
             ) : (
               <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
@@ -150,20 +173,42 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
+            {/* Prev arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={goPrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                aria-label="Foto anterior"
+              >
+                <ChevronLeft size={22} />
+              </button>
+            )}
+
+            {/* Next arrow */}
+            {images.length > 1 && (
+              <button
+                onClick={goNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                aria-label="Foto siguiente"
+              >
+                <ChevronRight size={22} />
+              </button>
+            )}
+
             {/* Media icons — bottom left */}
-            <div className="absolute bottom-4 left-4 z-10" onClick={(e) => e.stopPropagation()}>
+            <div className="absolute bottom-4 left-4 z-10">
               <MediaIcons />
             </div>
 
             {/* Image counter */}
             <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5">
-              1 / {totalMedia}
+              {currentIndex + 1} / {totalMedia}
             </div>
 
             {/* View all button */}
             {images.length > 1 && (
               <button
-                onClick={(e) => { e.stopPropagation(); setShowGrid(true); }}
+                onClick={() => setShowGrid(true)}
                 className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 hover:bg-[#C9B99A] hover:text-black transition-colors"
               >
                 {t("galleryAllPhotos")} ({images.length})
@@ -174,14 +219,14 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
           {/* Thumbnail strip */}
           {images.length > 1 && (
             <div className="hidden lg:flex gap-1 p-1 bg-black">
-              {images.slice(1, 6).map((img, i) => (
+              {images.slice(0, 6).map((img, i) => (
                 <button
                   key={i}
-                  onClick={() => openLightbox(i + 1)}
-                  className="relative flex-1 aspect-[4/3] overflow-hidden hover:opacity-80 transition-opacity"
+                  onClick={() => setCurrentIndex(i)}
+                  className={`relative flex-1 aspect-[4/3] overflow-hidden transition-opacity ${currentIndex === i ? "ring-2 ring-[#C9B99A] opacity-100" : "opacity-60 hover:opacity-90"}`}
                 >
-                  <Image src={img.url} alt={`${altBase} — foto ${i + 2}`} fill className="object-cover" sizes="200px" />
-                  {i === 4 && images.length > 6 && (
+                  <Image src={img.url} alt={`${altBase} — foto ${i + 1}`} fill className="object-cover" sizes="200px" />
+                  {i === 5 && images.length > 6 && (
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                       <span className="text-white text-sm font-body">+{images.length - 6}</span>
                     </div>
