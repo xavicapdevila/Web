@@ -8,73 +8,96 @@ interface Props {
   className?: string;
 }
 
-// Block-level tags whose text content we translate as a single unit
 const BLOCK_TAG_RE =
   /<(p|h[1-6]|li|blockquote|td|th|dt|dd)(\s[^>]*)?>[\s\S]*?<\/\1>/gi;
 
 /**
- * Translate block elements one request per block.
- * This is far cheaper on the MyMemory free tier than translating individual
- * text nodes (which produced 15–20 calls per article).
+ * Translate an HTML string block by block (1 API call per paragraph/heading/
+ * list-item). Only TOP-LEVEL blocks are processed — nested blocks (e.g. the
+ * <p> that Tiptap wraps inside <li>) are filtered out so we never corrupt the
+ * index-based reconstruction with overlapping replacements.
  *
- * The inner HTML of each block is replaced with its plain-text translation;
- * inline tags (strong, em, a…) are lost in the translated version — an
- * acceptable trade-off when the goal is readability in another language.
+ * Fallback for plain-text content (no HTML): split by sentences and translate
+ * each one individually.
  */
 async function translateHtmlBlocks(
   html: string,
   translateFn: (text: string) => Promise<string>
 ): Promise<string> {
+  // ── Plain-text fallback ───────────────────────────────────────────────────
+  if (!html.includes("<")) {
+    // Split into sentences so we stay under MyMemory's 5000-char limit
+    const sentences = html.split(/(?<=[.!?…])\s+/u).filter(Boolean);
+    if (sentences.length === 0) return html;
+    const translated = await Promise.all(sentences.map((s) => translateFn(s)));
+    return translated.join(" ");
+  }
+
+  // ── Block-element approach ────────────────────────────────────────────────
   type BlockMatch = {
     index: number;
     end: number;
     tag: string;
     attrs: string;
-    inner: string;
     plainText: string;
   };
 
-  const matches: BlockMatch[] = [];
+  const all: BlockMatch[] = [];
+  const re = new RegExp(BLOCK_TAG_RE.source, "gi");
   let m: RegExpExecArray | null;
-  const re = new RegExp(BLOCK_TAG_RE.source, "gi"); // fresh lastIndex
 
   while ((m = re.exec(html)) !== null) {
-    const tag   = m[1];
-    const attrs = m[2] ?? "";
-    const inner = m[0].slice(`<${tag}${attrs}>`.length, -`</${tag}>`.length);
-    // Strip inner HTML to get plain text for translation
+    const tag      = m[1];
+    const attrs    = m[2] ?? "";
+    const fullLen  = m[0].length;
+    const openLen  = `<${tag}${attrs}>`.length;
+    const closeLen = `</${tag}>`.length;
+    const inner    = m[0].slice(openLen, fullLen - closeLen);
     const plainText = inner.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
     if (plainText.length > 2) {
-      matches.push({
+      all.push({
         index: m.index,
-        end: m.index + m[0].length,
+        end:   m.index + fullLen,
         tag,
         attrs,
-        inner,
         plainText,
       });
     }
   }
 
-  if (matches.length === 0) return html;
+  if (all.length === 0) return html;
+
+  // Keep only TOP-LEVEL blocks — drop any block whose range sits fully inside
+  // another match (e.g. the <p> inside a Tiptap <li>).
+  const topLevel = all.filter(
+    (block) =>
+      !all.some(
+        (other) =>
+          other !== block &&
+          other.index <= block.index &&
+          other.end >= block.end
+      )
+  );
+
+  if (topLevel.length === 0) return html;
 
   // Deduplicate and translate
-  const uniqueTexts = [...new Set(matches.map((b) => b.plainText))];
+  const uniqueTexts = [...new Set(topLevel.map((b) => b.plainText))];
   const translations = new Map<string, string>();
 
   await Promise.all(
     uniqueTexts.map(async (text) => {
-      const translated = await translateFn(text);
-      translations.set(text, translated);
+      const result = await translateFn(text);
+      translations.set(text, result);
     })
   );
 
-  // Rebuild HTML from end to start so indices stay valid
+  // Rebuild from end → start so earlier indices are not invalidated
   let result = html;
-  for (const block of [...matches].reverse()) {
+  for (const block of [...topLevel].reverse()) {
     const translated = translations.get(block.plainText) ?? block.plainText;
-    const newBlock = `<${block.tag}${block.attrs}>${translated}</${block.tag}>`;
+    const newBlock   = `<${block.tag}${block.attrs}>${translated}</${block.tag}>`;
     result = result.slice(0, block.index) + newBlock + result.slice(block.end);
   }
 
@@ -91,9 +114,13 @@ export default function TranslatableHTML({ html, className }: Props) {
       return;
     }
     let cancelled = false;
-    translateHtmlBlocks(html, translate).then((translated) => {
-      if (!cancelled) setOutput(translated);
-    });
+    translateHtmlBlocks(html, translate)
+      .then((translated) => {
+        if (!cancelled) setOutput(translated);
+      })
+      .catch(() => {
+        // Keep original on any unexpected error
+      });
     return () => {
       cancelled = true;
     };
