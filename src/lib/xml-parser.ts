@@ -217,15 +217,20 @@ export async function fetchAndParseXML(): Promise<Property[]> {
 
       const ascensor = safeBool(item["ascensor"]);
       const hasGaraje  = safeBool(item["plaza_gara"]) || safeBool(item["garaje"]);
-      const hasParking = safeBool(item["parking"]);
+      // "parking" is a TYPE CODE in apinmo (0 = none, any non-zero value = has parking)
+      // safeBool only accepts "1"/"si"/etc., so we must check for any non-zero number
+      const parkingCode = Number(safeText(item["parking"] ?? "0"));
+      const hasParking = parkingCode > 0;
       const garaje     = hasGaraje || hasParking;
-      const garajeTipo = hasParking ? "parking" : "garaje";
+      const garajeTipo = hasParking && !hasGaraje ? "parking" : "garaje";
       const trastero = safeBool(item["trastero"]);
       const piscina = safeBool(item["piscina_prop"] ?? item["piscina_com"] ?? item["piscina"]);
       const terraza = safeBool(item["terraza"]);
       const jardin = safeBool(item["jardin"]);
       const amueblado = safeBool(item["muebles"]);
-      const aireCond = safeBool(item["aire_con"] ?? item["airecentral"]);
+      // "aire_con" is a type code: 0=none, 1=cold-only, 2=cold+hot, 3=central
+      const aireConCode = Number(safeText(item["aire_con"] ?? item["airecentral"] ?? "0"));
+      const aireCond = aireConCode > 0;
       const urbanizacion = safeBool(item["urbanizacion"]);
 
       // Calefaccion: field is 0 or name
