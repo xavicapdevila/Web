@@ -25,59 +25,58 @@ const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
   "Vivir en...":    { es: "Vivir en...",    ca: "Viure a...",    en: "Living in...",  fr: "Vivre à..." },
 };
 
-// ── Article card — compact, uniform ──────────────────────────────────────────
+// ── Article card ─────────────────────────────────────────────────────────────
 function ArticleCard({ post }: { post: BlogPost }) {
-  const translatedTitle = useAutoTranslate(post.titulo);
+  const translatedTitle   = useAutoTranslate(post.titulo);
+  const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
 
   return (
     <article className="group bg-[#0f0f0f] border border-[#1a1a1a] hover:border-[#C9B99A]/20 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Image */}
-      <Link href={`/blog/${post.slug}`} className="block relative h-36 overflow-hidden shrink-0">
+      <Link href={`/blog/${post.slug}`} className="block relative h-52 overflow-hidden shrink-0">
         {post.imagen ? (
           <Image
             src={post.imagen}
             alt={post.imagenAlt || post.titulo}
             fill
             className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             loading="lazy"
           />
         ) : (
           <div className="absolute inset-0 bg-[#141414] flex items-center justify-center">
-            <span className="font-display text-4xl text-[#C9B99A]/10 select-none">
+            <span className="font-display text-5xl text-[#C9B99A]/10 select-none">
               {post.titulo.charAt(0)}
             </span>
           </div>
         )}
         {/* Category badge */}
         {post.categoria && (
-          <span className="absolute top-2.5 left-2.5 text-black bg-[#C9B99A] text-[9px] font-body tracking-[0.14em] uppercase px-2 py-0.5 leading-tight">
+          <span className="absolute top-3 left-3 text-black bg-[#C9B99A] text-[9px] font-body tracking-[0.14em] uppercase px-2 py-0.5 leading-tight">
             {post.categoria}
           </span>
         )}
       </Link>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4">
+      <div className="flex flex-col flex-1 p-5">
         <Link href={`/blog/${post.slug}`} className="flex-1">
-          <h2 className="font-display text-[14px] leading-snug text-[#ddd] group-hover:text-[#C9B99A] transition-colors duration-200 line-clamp-2">
+          <h2 className="font-display text-base leading-snug text-[#ddd] group-hover:text-[#C9B99A] transition-colors duration-200 line-clamp-2 mb-2">
             {translatedTitle}
           </h2>
         </Link>
 
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#191919]">
-          <CalendarDays size={9} className="text-[#444] shrink-0" />
-          <span className="text-[#444] text-[10px] tabular-nums">
+        {post.extracto && (
+          <p className="text-[#555] text-xs leading-relaxed line-clamp-2 mb-4">
+            {translatedExcerpt}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 mt-auto pt-3 border-t border-[#191919]">
+          <CalendarDays size={10} className="text-[#444] shrink-0" />
+          <span className="text-[#444] text-[11px] tabular-nums">
             {formatBlogDate(post.fecha)}
           </span>
-          {post.etiquetas[0] && (
-            <>
-              <span className="text-[#2e2e2e]">·</span>
-              <span className="text-[#3a3a3a] text-[10px] font-body tracking-wide uppercase truncate">
-                {post.etiquetas[0]}
-              </span>
-            </>
-          )}
         </div>
       </div>
     </article>
@@ -244,7 +243,7 @@ export default function BlogContent({ posts }: Props) {
           {/* Grid */}
           {visible.length > 0 && (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
                 {visible.map((post) => (
                   <ArticleCard key={post.id} post={post} />
                 ))}
