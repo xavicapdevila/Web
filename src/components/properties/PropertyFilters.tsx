@@ -73,7 +73,6 @@ export default function PropertyFilters() {
       >
         <span className="flex items-center gap-2 text-white text-sm font-body">
           <SlidersHorizontal size={15} className="text-[#C9B99A]" />
-          {t("filtersTitle")}
           {activeCount > 0 && (
             <span className="bg-[#C9B99A] text-black text-[10px] font-bold px-1.5 py-0.5 leading-none">
               {activeCount}
@@ -93,7 +92,7 @@ export default function PropertyFilters() {
       )}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-xl text-white hidden lg:block">{t("filtersTitle")}</h2>
+          <h2 className="font-display text-xl text-white hidden lg:block" />
           {hasFilters && (
             <button
               onClick={clearFilters}
