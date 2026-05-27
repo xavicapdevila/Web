@@ -45,6 +45,7 @@ export interface Property {
   consumoEnergetico?: string;     // valor numérico kWh/m²·año
   emisionesLetra?: string;        // letra A-G de las emisiones CO₂
   emisionesEnergeticas?: string;  // valor numérico kg CO₂/m²·año
+  energiaExento?: boolean;        // true si energiarecibido=3 (exento)
   imagenes: PropertyImage[];
   video1?: string;
   tour?: string;

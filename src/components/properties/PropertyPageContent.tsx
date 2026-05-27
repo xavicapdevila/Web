@@ -125,6 +125,7 @@ function EnergyCertificate({
   consumo,
   emisionesLetra,
   emisiones,
+  exento,
   labelTitle,
   labelCO2,
 }: {
@@ -132,6 +133,7 @@ function EnergyCertificate({
   consumo?: string;
   emisionesLetra?: string;
   emisiones?: string;
+  exento?: boolean;
   labelTitle: string;
   labelCO2: string;
 }) {
@@ -142,24 +144,33 @@ function EnergyCertificate({
     <div className="bg-[#111] border border-[#1e1e1e] p-6">
       <h3 className="font-display text-xl text-white mb-5">{labelTitle}</h3>
 
-      {/* Consumption scale */}
-      {activeConsumo && (
-        <div className="mb-5">
-          <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
-            Consumo energético
-          </p>
-          <EnergyScale activeGrade={activeConsumo} value={consumo} unit="kWh/m²·año" />
+      {exento ? (
+        <div className="flex items-center gap-3 py-3 px-4 border border-[#2a2a2a] text-[#888] text-sm">
+          <span className="text-lg">⚡</span>
+          Inmueble exento de certificado energético
         </div>
-      )}
+      ) : (
+        <>
+          {/* Consumption scale */}
+          {activeConsumo && (
+            <div className="mb-5">
+              <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
+                Consumo energético
+              </p>
+              <EnergyScale activeGrade={activeConsumo} value={consumo} unit="kWh/m²·año" />
+            </div>
+          )}
 
-      {/* Emissions scale */}
-      {activeEmisiones && (
-        <div>
-          <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
-            {labelCO2}
-          </p>
-          <EnergyScale activeGrade={activeEmisiones} value={emisiones} unit="kg CO₂/m²·año" />
-        </div>
+          {/* Emissions scale */}
+          {activeEmisiones && (
+            <div>
+              <p className="text-[#555] text-[10px] font-body tracking-[0.2em] uppercase mb-2">
+                {labelCO2}
+              </p>
+              <EnergyScale activeGrade={activeEmisiones} value={emisiones} unit="kg CO₂/m²·año" />
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -331,12 +342,13 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
           </div>
 
           {/* Energy certificate */}
-          {(property.certificadoEnergetico || property.emisionesLetra) && (
+          {(property.certificadoEnergetico || property.emisionesLetra || property.energiaExento) && (
             <EnergyCertificate
               letra={property.certificadoEnergetico}
               consumo={property.consumoEnergetico}
               emisionesLetra={property.emisionesLetra}
               emisiones={property.emisionesEnergeticas}
+              exento={property.energiaExento}
               labelTitle={t("detailsEnergy")}
               labelCO2={t("detailsCO2")}
             />

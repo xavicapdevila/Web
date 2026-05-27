@@ -62,7 +62,7 @@ export async function syncProperties(): Promise<SyncResult> {
         m2_parcela, planta, ascensor, garaje, trastero, piscina, terraza,
         jardin, amueblado, calefaccion, aire_cond, orientacion, antiguedad,
         estado, ibi, gastos_comun, certificado_energetico, consumo_energetico,
-        emisiones_letra, emisiones_energeticas, imagenes, video1, tour, fecha, agente, agente_email,
+        emisiones_letra, emisiones_energeticas, energia_exento, imagenes, video1, tour, fecha, agente, agente_email,
         agente_foto, agente_telefono, slug, updated_at
       ) VALUES (
         @id, @ref, @tipo, @subtipo, @operacion, @precio, @precioAnterior, @outlet,
@@ -71,7 +71,7 @@ export async function syncProperties(): Promise<SyncResult> {
         @m2Parcela, @planta, @ascensor, @garaje, @trastero, @piscina, @terraza,
         @jardin, @amueblado, @calefaccion, @aireCond, @orientacion, @antiguedad,
         @estado, @ibi, @gastosComun, @certificadoEnergetico, @consumoEnergetico,
-        @emisionesLetra, @emisionesEnergeticas, @imagenes, @video1, @tour, @fecha, @agente, @agenteEmail,
+        @emisionesLetra, @emisionesEnergeticas, @energiaExento, @imagenes, @video1, @tour, @fecha, @agente, @agenteEmail,
         @agenteFoto, @agenteTelefono, @slug, datetime('now')
       )
       ON CONFLICT(ref) DO UPDATE SET
@@ -114,6 +114,7 @@ export async function syncProperties(): Promise<SyncResult> {
         consumo_energetico = excluded.consumo_energetico,
         emisiones_letra = excluded.emisiones_letra,
         emisiones_energeticas = excluded.emisiones_energeticas,
+        energia_exento = excluded.energia_exento,
         imagenes = excluded.imagenes,
         video1 = excluded.video1,
         tour = excluded.tour,
@@ -170,6 +171,7 @@ export async function syncProperties(): Promise<SyncResult> {
           consumoEnergetico: p.consumoEnergetico ?? null,
           emisionesLetra: p.emisionesLetra ?? null,
           emisionesEnergeticas: p.emisionesEnergeticas ?? null,
+          energiaExento: p.energiaExento ? 1 : 0,
           imagenes: JSON.stringify(p.imagenes),
           video1: p.video1 ?? null,
           tour: p.tour ?? null,
@@ -347,6 +349,7 @@ function rowToProperty(row: Record<string, unknown>): Property {
     emisionesEnergeticas: row.emisiones_energeticas
       ? String(row.emisiones_energeticas)
       : undefined,
+    energiaExento: Boolean(row.energia_exento),
     imagenes: JSON.parse(String(row.imagenes ?? "[]")),
     video1: row.video1 ? String(row.video1) : undefined,
     tour: row.tour ? String(row.tour) : undefined,

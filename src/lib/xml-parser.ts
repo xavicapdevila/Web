@@ -216,7 +216,9 @@ export async function fetchAndParseXML(): Promise<Property[]> {
 
       // Energy certificate — apinmo feed uses energialetra / energiavalor / emisionesletra / emisionesvalor
       // energiarecibido = 1 means the certificate has been received/is valid
+      // energiarecibido: 1=recibido, 2=en trámite, 3=exento
       const energiaRecibido = safeInt(item["energiarecibido"] ?? 0);
+      const energiaExento = energiaRecibido === 3;
       const certEnergetico = energiaRecibido === 1
         ? safeText(item["energialetra"] ?? item["califica_e"] ?? item["certificadoenergetico"] ?? "")
         : safeText(item["califica_e"] ?? item["certificadoenergetico"] ?? "");
@@ -276,6 +278,7 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         consumoEnergetico: consumoEnergetico || undefined,
         emisionesLetra: emisionesLetra || undefined,
         emisionesEnergeticas: emisionesEnergeticas || undefined,
+        energiaExento: energiaExento || undefined,
         imagenes,
         video1,
         tour,
