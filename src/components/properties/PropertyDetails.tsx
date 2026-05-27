@@ -133,7 +133,7 @@ function EnergyCertificateSection({ property }: { property: Property }) {
         {property.energiaExento ? (
           <p className="text-[#555] text-sm">Exento de certificado energético</p>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {gradeConsumo && (
               <EnergyRow
                 grade={gradeConsumo}
@@ -141,9 +141,6 @@ function EnergyCertificateSection({ property }: { property: Property }) {
                 unit="kWh/m²·año"
                 label="Consumo energético"
               />
-            )}
-            {gradeConsumo && gradeEmisiones && (
-              <div className="border-t border-[#1a1a1a]" />
             )}
             {gradeEmisiones && (
               <EnergyRow
