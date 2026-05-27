@@ -89,8 +89,9 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
 
   const handleShare = async () => {
     const url = `${window.location.origin}/propiedades/${property.slug}`;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     try {
-      if (navigator.share) {
+      if (navigator.share && isMobile) {
         await navigator.share({ title: titulo, url });
       } else {
         setShowShareModal(true);
