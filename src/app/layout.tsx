@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -115,26 +116,35 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>
       <head>
         {/* GA is loaded conditionally by CookieConsentProvider once analytics consent is given */}
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
-        <LanguageProvider>
-          <CookieConsentProvider>
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <WhatsAppButton />
-            <CookieBanner />
-          </CookieConsentProvider>
-        </LanguageProvider>
+        {isAdmin ? (
+          // Admin routes: no public chrome
+          <>{children}</>
+        ) : (
+          <LanguageProvider>
+            <CookieConsentProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <WhatsAppButton />
+              <CookieBanner />
+            </CookieConsentProvider>
+          </LanguageProvider>
+        )}
       </body>
     </html>
   );

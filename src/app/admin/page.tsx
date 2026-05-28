@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Building2, FileText, TrendingDown, Clock } from "lucide-react";
+import { Building2, FileText, Clock } from "lucide-react";
 import { getDb } from "@/lib/db";
 import { getAllBlogPostsAdmin } from "@/lib/blog";
+import { ensureDbSeeded } from "@/lib/sync";
 
 export const metadata = { title: "Admin — The Vila Home" };
 export const dynamic  = "force-dynamic";
@@ -48,6 +49,7 @@ function relativeTime(raw: string) {
 }
 
 export default async function AdminPage() {
+  try { await ensureDbSeeded(); } catch {}
   const s = getStats();
   let blogCount = 0;
   try { blogCount = (await getAllBlogPostsAdmin()).length; } catch {}
