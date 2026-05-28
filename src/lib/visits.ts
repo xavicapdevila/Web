@@ -232,13 +232,18 @@ export async function getShareCount(slug: string): Promise<number> {
   }
 }
 
-/** Atomically increment the share count for a slug and return the new value. */
+/** Increment the share count for a slug and return the new value (fire-and-forget write). */
 export async function incrementShare(slug: string): Promise<number> {
   if (USE_BLOB) {
-    const counts = await readBlobShares();
-    const newCount = (counts[slug] ?? 0) + 1;
-    counts[slug] = newCount;
-    await writeBlobShares(counts);
+    let newCount = 1;
+    try {
+      const counts = await readBlobShares();
+      newCount = (counts[slug] ?? 0) + 1;
+      counts[slug] = newCount;
+      writeBlobShares(counts).catch(() => {});
+    } catch {
+      newCount = 1;
+    }
     return newCount;
   }
   try {
@@ -253,17 +258,32 @@ export async function incrementShare(slug: string): Promise<number> {
       .get(slug) as { count: number } | undefined;
     return row?.count ?? 1;
   } catch {
-    return 0;
+    return 1;
   }
 }
 
-/** Atomically increment the visit count for a slug and return the new value. */
+/**
+ * Increment the visit count for a slug and return the new value.
+ *
+ * Blob path: read current counts → calculate newCount → fire Blob write
+ * in the background (non-blocking) → return newCount immediately.
+ * This ensures the counter is always visible even if the Blob write
+ * is slow or fails (the count shown is accurate for this request;
+ * persistence is best-effort).
+ */
 export async function incrementVisit(slug: string): Promise<number> {
   if (USE_BLOB) {
-    const counts = await readBlobVisits();
-    const newCount = (counts[slug] ?? 0) + 1;
-    counts[slug] = newCount;
-    await writeBlobVisits(counts);
+    let newCount = 1;
+    try {
+      const counts = await readBlobVisits();
+      newCount = (counts[slug] ?? 0) + 1;
+      counts[slug] = newCount;
+      // Fire-and-forget: write persists in background, never blocks the response
+      writeBlobVisits(counts).catch(() => {});
+    } catch {
+      // readBlobVisits failed — still show 1 for this visit
+      newCount = 1;
+    }
     return newCount;
   }
 
@@ -280,6 +300,6 @@ export async function incrementVisit(slug: string): Promise<number> {
       .get(slug) as { count: number } | undefined;
     return row?.count ?? 1;
   } catch {
-    return 0;
+    return 1;
   }
 }

@@ -220,7 +220,8 @@ export default function BlogPostClient({ post, related }: Props) {
     })
       .then((r) => r.json())
       .then((data) => {
-        if (data.count > 0) setVisitCount(data.count);
+        // Always set — incrementVisit always returns ≥ 1
+        if (typeof data.count === "number") setVisitCount(data.count);
         if (typeof data.shareCount === "number") setShareCount(data.shareCount);
       })
       .catch(() => {});
