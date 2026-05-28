@@ -159,37 +159,37 @@ function RelatedCard({ post }: { post: BlogPost }) {
   const translatedTitle = useAutoTranslate(post.titulo);
   return (
     <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/30 transition-all duration-300 overflow-hidden">
-      <div className="relative aspect-video bg-gradient-to-br from-[#1a1a1a] to-[#111] overflow-hidden border-b border-[#1e1e1e]">
-        {post.imagen ? (
-          <Image
-            src={post.imagen}
-            alt={post.imagenAlt || post.titulo}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="300px"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <span className="font-display text-3xl text-[#C9B99A]/20">
-              {post.titulo.charAt(0)}
+      <Link href={`/blog/${post.slug}`} className="flex flex-col h-full">
+        <div className="relative aspect-video bg-gradient-to-br from-[#1a1a1a] to-[#111] overflow-hidden border-b border-[#1e1e1e]">
+          {post.imagen ? (
+            <Image
+              src={post.imagen}
+              alt={post.imagenAlt || post.titulo}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="300px"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <span className="font-display text-3xl text-[#C9B99A]/20">
+                {post.titulo.charAt(0)}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="p-5 flex flex-col flex-1">
+          {post.categoria && (
+            <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase mb-2 block">
+              {post.categoria}
             </span>
-          </div>
-        )}
-      </div>
-      <div className="p-5">
-        {post.categoria && (
-          <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase mb-2 block">
-            {post.categoria}
-          </span>
-        )}
-        <Link href={`/blog/${post.slug}`}>
+          )}
           <h3 className="font-display text-base text-white group-hover:text-[#C9B99A] transition-colors leading-snug mb-2 line-clamp-2">
             {translatedTitle}
           </h3>
-        </Link>
-        <p className="text-[#555] text-xs">{formatBlogDate(post.fecha)}</p>
-      </div>
+          <p className="text-[#555] text-xs mt-auto">{formatBlogDate(post.fecha)}</p>
+        </div>
+      </Link>
     </article>
   );
 }
