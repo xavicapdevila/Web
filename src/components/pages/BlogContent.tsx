@@ -46,72 +46,73 @@ function ArticleCard({ post, visits }: { post: BlogPost; visits?: number }) {
         </span>
       )}
 
-      {/* Image */}
-      <Link href={`/blog/${post.slug}`} className="block relative h-56 overflow-hidden shrink-0">
-        {post.imagen ? (
-          <Image
-            src={post.imagen}
-            alt={post.imagenAlt || post.titulo}
-            fill
-            className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            loading="lazy"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-[#141414] flex items-center justify-center">
-            <span className="font-display text-5xl text-[#C9B99A]/10 select-none">
-              {post.titulo.charAt(0)}
-            </span>
-          </div>
-        )}
-      </Link>
-
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-5">
-        {/* Tags */}
-        {post.etiquetas.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            {post.etiquetas.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="text-[#C9B99A]/60 text-[10px] font-body tracking-wide uppercase border border-[#C9B99A]/15 px-2 py-0.5"
-              >
-                {tag}
+      {/* Single link wrapping the whole card */}
+      <Link href={`/blog/${post.slug}`} className="flex flex-col flex-1">
+        {/* Image */}
+        <div className="relative h-56 overflow-hidden shrink-0">
+          {post.imagen ? (
+            <Image
+              src={post.imagen}
+              alt={post.imagenAlt || post.titulo}
+              fill
+              className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-[1.03] transition-all duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[#141414] flex items-center justify-center">
+              <span className="font-display text-5xl text-[#C9B99A]/10 select-none">
+                {post.titulo.charAt(0)}
               </span>
-            ))}
-          </div>
-        )}
-
-        {/* Title */}
-        <Link href={`/blog/${post.slug}`} className="mb-3">
-          <h2 className="font-display text-lg leading-snug text-white group-hover:text-[#C9B99A] transition-colors duration-200">
-            {translatedTitle}
-          </h2>
-        </Link>
-
-        {/* Full excerpt */}
-        {post.extracto && (
-          <p className="text-[#666] text-sm leading-relaxed flex-1">
-            {translatedExcerpt}
-          </p>
-        )}
-
-        {/* Date + visits footer */}
-        <div className="flex items-center justify-between gap-2 mt-5 pt-4 border-t border-[#191919]">
-          <span className="flex items-center gap-1.5">
-            <CalendarDays size={11} className="text-[#C9B99A]/50 shrink-0" />
-            <span className="text-[#555] text-xs tabular-nums">
-              {formatBlogDate(post.fecha)}
-            </span>
-          </span>
-          {!!visits && visits > 0 && (
-            <span className="flex items-center gap-1 text-[#444] text-[10px] tabular-nums">
-              <Eye size={10} className="shrink-0" />
-              {fmtVisits(visits)}
-            </span>
+            </div>
           )}
         </div>
-      </div>
+
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-5">
+          {/* Tags */}
+          {post.etiquetas.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {post.etiquetas.slice(0, 2).map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[#C9B99A]/60 text-[10px] font-body tracking-wide uppercase border border-[#C9B99A]/15 px-2 py-0.5"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Title */}
+          <h2 className="font-display text-lg leading-snug text-white group-hover:text-[#C9B99A] transition-colors duration-200 mb-3">
+            {translatedTitle}
+          </h2>
+
+          {/* Full excerpt */}
+          {post.extracto && (
+            <p className="text-[#666] text-sm leading-relaxed flex-1">
+              {translatedExcerpt}
+            </p>
+          )}
+
+          {/* Date + visits footer */}
+          <div className="flex items-center justify-between gap-2 mt-5 pt-4 border-t border-[#191919]">
+            <span className="flex items-center gap-1.5">
+              <CalendarDays size={11} className="text-[#C9B99A]/50 shrink-0" />
+              <span className="text-[#555] text-xs tabular-nums">
+                {formatBlogDate(post.fecha)}
+              </span>
+            </span>
+            {!!visits && visits > 0 && (
+              <span className="flex items-center gap-1 text-[#444] text-[10px] tabular-nums">
+                <Eye size={10} className="shrink-0" />
+                {fmtVisits(visits)}
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
     </article>
   );
 }
