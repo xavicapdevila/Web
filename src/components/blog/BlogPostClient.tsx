@@ -13,13 +13,27 @@ const BASE_URL = "https://www.thevilahome.com";
 
 // ── Share button ──────────────────────────────────────────────────────────────
 
-function ShareButton({ url, title }: { url: string; title: string }) {
+function ShareButton({
+  url,
+  title,
+  direction = "up",
+}: {
+  url: string;
+  title: string;
+  direction?: "up" | "down";
+}) {
   const { t } = useLanguage();
   const [open, setOpen]     = useState(false);
   const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
-    if (typeof navigator !== "undefined" && "share" in navigator) {
+    // Use native share sheet only on touch devices (mobile/tablet).
+    // On desktop the OS share panel lacks social links, so always use the
+    // custom dropdown there.
+    const isTouch =
+      typeof window !== "undefined" &&
+      window.matchMedia("(pointer: coarse)").matches;
+    if (isTouch && typeof navigator !== "undefined" && "share" in navigator) {
       navigator.share({ title, url }).catch(() => {});
     } else {
       setOpen((o) => !o);
@@ -87,7 +101,7 @@ function ShareButton({ url, title }: { url: string; title: string }) {
             aria-hidden
           />
           {/* Dropdown */}
-          <div className="absolute bottom-full right-0 mb-2 z-50 bg-[#0f0f0f] border border-[#2a2a2a] shadow-2xl min-w-[190px] overflow-hidden">
+          <div className={`absolute ${direction === "down" ? "top-full mt-2" : "bottom-full mb-2"} right-0 z-50 bg-[#0f0f0f] border border-[#2a2a2a] shadow-2xl min-w-[190px] overflow-hidden`}>
             {platforms.map((p) => (
               <a
                 key={p.label}
@@ -231,7 +245,7 @@ export default function BlogPostClient({ post, related }: Props) {
         {translatedTitle}
       </h1>
 
-      {/* Meta: author · date · visits */}
+      {/* Meta: author · date · visits · share */}
       <div className="flex flex-wrap items-center gap-6 text-[#555] text-sm mb-8 pb-8 border-b border-[#1a1a1a]">
         <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase">
           The Vila Home
@@ -240,12 +254,15 @@ export default function BlogPostClient({ post, related }: Props) {
           <CalendarDays size={13} className="text-[#C9B99A]" />
           {formatBlogDate(post.fecha)}
         </span>
-        {visitCount !== null && (
-          <span className="flex items-center gap-1.5 text-[#444] text-xs ml-auto">
-            <Eye size={12} className="text-[#C9B99A]/50" />
-            {visitCount.toLocaleString("es")}
-          </span>
-        )}
+        <div className="flex items-center gap-4 ml-auto">
+          {visitCount !== null && (
+            <span className="flex items-center gap-1.5 text-[#444] text-xs">
+              <Eye size={12} className="text-[#C9B99A]/50" />
+              {visitCount.toLocaleString("es")}
+            </span>
+          )}
+          <ShareButton url={articleUrl} title={post.titulo} direction="down" />
+        </div>
       </div>
 
       {/* Featured image */}
