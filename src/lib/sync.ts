@@ -18,11 +18,20 @@ const _getCachedXmlProperties = unstable_cache(
   { revalidate: 3600, tags: ["properties"] }
 );
 
-/** Returns a single property by slug using the Vercel Data Cache. */
+/** Returns a single property by slug.
+ *  Primary source: Vercel Data Cache (XML-based, fast, shared across Lambdas).
+ *  Fallback: SQLite DB — catches properties published after the XML regenerated.
+ */
 export async function getCachedPropertyBySlug(slug: string): Promise<Property | null> {
   try {
     const properties = await _getCachedXmlProperties();
-    return properties.find((p) => p.slug === slug) ?? null;
+    const found = properties.find((p) => p.slug === slug);
+    if (found) return found;
+  } catch { /* fall through to DB */ }
+
+  // DB fallback: REST-only listings not yet in the XML feed
+  try {
+    return getPropertyBySlug(slug);
   } catch {
     return null;
   }
