@@ -269,7 +269,7 @@ export default function BlogPostClient({ post, related }: Props) {
       </div>
 
       {/* Title */}
-      <h1 className="font-display text-4xl lg:text-5xl text-white font-light leading-tight mb-6">
+      <h1 className="font-display text-4xl lg:text-5xl text-white font-normal leading-tight mb-6">
         {translatedTitle}
       </h1>
 
@@ -320,7 +320,7 @@ export default function BlogPostClient({ post, related }: Props) {
           html={post.contenido}
           className="prose prose-invert prose-base max-w-none
             prose-p:text-[#aaa] prose-p:leading-relaxed
-            prose-headings:text-white prose-headings:font-display prose-headings:font-light
+            prose-headings:text-white prose-headings:font-display prose-headings:font-normal
             prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
             prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
             prose-strong:text-white prose-em:text-[#ccc]
@@ -354,7 +354,7 @@ export default function BlogPostClient({ post, related }: Props) {
       {/* Related posts */}
       {related.length > 0 && (
         <section className="mt-16 pt-12 border-t border-[#1a1a1a]">
-          <h2 className="font-display text-2xl text-white font-light mb-8">
+          <h2 className="font-display text-2xl text-white font-normal mb-8">
             {t("blogRelatedTitle")}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -367,7 +367,7 @@ export default function BlogPostClient({ post, related }: Props) {
 
       {/* Bottom CTA */}
       <div className="mt-16 pt-12 border-t border-[#1a1a1a] bg-[#111] border border-[#1e1e1e] p-8">
-        <h3 className="font-display text-2xl text-white mb-3">
+        <h3 className="font-display text-2xl text-white font-normal mb-3">
           {t("blogCtaTitle")}
         </h3>
         <p className="text-[#888] text-sm mb-5">
