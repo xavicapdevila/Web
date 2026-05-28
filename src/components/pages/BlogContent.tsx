@@ -16,12 +16,24 @@ interface Props {
 
 const PAGE_SIZE = 12;
 
-const CATEGORIES = ["Mercado", "Procesos", "Documentación", "Consejos", "Vivir en..."];
+const CATEGORIES = [
+  "Mercado",
+  "Procesos",
+  "Documentación",
+  "Hipotecas",
+  "Impuestos",
+  "Herencias",
+  "Consejos",
+  "Vivir en...",
+];
 
 const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
   "Mercado":        { es: "Mercado",        ca: "Mercat",        en: "Market",        fr: "Marché" },
   "Procesos":       { es: "Procesos",       ca: "Processos",     en: "Processes",     fr: "Processus" },
   "Documentación":  { es: "Documentación",  ca: "Documentació",  en: "Documentation", fr: "Documentation" },
+  "Hipotecas":      { es: "Hipotecas",      ca: "Hipoteques",    en: "Mortgages",     fr: "Hypothèques" },
+  "Impuestos":      { es: "Impuestos",      ca: "Impostos",      en: "Taxes",         fr: "Impôts" },
+  "Herencias":      { es: "Herencias",      ca: "Herències",     en: "Inheritances",  fr: "Héritages" },
   "Consejos":       { es: "Consejos",       ca: "Consells",      en: "Tips",          fr: "Conseils" },
   "Vivir en...":    { es: "Vivir en...",    ca: "Viure a...",    en: "Living in...",  fr: "Vivre à..." },
 };

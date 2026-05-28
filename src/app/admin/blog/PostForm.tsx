@@ -26,6 +26,9 @@ const CATEGORIAS = [
   "Mercado",
   "Procesos",
   "Documentación",
+  "Hipotecas",
+  "Impuestos",
+  "Herencias",
   "Consejos",
   "Vivir en...",
 ];
