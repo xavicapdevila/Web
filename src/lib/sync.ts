@@ -1,4 +1,4 @@
-import { unstable_cache } from "next/cache";
+import { unstable_cache, revalidateTag } from "next/cache";
 import { getDb } from "./db";
 import { fetchAndParseXML } from "./xml-parser";
 import { fetchFromRestApi } from "./rest-parser";
@@ -241,6 +241,9 @@ async function syncFromRest(): Promise<SyncResult> {
     "INSERT INTO sync_log (properties_added, properties_updated, properties_removed, status, source) VALUES (?, ?, ?, 'ok', 'rest')"
   ).run(added, updated, removed);
 
+  // Revalidate the Vercel Data Cache so detail pages pick up the new data
+  try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
+
   return { added, updated, removed, total, source: "rest", unchanged };
 }
 
@@ -282,6 +285,9 @@ async function syncFromXml(): Promise<SyncResult> {
     "INSERT INTO sync_log (properties_added, properties_updated, properties_removed, status, source) VALUES (?, ?, ?, 'ok', 'xml')"
   ).run(added, updated, removed);
 
+  // Revalidate the Vercel Data Cache so detail pages pick up the new data
+  try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
+
   return { added, updated, removed, total: properties.length, source: "xml" };
 }
 
@@ -291,8 +297,12 @@ async function syncFromXml(): Promise<SyncResult> {
 
 /**
  * Ensures the DB has properties on cold starts.
- * Always uses the XML feed — it's a single fast request, suitable for
- * rendering contexts where the REST sync (~2–3 min) would time out.
+ *
+ * 1. Seeds from the XML feed (single fast request, <5 s).
+ * 2. If INMOVILLA_API_TOKEN is set, does a quick REST delta check:
+ *    fetches the REST property list and upserts any refs that the XML
+ *    feed doesn't contain yet (new listings published after the last
+ *    XML regeneration). Usually 0–1 extra fetch, so negligible overhead.
  */
 export async function ensureDbSeeded(): Promise<void> {
   try {
@@ -300,9 +310,39 @@ export async function ensureDbSeeded(): Promise<void> {
     const { c } = db
       .prepare("SELECT COUNT(*) as c FROM properties")
       .get() as { c: number };
-    if (c === 0) await syncFromXml();
+
+    if (c > 0) return; // Already seeded — nothing to do
+
+    // Step 1: fast XML seed
+    await syncFromXml();
+
+    // Step 2: REST delta — catch listings published after the XML regenerated
+    if (!process.env.INMOVILLA_API_TOKEN) return;
+
+    try {
+      const { fetchFromRestApi: restFetch } = await import("./rest-parser");
+      const db2 = getDb();
+      const existingRefs = new Set(
+        (db2.prepare("SELECT ref FROM properties").all() as { ref: string }[]).map((r) => r.ref)
+      );
+      // Pass empty fechaacts so ALL REST-active refs are considered new,
+      // but pass existingRefs so only truly missing ones get fetched.
+      const { properties, fechaacts } = await restFetch(
+        new Map(), // all refs treated as "changed"
+        existingRefs
+      );
+      if (properties.length > 0) {
+        const upsert = buildUpsertStatement(db2);
+        const tx = db2.transaction((props: Property[]) => {
+          for (const p of props) upsert.run(propertyToRow(p, fechaacts.get(p.ref) ?? null));
+        });
+        tx(properties);
+      }
+    } catch {
+      // REST delta is best-effort — XML seed already covers the base case
+    }
   } catch {
-    // Never block rendering — log and continue with empty state
+    // Never block rendering
   }
 }
 
