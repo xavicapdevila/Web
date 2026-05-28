@@ -21,12 +21,15 @@ async function readBlobVisits(): Promise<VisitMap> {
     const { list } = await import("@vercel/blob");
     const { blobs } = await list({ prefix: VISITS_KEY });
     if (blobs.length === 0) return {};
-    const latest = [...blobs].sort(
+    const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-    )[0];
-    const res = await fetch(latest.url, { cache: "no-store" });
-    if (!res.ok) return {};
-    return (await res.json()) as VisitMap;
+    );
+    // Try blobs from newest to oldest; skip any that return 404 (race with deletion)
+    for (const blob of sorted) {
+      const res = await fetch(blob.url, { cache: "no-store" });
+      if (res.ok) return (await res.json()) as VisitMap;
+    }
+    return {};
   } catch {
     return {};
   }
@@ -34,12 +37,21 @@ async function readBlobVisits(): Promise<VisitMap> {
 
 async function writeBlobVisits(counts: VisitMap): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
-  const { blobs } = await list({ prefix: VISITS_KEY });
-  if (blobs.length > 0) await del(blobs.map((b) => b.url));
+  // Write new version FIRST — ensures reads never see 0 blobs and return {}
   await put(VISITS_KEY, JSON.stringify(counts), {
     access: "public",
     contentType: "application/json",
   });
+  // Clean up old versions (non-fatal if it fails)
+  try {
+    const { blobs } = await list({ prefix: VISITS_KEY });
+    if (blobs.length > 1) {
+      const sorted = [...blobs].sort(
+        (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
+      await del(sorted.slice(1).map((b) => b.url));
+    }
+  } catch { /* cleanup failure is non-fatal */ }
 }
 
 // ── Blob helpers — shares ─────────────────────────────────────────────────────
@@ -49,12 +61,14 @@ async function readBlobShares(): Promise<VisitMap> {
     const { list } = await import("@vercel/blob");
     const { blobs } = await list({ prefix: SHARES_KEY });
     if (blobs.length === 0) return {};
-    const latest = [...blobs].sort(
+    const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-    )[0];
-    const res = await fetch(latest.url, { cache: "no-store" });
-    if (!res.ok) return {};
-    return (await res.json()) as VisitMap;
+    );
+    for (const blob of sorted) {
+      const res = await fetch(blob.url, { cache: "no-store" });
+      if (res.ok) return (await res.json()) as VisitMap;
+    }
+    return {};
   } catch {
     return {};
   }
@@ -62,12 +76,19 @@ async function readBlobShares(): Promise<VisitMap> {
 
 async function writeBlobShares(counts: VisitMap): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
-  const { blobs } = await list({ prefix: SHARES_KEY });
-  if (blobs.length > 0) await del(blobs.map((b) => b.url));
   await put(SHARES_KEY, JSON.stringify(counts), {
     access: "public",
     contentType: "application/json",
   });
+  try {
+    const { blobs } = await list({ prefix: SHARES_KEY });
+    if (blobs.length > 1) {
+      const sorted = [...blobs].sort(
+        (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
+      await del(sorted.slice(1).map((b) => b.url));
+    }
+  } catch { /* cleanup failure is non-fatal */ }
 }
 
 // ── Blob helpers — referrers ──────────────────────────────────────────────────
@@ -77,12 +98,14 @@ async function readBlobRefs(): Promise<RefMap> {
     const { list } = await import("@vercel/blob");
     const { blobs } = await list({ prefix: REFS_KEY });
     if (blobs.length === 0) return {};
-    const latest = [...blobs].sort(
+    const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-    )[0];
-    const res = await fetch(latest.url, { cache: "no-store" });
-    if (!res.ok) return {};
-    return (await res.json()) as RefMap;
+    );
+    for (const blob of sorted) {
+      const res = await fetch(blob.url, { cache: "no-store" });
+      if (res.ok) return (await res.json()) as RefMap;
+    }
+    return {};
   } catch {
     return {};
   }
@@ -90,12 +113,19 @@ async function readBlobRefs(): Promise<RefMap> {
 
 async function writeBlobRefs(refs: RefMap): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
-  const { blobs } = await list({ prefix: REFS_KEY });
-  if (blobs.length > 0) await del(blobs.map((b) => b.url));
   await put(REFS_KEY, JSON.stringify(refs), {
     access: "public",
     contentType: "application/json",
   });
+  try {
+    const { blobs } = await list({ prefix: REFS_KEY });
+    if (blobs.length > 1) {
+      const sorted = [...blobs].sort(
+        (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+      );
+      await del(sorted.slice(1).map((b) => b.url));
+    }
+  } catch { /* cleanup failure is non-fatal */ }
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
