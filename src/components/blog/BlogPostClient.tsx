@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, ArrowLeft, Tag } from "lucide-react";
+import { CalendarDays, ArrowLeft, Tag, Eye } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate } from "@/lib/utils";
 import TranslatableHTML from "@/components/blog/TranslatableHTML";
@@ -60,6 +61,19 @@ export default function BlogPostClient({ post, related }: Props) {
   const { t } = useLanguage();
   const translatedTitle   = useAutoTranslate(post.titulo);
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
+  const [visitCount, setVisitCount] = useState<number | null>(null);
+
+  // Fire-and-forget: increment visit counter and show updated count
+  useEffect(() => {
+    fetch("/api/blog/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: post.slug }),
+    })
+      .then((r) => r.json())
+      .then((data) => { if (data.count > 0) setVisitCount(data.count); })
+      .catch(() => {});
+  }, [post.slug]);
 
   return (
     <article className="max-w-3xl mx-auto px-6 lg:px-0 py-16">
@@ -94,8 +108,8 @@ export default function BlogPostClient({ post, related }: Props) {
         {translatedTitle}
       </h1>
 
-      {/* Meta: author + date */}
-      <div className="flex items-center gap-6 text-[#555] text-sm mb-8 pb-8 border-b border-[#1a1a1a]">
+      {/* Meta: author + date + visits */}
+      <div className="flex flex-wrap items-center gap-6 text-[#555] text-sm mb-8 pb-8 border-b border-[#1a1a1a]">
         <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase">
           The Vila Home
         </span>
@@ -103,6 +117,12 @@ export default function BlogPostClient({ post, related }: Props) {
           <CalendarDays size={13} className="text-[#C9B99A]" />
           {formatBlogDate(post.fecha)}
         </span>
+        {visitCount !== null && (
+          <span className="flex items-center gap-1.5 text-[#444] text-xs ml-auto">
+            <Eye size={12} className="text-[#C9B99A]/50" />
+            {visitCount.toLocaleString("es")}
+          </span>
+        )}
       </div>
 
       {/* Featured image */}

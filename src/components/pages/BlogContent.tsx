@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, Eye, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate } from "@/lib/utils";
 import type { BlogPost } from "@/lib/blog";
@@ -11,6 +11,7 @@ import type { Lang } from "@/lib/i18n";
 
 interface Props {
   posts: BlogPost[];
+  visitCounts?: Record<string, number>;
 }
 
 const PAGE_SIZE = 12;
@@ -25,8 +26,14 @@ const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
   "Vivir en...":    { es: "Vivir en...",    ca: "Viure a...",    en: "Living in...",  fr: "Vivre à..." },
 };
 
+function fmtVisits(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toString();
+}
+
 // ── Article card ─────────────────────────────────────────────────────────────
-function ArticleCard({ post }: { post: BlogPost }) {
+function ArticleCard({ post, visits }: { post: BlogPost; visits?: number }) {
   const translatedTitle   = useAutoTranslate(post.titulo);
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
 
@@ -89,12 +96,20 @@ function ArticleCard({ post }: { post: BlogPost }) {
           </p>
         )}
 
-        {/* Date footer */}
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-[#191919]">
-          <CalendarDays size={11} className="text-[#C9B99A]/50 shrink-0" />
-          <span className="text-[#555] text-xs tabular-nums">
-            {formatBlogDate(post.fecha)}
+        {/* Date + visits footer */}
+        <div className="flex items-center justify-between gap-2 mt-5 pt-4 border-t border-[#191919]">
+          <span className="flex items-center gap-1.5">
+            <CalendarDays size={11} className="text-[#C9B99A]/50 shrink-0" />
+            <span className="text-[#555] text-xs tabular-nums">
+              {formatBlogDate(post.fecha)}
+            </span>
           </span>
+          {!!visits && visits > 0 && (
+            <span className="flex items-center gap-1 text-[#444] text-[10px] tabular-nums">
+              <Eye size={10} className="shrink-0" />
+              {fmtVisits(visits)}
+            </span>
+          )}
         </div>
       </div>
     </article>
@@ -103,7 +118,7 @@ function ArticleCard({ post }: { post: BlogPost }) {
 
 // ── Main listing component ────────────────────────────────────────────────────
 
-export default function BlogContent({ posts }: Props) {
+export default function BlogContent({ posts, visitCounts = {} }: Props) {
   const { t, lang } = useLanguage();
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -288,7 +303,7 @@ export default function BlogContent({ posts }: Props) {
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
               >
                 {visible.map((post) => (
-                  <ArticleCard key={post.id} post={post} />
+                  <ArticleCard key={post.id} post={post} visits={visitCounts[post.slug]} />
                 ))}
               </div>
 

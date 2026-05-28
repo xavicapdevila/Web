@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { getBlogPosts } from "@/lib/blog";
+import { getAllVisitCounts } from "@/lib/visits";
 import BlogContent from "@/components/pages/BlogContent";
 
 const BASE_URL = "https://www.thevilahome.com";
@@ -31,9 +32,14 @@ export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
   let posts: import("@/lib/blog").BlogPost[] = [];
+  let visitCounts: Record<string, number> = {};
   try {
-    const result = await getBlogPosts(500, 0);
+    const [result, counts] = await Promise.all([
+      getBlogPosts(500, 0),
+      getAllVisitCounts(),
+    ]);
     posts = result.posts;
+    visitCounts = counts;
   } catch {
     // store not ready
   }
@@ -73,7 +79,7 @@ export default async function BlogPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBlog) }}
       />
-      <BlogContent posts={posts} />
+      <BlogContent posts={posts} visitCounts={visitCounts} />
     </div>
   );
 }

@@ -113,6 +113,11 @@ function initSchema(db: Database.Database): void {
       error TEXT
     );
 
+    CREATE TABLE IF NOT EXISTS blog_visits (
+      slug  TEXT PRIMARY KEY,
+      count INTEGER NOT NULL DEFAULT 0
+    );
+
     CREATE TABLE IF NOT EXISTS blog_posts (
       id TEXT PRIMARY KEY,
       slug TEXT UNIQUE NOT NULL,
