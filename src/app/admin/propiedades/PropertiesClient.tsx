@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, ExternalLink, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, ExternalLink, Home, RefreshCw } from "lucide-react";
 
 interface PropRow {
   ref:            string;
@@ -50,8 +51,29 @@ const TABS = [
 ];
 
 export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
-  const [tab,    setTab]    = useState("all");
-  const [search, setSearch] = useState("");
+  const router = useRouter();
+  const [tab,     setTab]     = useState("all");
+  const [search,  setSearch]  = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncErr, setSyncErr] = useState("");
+
+  async function handleSync() {
+    setSyncing(true);
+    setSyncErr("");
+    try {
+      const res  = await fetch("/api/admin/sync", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        router.refresh();
+      } else {
+        setSyncErr(data.error ?? "Error al sincronizar");
+      }
+    } catch {
+      setSyncErr("Error de conexión");
+    } finally {
+      setSyncing(false);
+    }
+  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -114,10 +136,29 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
       </div>
 
       {/* Table */}
-      {filtered.length === 0 ? (
+      {rows.length === 0 ? (
+        /* DB vacía — nunca se ha sincronizado en este contenedor */
+        <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-20 text-center">
+          <Home size={20} className="text-[#333] mx-auto mb-4" />
+          <p className="text-white text-sm mb-1">Base de datos vacía</p>
+          <p className="text-[#555] text-xs mb-6 max-w-xs mx-auto">
+            Pulsa Sync para importar las propiedades desde la API de Inmovilla.
+            La primera sincronización tarda ~2 min.
+          </p>
+          {syncErr && <p className="text-red-400 text-xs mb-4">{syncErr}</p>}
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-2 bg-[#C9B99A] text-black font-body text-xs tracking-widest uppercase px-6 py-3 hover:bg-[#DDD0BB] transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+            {syncing ? "Sincronizando… (~2 min)" : "Sincronizar desde Inmovilla"}
+          </button>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-20 text-center">
           <Home size={20} className="text-[#222] mx-auto mb-3" />
-          <p className="text-[#444] text-sm">No hay propiedades</p>
+          <p className="text-[#444] text-sm">Sin resultados para este filtro</p>
         </div>
       ) : (
         <div className="border border-[#1a1a1a] overflow-x-auto">

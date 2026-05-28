@@ -1,5 +1,4 @@
 import { getDb } from "@/lib/db";
-import { ensureDbSeeded } from "@/lib/sync";
 import PropertiesClient from "./PropertiesClient";
 
 export const metadata = { title: "Propiedades — Admin · The Vila Home" };
@@ -23,9 +22,8 @@ interface PropRow {
   fechaact:       string | null;
 }
 
-async function getProperties(): Promise<PropRow[]> {
+function getProperties(): PropRow[] {
   try {
-    await ensureDbSeeded();
     const db = getDb();
     return db
       .prepare(
@@ -41,7 +39,7 @@ async function getProperties(): Promise<PropRow[]> {
   }
 }
 
-export default async function AdminPropertiesPage() {
-  const rows = await getProperties();
+export default function AdminPropertiesPage() {
+  const rows = getProperties();
   return <PropertiesClient rows={rows} />;
 }
