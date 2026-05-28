@@ -163,6 +163,10 @@ function initSchema(db: Database.Database): void {
     slug  TEXT PRIMARY KEY,
     count INTEGER NOT NULL DEFAULT 0
   )`); } catch {}
+  // fechaact: Inmovilla REST API last-modified timestamp (for differential sync)
+  try { db.exec(`ALTER TABLE properties ADD COLUMN fechaact TEXT`); } catch {}
+  // source column on sync_log: which data source was used ('rest' | 'xml')
+  try { db.exec(`ALTER TABLE sync_log ADD COLUMN source TEXT DEFAULT 'xml'`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);
     CREATE INDEX IF NOT EXISTS idx_properties_ciudad ON properties(ciudad);
