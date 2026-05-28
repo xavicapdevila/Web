@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Edit2, Trash2, Eye, EyeOff, LogOut, ArrowLeft, RefreshCw } from "lucide-react";
+import { Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 
 // ── Login screen ─────────────────────────────────────────────────────────────
@@ -72,27 +72,6 @@ export function AdminBlogList({ initialPosts }: { initialPosts: BlogPost[] }) {
   const router = useRouter();
   const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState<{ ok: boolean; text: string } | null>(null);
-
-  async function handleSync() {
-    setSyncing(true);
-    setSyncMsg(null);
-    try {
-      const res = await fetch("/api/admin/sync", { method: "POST" });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setSyncMsg({ ok: true, text: `✓ ${data.added} añadidas · ${data.updated} actualizadas` });
-      } else {
-        setSyncMsg({ ok: false, text: data.error ?? "Error al sincronizar" });
-      }
-    } catch {
-      setSyncMsg({ ok: false, text: "Error de conexión" });
-    } finally {
-      setSyncing(false);
-      setTimeout(() => setSyncMsg(null), 6000);
-    }
-  }
 
   async function handleDelete(id: string, titulo: string) {
     if (!confirm(`¿Eliminar "${titulo}"? Esta acción no se puede deshacer.`)) return;
@@ -126,57 +105,8 @@ export function AdminBlogList({ initialPosts }: { initialPosts: BlogPost[] }) {
     }
   }
 
-  async function handleLogout() {
-    await fetch("/api/admin/login", { method: "DELETE" });
-    router.refresh();
-  }
-
   return (
-    <div className="min-h-screen bg-[#080808]">
-      {/* Top bar */}
-      <div className="border-b border-[#1a1a1a] bg-[#0a0a0a] sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img src="/logo.svg" alt="The Vila Home" className="h-7 w-auto" />
-            <span className="text-[#444] text-xs">/</span>
-            <span className="text-[#888] text-sm">Blog</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/blog"
-              target="_blank"
-              className="text-[#555] hover:text-[#C9B99A] transition-colors text-xs flex items-center gap-1.5"
-            >
-              Ver blog público
-            </Link>
-            <div className="flex items-center gap-1.5">
-              {syncMsg && (
-                <span className={`text-xs ${syncMsg.ok ? "text-[#C9B99A]" : "text-red-400"}`}>
-                  {syncMsg.text}
-                </span>
-              )}
-              <button
-                onClick={handleSync}
-                disabled={syncing}
-                className="flex items-center gap-1.5 text-[#555] hover:text-[#C9B99A] transition-colors text-xs disabled:opacity-50 px-2 py-1 border border-[#1a1a1a] hover:border-[#C9B99A]/40"
-                title="Sincronizar propiedades desde Inmovilla"
-              >
-                <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
-                {syncing ? "Sync..." : "Sync"}
-              </button>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="text-[#555] hover:text-white transition-colors p-1.5"
-              title="Cerrar sesión"
-            >
-              <LogOut size={14} />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -295,7 +225,6 @@ export function AdminBlogList({ initialPosts }: { initialPosts: BlogPost[] }) {
             </table>
           </div>
         )}
-      </div>
     </div>
   );
 }

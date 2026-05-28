@@ -189,20 +189,18 @@ export default function PostForm({ post, mode }: Props) {
 
   return (
     <>
-      <div className="min-h-screen bg-[#080808]">
-        {/* Top bar */}
-        <div className="border-b border-[#1a1a1a] bg-[#0a0a0a] sticky top-0 z-10">
-          <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img src="/logo.svg" alt="The Vila Home" className="h-7 w-auto" />
-              <span className="text-[#444] text-xs">/</span>
-              <Link href="/admin/blog" className="text-[#666] hover:text-white text-sm transition-colors">
-                Blog
-              </Link>
-              <span className="text-[#444] text-xs">/</span>
-              <span className="text-[#888] text-sm">
-                {mode === "nuevo" ? "Nuevo artículo" : "Editar"}
-              </span>
+      <div className="max-w-4xl mx-auto px-6 py-8">
+          {/* Page header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <div className="flex items-center gap-2 text-xs text-[#444] mb-2">
+                <Link href="/admin/blog" className="hover:text-[#888] transition-colors">Blog</Link>
+                <span>/</span>
+                <span>{mode === "nuevo" ? "Nuevo artículo" : "Editar"}</span>
+              </div>
+              <h1 className="text-white font-display text-2xl">
+                {mode === "nuevo" ? "Nuevo artículo" : `Editar: ${post?.titulo}`}
+              </h1>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -222,12 +220,6 @@ export default function PostForm({ post, mode }: Props) {
               </Link>
             </div>
           </div>
-        </div>
-
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <h1 className="text-white font-display text-2xl mb-8">
-            {mode === "nuevo" ? "Nuevo artículo" : `Editar: ${post?.titulo}`}
-          </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -537,7 +529,6 @@ export default function PostForm({ post, mode }: Props) {
               </Link>
             </div>
           </form>
-        </div>
       </div>
 
       {/* Preview modal */}
