@@ -273,6 +273,9 @@ const dict = {
     blogMoreArticlesMany: "artículos más",
     blogSeeAll: "Ver todos los artículos",
     blogLoadMore: "Ver más artículos",
+    blogShare: "Compartir",
+    blogShareCopy: "Copiar enlace",
+    blogShareCopied: "¡Copiado!",
   },
 
   ca: {
@@ -520,6 +523,9 @@ const dict = {
     blogMoreArticlesMany: "articles més",
     blogSeeAll: "Veure tots els articles",
     blogLoadMore: "Veure més articles",
+    blogShare: "Compartir",
+    blogShareCopy: "Copiar enllaç",
+    blogShareCopied: "Copiat!",
   },
 
   en: {
@@ -767,6 +773,9 @@ const dict = {
     blogMoreArticlesMany: "more articles",
     blogSeeAll: "See all articles",
     blogLoadMore: "Load more articles",
+    blogShare: "Share",
+    blogShareCopy: "Copy link",
+    blogShareCopied: "Copied!",
   },
 
   fr: {
@@ -1014,6 +1023,9 @@ const dict = {
     blogMoreArticlesMany: "articles de plus",
     blogSeeAll: "Voir tous les articles",
     blogLoadMore: "Voir plus d'articles",
+    blogShare: "Partager",
+    blogShareCopy: "Copier le lien",
+    blogShareCopied: "Copié !",
   },
 } as const;
 

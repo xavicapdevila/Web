@@ -118,6 +118,13 @@ function initSchema(db: Database.Database): void {
       count INTEGER NOT NULL DEFAULT 0
     );
 
+    CREATE TABLE IF NOT EXISTS blog_referrers (
+      slug   TEXT NOT NULL,
+      domain TEXT NOT NULL,
+      count  INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (slug, domain)
+    );
+
     CREATE TABLE IF NOT EXISTS blog_posts (
       id TEXT PRIMARY KEY,
       slug TEXT UNIQUE NOT NULL,

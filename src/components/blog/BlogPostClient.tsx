@@ -3,13 +3,131 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { CalendarDays, ArrowLeft, Tag, Eye } from "lucide-react";
+import { ArrowLeft, CalendarDays, Check, Copy, Eye, Share2, Tag } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate } from "@/lib/utils";
 import TranslatableHTML from "@/components/blog/TranslatableHTML";
 import type { BlogPost } from "@/lib/blog";
 
-// ── Related-post card (needs useAutoTranslate, so it's its own component) ───
+const BASE_URL = "https://www.thevilahome.com";
+
+// ── Share button ──────────────────────────────────────────────────────────────
+
+function ShareButton({ url, title }: { url: string; title: string }) {
+  const { t } = useLanguage();
+  const [open, setOpen]     = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = () => {
+    if (typeof navigator !== "undefined" && "share" in navigator) {
+      navigator.share({ title, url }).catch(() => {});
+    } else {
+      setOpen((o) => !o);
+    }
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Fallback for older browsers
+      const el = document.createElement("input");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const enc  = encodeURIComponent(url);
+  const encT = encodeURIComponent(title);
+
+  const platforms = [
+    {
+      label: "WhatsApp",
+      color: "#25D366",
+      href: `https://wa.me/?text=${encT}%20${enc}`,
+    },
+    {
+      label: "Twitter / X",
+      color: "#1DA1F2",
+      href: `https://twitter.com/intent/tweet?text=${encT}&url=${enc}`,
+    },
+    {
+      label: "LinkedIn",
+      color: "#0A66C2",
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc}`,
+    },
+    {
+      label: "Facebook",
+      color: "#1877F2",
+      href: `https://www.facebook.com/sharer/sharer.php?u=${enc}`,
+    },
+  ];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleShare}
+        className="flex items-center gap-2 text-xs font-body tracking-widest uppercase text-[#888] hover:text-[#C9B99A] transition-colors border border-[#1e1e1e] hover:border-[#C9B99A]/30 px-4 py-2"
+      >
+        <Share2 size={12} />
+        {t("blogShare")}
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          {/* Dropdown */}
+          <div className="absolute bottom-full right-0 mb-2 z-50 bg-[#0f0f0f] border border-[#2a2a2a] shadow-2xl min-w-[190px] overflow-hidden">
+            {platforms.map((p) => (
+              <a
+                key={p.label}
+                href={p.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-2.5 text-[#999] hover:text-white hover:bg-[#1a1a1a] text-xs font-body transition-colors"
+              >
+                <span style={{ color: p.color }} className="text-base leading-none select-none">
+                  ●
+                </span>
+                {p.label}
+              </a>
+            ))}
+            <div className="border-t border-[#1e1e1e]" />
+            <button
+              onClick={copyLink}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-[#999] hover:text-white hover:bg-[#1a1a1a] text-xs font-body transition-colors text-left"
+            >
+              {copied ? (
+                <>
+                  <Check size={11} className="text-[#C9B99A] shrink-0" />
+                  <span className="text-[#C9B99A]">{t("blogShareCopied")}</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={11} className="shrink-0" />
+                  {t("blogShareCopy")}
+                </>
+              )}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ── Related-post card ─────────────────────────────────────────────────────────
 
 function RelatedCard({ post }: { post: BlogPost }) {
   const translatedTitle = useAutoTranslate(post.titulo);
@@ -63,12 +181,17 @@ export default function BlogPostClient({ post, related }: Props) {
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
   const [visitCount, setVisitCount] = useState<number | null>(null);
 
-  // Fire-and-forget: increment visit counter and show updated count
+  const articleUrl = `${BASE_URL}/blog/${post.slug}`;
+
+  // Increment visit counter and track referrer (fire-and-forget)
   useEffect(() => {
     fetch("/api/blog/visit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: post.slug }),
+      body: JSON.stringify({
+        slug: post.slug,
+        referrer: document.referrer,
+      }),
     })
       .then((r) => r.json())
       .then((data) => { if (data.count > 0) setVisitCount(data.count); })
@@ -108,7 +231,7 @@ export default function BlogPostClient({ post, related }: Props) {
         {translatedTitle}
       </h1>
 
-      {/* Meta: author + date + visits */}
+      {/* Meta: author · date · visits */}
       <div className="flex flex-wrap items-center gap-6 text-[#555] text-sm mb-8 pb-8 border-b border-[#1a1a1a]">
         <span className="text-[#C9B99A] text-xs font-body tracking-widest uppercase">
           The Vila Home
@@ -163,22 +286,25 @@ export default function BlogPostClient({ post, related }: Props) {
         />
       )}
 
-      {/* Tags footer */}
-      {post.etiquetas.length > 0 && (
-        <div className="flex items-center gap-3 mt-12 pt-8 border-t border-[#1a1a1a]">
-          <Tag size={13} className="text-[#C9B99A] shrink-0" />
-          <div className="flex flex-wrap gap-2">
-            {post.etiquetas.map((tag) => (
-              <span
-                key={tag}
-                className="text-[#666] text-xs font-body border border-[#1e1e1e] px-2 py-0.5"
-              >
-                {tag}
-              </span>
-            ))}
+      {/* Tags + Share */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mt-12 pt-8 border-t border-[#1a1a1a]">
+        {post.etiquetas.length > 0 && (
+          <div className="flex items-center gap-3">
+            <Tag size={13} className="text-[#C9B99A] shrink-0" />
+            <div className="flex flex-wrap gap-2">
+              {post.etiquetas.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[#666] text-xs font-body border border-[#1e1e1e] px-2 py-0.5"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+        <ShareButton url={articleUrl} title={post.titulo} />
+      </div>
 
       {/* Related posts */}
       {related.length > 0 && (
