@@ -210,37 +210,20 @@ export default function BlogPostClient({ post, related }: Props) {
 
   const articleUrl = `${BASE_URL}/blog/${post.slug}`;
 
-  // Increment visit counter once per day per article per browser.
-  // Uses localStorage to deduplicate; also fetches initial share count.
+  // Increment visit counter and fetch initial share count on every page load.
+  // The server-side write-first pattern prevents race-condition resets.
   useEffect(() => {
-    const lsKey = `blog-visit-${post.slug}`;
-    const today  = new Date().toDateString(); // e.g. "Thu May 29 2026"
-    let alreadyCounted = false;
-    try { alreadyCounted = localStorage.getItem(lsKey) === today; } catch {}
-
-    if (!alreadyCounted) {
-      fetch("/api/blog/visit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: post.slug, referrer: document.referrer }),
+    fetch("/api/blog/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: post.slug, referrer: document.referrer }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.count > 0) setVisitCount(data.count);
+        if (typeof data.shareCount === "number") setShareCount(data.shareCount);
       })
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.count > 0) setVisitCount(data.count);
-          if (typeof data.shareCount === "number") setShareCount(data.shareCount);
-        })
-        .catch(() => {});
-      try { localStorage.setItem(lsKey, today); } catch {}
-    } else {
-      // Already counted today — just fetch current counts without incrementing
-      fetch(`/api/blog/visit/count?slug=${encodeURIComponent(post.slug)}`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (data.count > 0) setVisitCount(data.count);
-          if (typeof data.shareCount === "number") setShareCount(data.shareCount);
-        })
-        .catch(() => {});
-    }
+      .catch(() => {});
   }, [post.slug]);
 
   // Called when user actually shares — increments counter and updates state
