@@ -48,13 +48,33 @@ export const metadata: Metadata = {
   publisher: "The Vila Home",
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/favicon-32x32.png", type: "image/png", sizes: "32x32" },
-      { url: "/favicon-48x48.png", type: "image/png", sizes: "48x48" },
-      { url: "/favicon.ico", sizes: "any" },
+      // SVG — scalable, modern browsers (Chrome 80+, Firefox, Edge)
+      { url: "/favicon.svg",        type: "image/svg+xml" },
+      // PNG fallbacks — ordered smallest → largest
+      { url: "/favicon-16x16.png",  type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png",  type: "image/png", sizes: "32x32" },
+      { url: "/favicon-48x48.png",  type: "image/png", sizes: "48x48" },
+      { url: "/favicon-96x96.png",  type: "image/png", sizes: "96x96" },
+      // ICO — legacy fallback (IE, old Windows Explorer)
+      { url: "/favicon.ico",        sizes: "any" },
     ],
     shortcut: "/favicon.ico",
+    // iOS home-screen icon
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    // Android / PWA icons (also referenced in site.webmanifest)
+    other: [
+      { rel: "icon", url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { rel: "icon", url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+  },
+  // PWA manifest
+  manifest: "/site.webmanifest",
+  // Windows tile color + mobile browser theme
+  other: {
+    "msapplication-TileColor":  "#0a0a0a",
+    "msapplication-TileImage":  "/mstile-150x150.png",
+    "msapplication-config":     "/browserconfig.xml",
+    "theme-color":              "#C9B99A",
   },
   alternates: { canonical: BASE_URL },
   openGraph: {
