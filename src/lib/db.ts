@@ -158,6 +158,11 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN categoria TEXT DEFAULT ''`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN imagen_alt TEXT DEFAULT ''`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN palabra_clave TEXT DEFAULT ''`); } catch {}
+  // Share counter table
+  try { db.exec(`CREATE TABLE IF NOT EXISTS blog_shares (
+    slug  TEXT PRIMARY KEY,
+    count INTEGER NOT NULL DEFAULT 0
+  )`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);
     CREATE INDEX IF NOT EXISTS idx_properties_ciudad ON properties(ciudad);

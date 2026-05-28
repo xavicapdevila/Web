@@ -1,10 +1,11 @@
 /**
- * Blog visit counter + referrer tracker.
- * Production  → Vercel Blob  (blog-visits.json / blog-referrers.json)
- * Local dev   → SQLite       (blog_visits / blog_referrers tables)
+ * Blog visit counter + share counter + referrer tracker.
+ * Production  → Vercel Blob  (blog-visits.json / blog-shares.json / blog-referrers.json)
+ * Local dev   → SQLite       (blog_visits / blog_shares / blog_referrers tables)
  */
 
 const VISITS_KEY = "blog-visits.json";
+const SHARES_KEY = "blog-shares.json";
 const REFS_KEY   = "blog-referrers.json";
 const USE_BLOB   = process.env.VERCEL === "1";
 const OWN_DOMAIN = "thevilahome.com";
@@ -36,6 +37,34 @@ async function writeBlobVisits(counts: VisitMap): Promise<void> {
   const { blobs } = await list({ prefix: VISITS_KEY });
   if (blobs.length > 0) await del(blobs.map((b) => b.url));
   await put(VISITS_KEY, JSON.stringify(counts), {
+    access: "public",
+    contentType: "application/json",
+  });
+}
+
+// ── Blob helpers — shares ─────────────────────────────────────────────────────
+
+async function readBlobShares(): Promise<VisitMap> {
+  try {
+    const { list } = await import("@vercel/blob");
+    const { blobs } = await list({ prefix: SHARES_KEY });
+    if (blobs.length === 0) return {};
+    const latest = [...blobs].sort(
+      (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    )[0];
+    const res = await fetch(latest.url, { cache: "no-store" });
+    if (!res.ok) return {};
+    return (await res.json()) as VisitMap;
+  } catch {
+    return {};
+  }
+}
+
+async function writeBlobShares(counts: VisitMap): Promise<void> {
+  const { put, list, del } = await import("@vercel/blob");
+  const { blobs } = await list({ prefix: SHARES_KEY });
+  if (blobs.length > 0) await del(blobs.map((b) => b.url));
+  await put(SHARES_KEY, JSON.stringify(counts), {
     access: "public",
     contentType: "application/json",
   });
@@ -153,6 +182,49 @@ export async function getTopReferrers(
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
     .map(([domain, count]) => ({ domain, count }));
+}
+
+/** Return the share count for a single slug. */
+export async function getShareCount(slug: string): Promise<number> {
+  if (USE_BLOB) {
+    const counts = await readBlobShares();
+    return counts[slug] ?? 0;
+  }
+  try {
+    const { getDb } = await import("./db");
+    const db = getDb();
+    const row = db
+      .prepare("SELECT count FROM blog_shares WHERE slug = ?")
+      .get(slug) as { count: number } | undefined;
+    return row?.count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Atomically increment the share count for a slug and return the new value. */
+export async function incrementShare(slug: string): Promise<number> {
+  if (USE_BLOB) {
+    const counts = await readBlobShares();
+    const newCount = (counts[slug] ?? 0) + 1;
+    counts[slug] = newCount;
+    await writeBlobShares(counts);
+    return newCount;
+  }
+  try {
+    const { getDb } = await import("./db");
+    const db = getDb();
+    db.prepare(
+      `INSERT INTO blog_shares (slug, count) VALUES (?, 1)
+       ON CONFLICT (slug) DO UPDATE SET count = count + 1`
+    ).run(slug);
+    const row = db
+      .prepare("SELECT count FROM blog_shares WHERE slug = ?")
+      .get(slug) as { count: number } | undefined;
+    return row?.count ?? 1;
+  } catch {
+    return 0;
+  }
 }
 
 /** Atomically increment the visit count for a slug and return the new value. */

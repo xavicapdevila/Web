@@ -17,10 +17,14 @@ function ShareButton({
   url,
   title,
   direction = "up",
+  shareCount,
+  onShare,
 }: {
   url: string;
   title: string;
   direction?: "up" | "down";
+  shareCount?: number | null;
+  onShare?: () => void;
 }) {
   const { t } = useLanguage();
   const [open, setOpen]     = useState(false);
@@ -34,7 +38,9 @@ function ShareButton({
       typeof window !== "undefined" &&
       window.matchMedia("(pointer: coarse)").matches;
     if (isTouch && typeof navigator !== "undefined" && "share" in navigator) {
-      navigator.share({ title, url }).catch(() => {});
+      navigator.share({ title, url })
+        .then(() => onShare?.())
+        .catch(() => {});
     } else {
       setOpen((o) => !o);
     }
@@ -53,6 +59,7 @@ function ShareButton({
       document.body.removeChild(el);
     }
     setCopied(true);
+    onShare?.();
     setTimeout(() => setCopied(false), 2500);
   };
 
@@ -90,6 +97,11 @@ function ShareButton({
       >
         <Share2 size={12} />
         {t("blogShare")}
+        {shareCount != null && shareCount > 0 && (
+          <span className="ml-1 text-[#555] normal-case tracking-normal font-normal">
+            · {shareCount >= 1000 ? `${(shareCount / 1000).toFixed(1)}K` : shareCount}
+          </span>
+        )}
       </button>
 
       {open && (
@@ -108,7 +120,7 @@ function ShareButton({
                 href={p.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); onShare?.(); }}
                 className="flex items-center gap-3 px-4 py-2.5 text-[#999] hover:text-white hover:bg-[#1a1a1a] text-xs font-body transition-colors"
               >
                 <span style={{ color: p.color }} className="text-base leading-none select-none">
@@ -193,11 +205,12 @@ export default function BlogPostClient({ post, related }: Props) {
   const { t } = useLanguage();
   const translatedTitle   = useAutoTranslate(post.titulo);
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
-  const [visitCount, setVisitCount] = useState<number | null>(null);
+  const [visitCount, setVisitCount]   = useState<number | null>(null);
+  const [shareCount, setShareCount]   = useState<number | null>(null);
 
   const articleUrl = `${BASE_URL}/blog/${post.slug}`;
 
-  // Increment visit counter and track referrer (fire-and-forget)
+  // Increment visit counter, get initial share count, track referrer
   useEffect(() => {
     fetch("/api/blog/visit", {
       method: "POST",
@@ -208,9 +221,24 @@ export default function BlogPostClient({ post, related }: Props) {
       }),
     })
       .then((r) => r.json())
-      .then((data) => { if (data.count > 0) setVisitCount(data.count); })
+      .then((data) => {
+        if (data.count > 0) setVisitCount(data.count);
+        if (typeof data.shareCount === "number") setShareCount(data.shareCount);
+      })
       .catch(() => {});
   }, [post.slug]);
+
+  // Called when user actually shares — increments counter and updates state
+  const handleShare = () => {
+    fetch("/api/blog/share", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: post.slug }),
+    })
+      .then((r) => r.json())
+      .then((data) => { if (typeof data.count === "number") setShareCount(data.count); })
+      .catch(() => {});
+  };
 
   return (
     <article className="max-w-3xl mx-auto px-6 lg:px-0 py-16">
@@ -261,7 +289,7 @@ export default function BlogPostClient({ post, related }: Props) {
               {visitCount.toLocaleString("es")}
             </span>
           )}
-          <ShareButton url={articleUrl} title={post.titulo} direction="down" />
+          <ShareButton url={articleUrl} title={post.titulo} direction="down" shareCount={shareCount} onShare={handleShare} />
         </div>
       </div>
 
@@ -320,7 +348,7 @@ export default function BlogPostClient({ post, related }: Props) {
             </div>
           </div>
         )}
-        <ShareButton url={articleUrl} title={post.titulo} />
+        <ShareButton url={articleUrl} title={post.titulo} shareCount={shareCount} onShare={handleShare} />
       </div>
 
       {/* Related posts */}

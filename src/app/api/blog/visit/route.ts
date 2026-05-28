@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { incrementVisit, trackReferrer } from "@/lib/visits";
+import { incrementVisit, getShareCount, trackReferrer } from "@/lib/visits";
 
 export async function POST(req: NextRequest) {
   try {
@@ -7,15 +7,19 @@ export async function POST(req: NextRequest) {
     const slug     = typeof body?.slug     === "string" ? body.slug.trim()     : "";
     const referrer = typeof body?.referrer === "string" ? body.referrer.trim() : "";
 
-    if (!slug) return NextResponse.json({ count: 0 }, { status: 400 });
+    if (!slug) return NextResponse.json({ count: 0, shareCount: 0 }, { status: 400 });
 
-    const count = await incrementVisit(slug);
+    // Run visit increment and share count fetch in parallel
+    const [count, shareCount] = await Promise.all([
+      incrementVisit(slug),
+      getShareCount(slug),
+    ]);
 
     // Track external referrer in the background (non-blocking)
     if (referrer) trackReferrer(slug, referrer).catch(() => {});
 
-    return NextResponse.json({ count });
+    return NextResponse.json({ count, shareCount });
   } catch {
-    return NextResponse.json({ count: 0 });
+    return NextResponse.json({ count: 0, shareCount: 0 });
   }
 }
