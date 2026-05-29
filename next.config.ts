@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         headers: [{ key: "Access-Control-Allow-Origin", value: "https://www.thevilahome.com" }],
       },
+      {
+        // Prevent browsers and CDN from caching favicons for too long
+        source: "/(favicon.ico|favicon.svg|favicon-:size.png|apple-touch-icon.png|android-chrome-:size.png)",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
     ];
   },
 };

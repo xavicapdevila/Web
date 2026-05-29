@@ -14,12 +14,12 @@ const PUBLIC = path.join(ROOT, "public");
 const APP = path.join(ROOT, "src", "app");
 
 // ─── Icon design ──────────────────────────────────────────────────────────────
-// Gold (#C9B99A) tile with a bold dark V cut into it.
-// Gold background = instantly recognisable brand colour even at 16 px.
-// The V negative-space gives ≥4 px arm width at the smallest size (16 px).
+// Gold (#C9B99A) tile with a bold dark V.
+// Full-bleed V (fills corners → wider arms) = cleaner read at 16 px.
+// Arms are 30 px wide in the 100-unit viewBox → ~5 px at 16 px output.
 const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <rect width="100" height="100" fill="#C9B99A"/>
-  <polygon points="6,14 50,90 94,14 68,14 50,66 32,14" fill="#0f0f0f"/>
+  <polygon points="0,0 50,100 100,0 70,0 50,70 30,0" fill="#0f0f0f"/>
 </svg>`;
 
 // ─── ICO builder (multi-resolution PNG-in-ICO) ───────────────────────────────

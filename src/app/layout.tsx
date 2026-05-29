@@ -50,22 +50,22 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       // SVG — scalable, modern browsers (Chrome 80+, Firefox, Edge)
-      { url: "/favicon.svg",        type: "image/svg+xml" },
+      { url: "/favicon.svg?v=2",        type: "image/svg+xml" },
       // PNG fallbacks — ordered smallest → largest
-      { url: "/favicon-16x16.png",  type: "image/png", sizes: "16x16" },
-      { url: "/favicon-32x32.png",  type: "image/png", sizes: "32x32" },
-      { url: "/favicon-48x48.png",  type: "image/png", sizes: "48x48" },
-      { url: "/favicon-96x96.png",  type: "image/png", sizes: "96x96" },
+      { url: "/favicon-16x16.png?v=2",  type: "image/png", sizes: "16x16" },
+      { url: "/favicon-32x32.png?v=2",  type: "image/png", sizes: "32x32" },
+      { url: "/favicon-48x48.png?v=2",  type: "image/png", sizes: "48x48" },
+      { url: "/favicon-96x96.png?v=2",  type: "image/png", sizes: "96x96" },
       // ICO — legacy fallback (IE, old Windows Explorer)
       { url: "/favicon.ico",        sizes: "any" },
     ],
     shortcut: "/favicon.ico",
     // iOS home-screen icon
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png?v=2", sizes: "180x180", type: "image/png" }],
     // Android / PWA icons (also referenced in site.webmanifest)
     other: [
-      { rel: "icon", url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { rel: "icon", url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      { rel: "icon", url: "/android-chrome-192x192.png?v=2", sizes: "192x192", type: "image/png" },
+      { rel: "icon", url: "/android-chrome-512x512.png?v=2", sizes: "512x512", type: "image/png" },
     ],
   },
   // PWA manifest
