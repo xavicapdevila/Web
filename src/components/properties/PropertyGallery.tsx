@@ -28,13 +28,32 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const touchStartX = useRef<number | null>(null);
   const { t } = useLanguage();
 
+  // Cross-fade state: keep old image in bg while new image fades in
+  const [prevSrc, setPrevSrc] = useState<string | null>(null);
+  const [crossfading, setCrossfading] = useState(false);
+  const crossfadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const goTo = useCallback((newIdx: number) => {
+    if (crossfadeTimer.current) clearTimeout(crossfadeTimer.current);
+    const oldSrc = images[newIdx === currentIndex ? currentIndex : currentIndex]?.url ?? null;
+    setPrevSrc(oldSrc);
+    setCrossfading(false);
+    setCurrentIndex(newIdx);
+    // Two rAFs: first renders new src at opacity-0, second starts the CSS transition
+    requestAnimationFrame(() => requestAnimationFrame(() => setCrossfading(true)));
+    crossfadeTimer.current = setTimeout(() => {
+      setPrevSrc(null);
+      setCrossfading(false);
+    }, 320);
+  }, [currentIndex, images]);
+
   const goPrev = useCallback(() => {
-    setCurrentIndex((i) => (i - 1 + images.length) % images.length);
-  }, [images.length]);
+    goTo((currentIndex - 1 + images.length) % images.length);
+  }, [currentIndex, images.length, goTo]);
 
   const goNext = useCallback(() => {
-    setCurrentIndex((i) => (i + 1) % images.length);
-  }, [images.length]);
+    goTo((currentIndex + 1) % images.length);
+  }, [currentIndex, images.length, goTo]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -138,25 +157,10 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            {mainImage ? (
-              <Image
-                src={mainImage.url}
-                alt={`${altBase} — foto ${currentIndex + 1} de ${images.length}`}
-                fill
-                className="object-cover cursor-pointer"
-                priority
-                sizes="100vw"
-                onClick={() => openLightbox(currentIndex)}
-              />
-            ) : (
-              <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
-                <span className="text-[#333]">{t("cardNoImage")}</span>
-              </div>
-            )}
-
-            {/* Preload next + previous images so slide navigation is instant */}
+            {/* ── Cross-fade image layers ── */}
+            {/* Layer 0: preload next image (invisible, warms browser cache) */}
             {images.length > 1 && (
-              <div className="absolute inset-0 pointer-events-none opacity-0 z-0" aria-hidden="true">
+              <div className="absolute inset-0 pointer-events-none opacity-0" style={{ zIndex: 0 }} aria-hidden="true">
                 <Image
                   src={images[(currentIndex + 1) % images.length].url}
                   alt=""
@@ -166,24 +170,46 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
                 />
               </div>
             )}
-            {images.length > 2 && (
-              <div className="absolute inset-0 pointer-events-none opacity-0 z-0" aria-hidden="true">
-                <Image
-                  src={images[(currentIndex - 1 + images.length) % images.length].url}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  priority
-                />
+
+            {/* Layer 1: previous image (bg, fades out) */}
+            {prevSrc && (
+              <div
+                className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${crossfading ? "opacity-0" : "opacity-100"}`}
+                style={{ zIndex: 1 }}
+                aria-hidden="true"
+              >
+                <Image src={prevSrc} alt="" fill className="object-cover" sizes="100vw" priority />
               </div>
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            {/* Layer 2: current image (fg, fades in) */}
+            {mainImage ? (
+              <div
+                className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${crossfading || !prevSrc ? "opacity-100" : "opacity-0"}`}
+                style={{ zIndex: 2 }}
+              >
+                <Image
+                  src={mainImage.url}
+                  alt={`${altBase} — foto ${currentIndex + 1} de ${images.length}`}
+                  fill
+                  className="object-cover cursor-pointer"
+                  priority
+                  sizes="100vw"
+                  onClick={() => openLightbox(currentIndex)}
+                />
+              </div>
+            ) : (
+              <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center" style={{ zIndex: 2 }}>
+                <span className="text-[#333]">{t("cardNoImage")}</span>
+              </div>
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
 
             {images.length > 1 && (
               <button
                 onClick={goPrev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto anterior"
               >
                 <ChevronLeft size={22} />
@@ -192,7 +218,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={goNext}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto siguiente"
               >
                 <ChevronRight size={22} />
@@ -200,12 +226,12 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             )}
 
             {/* Media icons — bottom left */}
-            <div className="absolute bottom-4 left-4 z-10">
+            <div className="absolute bottom-4 left-4 z-20">
               <MediaIcons />
             </div>
 
             {/* Counter */}
-            <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5">
+            <div className="absolute bottom-4 right-4 z-20 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5">
               {currentIndex + 1} / {totalMedia}
             </div>
 
@@ -235,7 +261,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
               {images.slice(0, 6).map((img, i) => (
                 <button
                   key={i}
-                  onClick={() => setCurrentIndex(i)}
+                  onClick={() => goTo(i)}
                   className={`relative flex-1 aspect-[4/3] overflow-hidden transition-opacity ${currentIndex === i ? "ring-2 ring-[#C9B99A] opacity-100" : "opacity-60 hover:opacity-90"}`}
                 >
                   <Image src={img.url} alt={`${altBase} — foto ${i + 1}`} fill className="object-cover" sizes="200px" />
