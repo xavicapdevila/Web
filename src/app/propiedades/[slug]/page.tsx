@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getCachedPropertyBySlug, getCachedSlugs } from "@/lib/sync";
+import { getAgentInfo, buildAgentWhatsApp } from "@/lib/agents";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import PropertyPageContent from "@/components/properties/PropertyPageContent";
 import { formatPrice } from "@/lib/utils";
@@ -89,33 +90,12 @@ export default async function PropertyPage({ params }: Props) {
 
   const isReserved = property.estadoFicha === 7;
 
-  // Assign agent based on email or default
-  const agents = {
-    "a.garcia@thevilahome.com": { name: "Ariadna Garcia", photo: "/images/agents/ariadna.jpg" },
-    "x.capdevila@thevilahome.com": { name: "Xavier Capdevila", photo: "/images/agents/xavier.jpg" },
-    "s.pascual@thevilahome.com": { name: "Sofía Pascual", photo: "/images/agents/sofia.jpg" },
-  };
-  const agentKey = (property.agenteEmail ?? "") as keyof typeof agents;
-  const agentInfo = agents[agentKey] ?? {
-    name: property.agente ?? "The Vila Home",
-    photo: "/images/agents/equipo.jpg",
-  };
+  // Resolve agent from centralised config (src/lib/agents.ts)
+  const { name: agentName, photo: agentPhoto, contactEmail } = getAgentInfo(property.agenteEmail);
+  const agentInfo = { name: agentName, photo: agentPhoto };
 
-  const contactEmail = agentKey && agents[agentKey]
-    ? agentKey
-    : "info@thevilahome.com";
-
-  const agentMobiles: Record<string, string> = {
-    "a.garcia@thevilahome.com": "34680526196",
-    "x.capdevila@thevilahome.com": "34638359612",
-    "s.pascual@thevilahome.com": "34679876331",
-  };
-  const waNumber = agentMobiles[agentKey] ?? "34638359612";
   const propertyUrl = `${BASE_URL}/propiedades/${slug}`;
-  const waMessage = encodeURIComponent(
-    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.\n\n${propertyUrl}`
-  );
-  const waUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
+  const waUrl = buildAgentWhatsApp(property.agenteEmail, property.titulo, property.ref ?? "", propertyUrl);
 
   const canonicalUrl = `${BASE_URL}/propiedades/${slug}`;
 

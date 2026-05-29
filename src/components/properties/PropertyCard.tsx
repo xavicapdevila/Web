@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useCallback, useEffect } from "react";
+import { memo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2, X } from "lucide-react";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
@@ -10,13 +10,14 @@ import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import ShareModal from "./ShareModal";
+import { buildAgentWhatsApp } from "@/lib/agents";
 
 interface Props {
   property: Property;
   priority?: boolean;
 }
 
-export default function PropertyCard({ property, priority = false }: Props) {
+function PropertyCard({ property, priority = false }: Props) {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
@@ -61,18 +62,9 @@ export default function PropertyCard({ property, priority = false }: Props) {
     }
   };
 
-  const agentMobiles: Record<string, string> = {
-    "a.garcia@thevilahome.com": "34680526196",
-    "x.capdevila@thevilahome.com": "34638359612",
-    "s.pascual@thevilahome.com": "34679876331",
-  };
-  const waNumber = agentMobiles[property.agenteEmail ?? ""] ?? "34638359612";
   const propertyUrl = `https://www.thevilahome.com/propiedades/${property.slug}`;
-  const waMessage = encodeURIComponent(
-    `Hola, he visto la propiedad ${property.titulo} (Ref. ${property.ref}) en vuestra web y me gustaría recibir más información.\n\n${propertyUrl}`
-  );
-  // WA button in card → contact the agent
-  const cardWaUrl = `https://wa.me/${waNumber}?text=${waMessage}`;
+  // WA button in card → contact the agent (resolved from centralised agents config)
+  const cardWaUrl = buildAgentWhatsApp(property.agenteEmail, property.titulo, property.ref ?? "", propertyUrl);
   // WA button in share modal → open WhatsApp without recipient so user chooses who to forward to
   const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${property.titulo}\n${propertyUrl}`)}`;
   const isReserved = property.estadoFicha === 7;
@@ -241,24 +233,24 @@ export default function PropertyCard({ property, priority = false }: Props) {
           <div className="ml-auto flex items-center gap-2">
             <a
               href="tel:936061800"
-              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
-              title="Llamar"
+              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              aria-label="Llamar a The Vila Home"
             >
-              <Phone size={13} />
+              <Phone size={13} aria-hidden="true" />
             </a>
             <a
               href={`mailto:info@thevilahome.com?subject=Información sobre ${property.ref}`}
-              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
-              title="Email"
+              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              aria-label="Enviar email sobre esta propiedad"
             >
-              <Mail size={13} />
+              <Mail size={13} aria-hidden="true" />
             </a>
             <button
               onClick={handleShare}
-              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
-              title="Compartir"
+              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              aria-label="Compartir propiedad"
             >
-              <Share2 size={13} />
+              <Share2 size={13} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -329,3 +321,6 @@ export default function PropertyCard({ property, priority = false }: Props) {
     </>
   );
 }
+
+// Memoised: skips re-render when parent re-renders but this card's props haven't changed
+export default memo(PropertyCard);

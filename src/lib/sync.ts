@@ -495,7 +495,7 @@ function rowToProperty(row: Record<string, unknown>): Property {
     emisionesLetra: row.emisiones_letra ? String(row.emisiones_letra) : undefined,
     emisionesEnergeticas: row.emisiones_energeticas ? String(row.emisiones_energeticas) : undefined,
     energiaExento: Boolean(row.energia_exento),
-    imagenes:  JSON.parse(String(row.imagenes ?? "[]")),
+    imagenes:  (() => { try { return JSON.parse(String(row.imagenes ?? "[]")); } catch { return []; } })(),
     video1:    row.video1 ? String(row.video1) : undefined,
     tour:      row.tour  ? String(row.tour)   : undefined,
     fecha:     String(row.fecha ?? ""),

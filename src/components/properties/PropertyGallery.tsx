@@ -279,7 +279,12 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
       {/* ── Lightbox — nearly full screen ── */}
       {lightboxIndex !== null && (
-        <div className="fixed inset-0 bg-black z-[100] flex flex-col">
+        <div
+          className="fixed inset-0 bg-black z-[100] flex flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Galería de fotos — ${lightboxIndex + 1} de ${images.length}`}
+        >
 
           {/* Top bar */}
           <div className="flex items-center justify-between px-5 h-12 shrink-0">
