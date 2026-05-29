@@ -185,18 +185,38 @@ function initSchema(db: Database.Database): void {
 const BLOB_DB_PATHNAME = "db/properties.db";
 
 /**
+ * In-flight restore promise — used to deduplicate concurrent cold-start
+ * requests (e.g. a Next.js prefetch racing with an actual navigation click).
+ * Without this, two simultaneous calls would each download the Blob and the
+ * second one would close the DB connection opened by the first, causing a
+ * "database is closed" exception and returning empty results to the user.
+ */
+let _initDbPromise: Promise<void> | null = null;
+
+/**
  * Restores the SQLite DB from Vercel Blob on cold container starts.
  * No-op if the DB file is already populated (warm container) or if
  * BLOB_READ_WRITE_TOKEN is not set.
+ * Concurrent calls share a single in-flight promise so only one restore
+ * runs at a time.
  */
 export async function initDbFromBlob(): Promise<void> {
-  // Skip if the DB file already exists with content (warm container)
+  // Fast path: DB file already present and populated (warm container)
   try {
     if (fs.statSync(DB_PATH).size > 32_768) return; // > 32 KB → already loaded
-  } catch { /* file doesn't exist → fall through */ }
+  } catch { /* file doesn't exist → cold start → fall through */ }
 
   if (!process.env.BLOB_READ_WRITE_TOKEN) return;
 
+  // If a restore is already in progress (concurrent request), wait for it
+  // instead of starting a second parallel download.
+  if (!_initDbPromise) {
+    _initDbPromise = _restoreFromBlob();
+  }
+  return _initDbPromise;
+}
+
+async function _restoreFromBlob(): Promise<void> {
   try {
     const { blobs } = await list({
       prefix: BLOB_DB_PATHNAME,
@@ -215,7 +235,11 @@ export async function initDbFromBlob(): Promise<void> {
     // Reset the cached connection so next getDb() opens the restored file
     if (_db) { try { _db.close(); } catch {} _db = null; }
   } catch {
-    // Non-fatal: DB will be empty until first sync
+    // Non-fatal: DB will be empty until the daily cron sync runs
+  } finally {
+    // Clear the in-flight reference so a retry is possible if the restore
+    // failed. On success, the size > 32 KB check above short-circuits anyway.
+    _initDbPromise = null;
   }
 }
 
