@@ -90,19 +90,17 @@ export default function PropertyFilters() {
         "lg:block",
         mobileOpen ? "block" : "hidden"
       )}>
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-xl text-white hidden lg:block">{t("filtersTitle")}</h2>
-          {hasFilters && (
+        {hasFilters && (
+          <div className="flex justify-end mb-4">
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 text-[#666] hover:text-[#C9B99A] text-xs transition-colors ml-auto"
+              className="flex items-center gap-1 text-[#666] hover:text-[#C9B99A] text-xs transition-colors"
             >
               <X size={12} />
               {t("filtersClear")}
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="space-y-5">
           {/* Ciudad */}
