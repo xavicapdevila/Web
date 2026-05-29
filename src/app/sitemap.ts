@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllPropertySlugs } from "@/lib/sync";
+import { getCachedSlugs } from "@/lib/sync";
 import { getBlogPosts } from "@/lib/blog";
 
 // Force dynamic so sitemap reflects new blog posts and properties without a redeploy
@@ -17,18 +17,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/contacto`,             lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
   ];
 
+  const safeDate = (s: string) => {
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? new Date() : d;
+  };
+
   try {
-    const slugs = getAllPropertySlugs();
+    const slugs = await getCachedSlugs();
     for (const { slug, fecha } of slugs) {
       routes.push({
         url: `${BASE_URL}/propiedades/${slug}`,
-        lastModified: new Date(fecha),
+        lastModified: safeDate(fecha),
         priority: 0.8,
         changeFrequency: "weekly",
       });
     }
   } catch {
-    // DB not ready
+    // XML cache not ready
   }
 
   try {
@@ -36,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const post of posts) {
       routes.push({
         url: `${BASE_URL}/blog/${post.slug}`,
-        lastModified: new Date(post.fecha),
+        lastModified: safeDate(post.fecha),
         priority: 0.7,
         changeFrequency: "weekly",
       });

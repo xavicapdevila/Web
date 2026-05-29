@@ -1054,6 +1054,8 @@ const TIPO_MAP: Record<string, Record<Lang, string>> = {
   local:    { es: "Local",   ca: "Local",     en: "Commercial", fr: "Local commercial" },
   garaje:   { es: "Garaje",  ca: "Garatge",   en: "Garage",     fr: "Garage" },
   oficina:  { es: "Oficina", ca: "Oficina",   en: "Office",     fr: "Bureau" },
+  nave:     { es: "Nave",    ca: "Nau",       en: "Warehouse",  fr: "Entrepôt" },
+  trastero: { es: "Trastero", ca: "Traster",  en: "Storage",    fr: "Cave" },
 };
 
 export function getTipoLabel(tipo: string, lang: Lang, subtipo?: string): string {

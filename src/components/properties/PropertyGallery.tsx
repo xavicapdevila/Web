@@ -35,7 +35,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
 
   const goTo = useCallback((newIdx: number) => {
     if (crossfadeTimer.current) clearTimeout(crossfadeTimer.current);
-    const oldSrc = images[newIdx === currentIndex ? currentIndex : currentIndex]?.url ?? null;
+    const oldSrc = images[currentIndex]?.url ?? null;
     setPrevSrc(oldSrc);
     setCrossfading(false);
     setCurrentIndex(newIdx);
@@ -260,7 +260,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             <div className="hidden lg:flex gap-1 p-1 bg-black">
               {images.slice(0, 6).map((img, i) => (
                 <button
-                  key={i}
+                  key={img.url}
                   onClick={() => goTo(i)}
                   className={`relative flex-1 aspect-[4/3] overflow-hidden transition-opacity ${currentIndex === i ? "ring-2 ring-[#C9B99A] opacity-100" : "opacity-60 hover:opacity-90"}`}
                 >
@@ -343,7 +343,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
               <div className="flex gap-1 px-3 py-2 overflow-x-auto">
                 {images.map((img, i) => (
                   <button
-                    key={i}
+                    key={img.url}
                     onClick={() => setLightboxIndex(i)}
                     className={`relative w-16 h-11 shrink-0 overflow-hidden transition-opacity ${lightboxIndex === i ? "ring-1 ring-[#C9B99A] opacity-100" : "opacity-45 hover:opacity-80"}`}
                   >
@@ -369,7 +369,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {images.map((img, i) => (
                 <button
-                  key={i}
+                  key={img.url}
                   onClick={() => { setShowGrid(false); openLightbox(i); }}
                   className="relative aspect-[4/3] overflow-hidden hover:opacity-90 transition-opacity"
                 >

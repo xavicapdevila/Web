@@ -98,7 +98,7 @@ export default async function PropertyPage({ params }: Props) {
   const agentKey = (property.agenteEmail ?? "") as keyof typeof agents;
   const agentInfo = agents[agentKey] ?? {
     name: property.agente ?? "The Vila Home",
-    photo: "/images/agents/placeholder.jpg",
+    photo: "/images/agents/equipo.jpg",
   };
 
   const contactEmail = agentKey && agents[agentKey]

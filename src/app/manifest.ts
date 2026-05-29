@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description:
       "Inmobiliaria en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès.",
     start_url: "/",
-    display: "browser",
+    display: "standalone",
     background_color: "#0a0a0a",
     theme_color: "#0a0a0a",
     icons: [
