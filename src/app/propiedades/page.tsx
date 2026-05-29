@@ -3,8 +3,7 @@ import type { Metadata } from "next";
 import PropertyFilters from "@/components/properties/PropertyFilters";
 import PropertyGrid from "@/components/properties/PropertyGrid";
 import PropiedadesHeader from "@/components/properties/PropiedadesHeader";
-import { getPropertiesFromDb } from "@/lib/sync";
-import { initDbFromBlob } from "@/lib/db";
+import { getCachedPropertiesList } from "@/lib/sync";
 
 export const metadata: Metadata = {
   title: "Propiedades en venta",
@@ -28,6 +27,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Keep force-dynamic so filters (searchParams) are always respected.
+// Data now comes from the Vercel Data Cache (XML), not from SQLite,
+// so cold-container delays are eliminated.
 export const dynamic = "force-dynamic";
 
 interface Props {
@@ -48,28 +50,20 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   const page = Number(params.page ?? 1);
   const limit = 12;
 
-  await initDbFromBlob();
-
-  let properties: import("@/types/property").Property[] = [];
-  let total = 0;
-
-  try {
-    const result = getPropertiesFromDb({
-      tipo: params.tipo,
-      subtipo: params.subtipo,
-      precioMin: params.precioMin ? Number(params.precioMin) : undefined,
-      precioMax: params.precioMax ? Number(params.precioMax) : undefined,
-      habitaciones: params.habitaciones ? Number(params.habitaciones) : undefined,
-      m2Min: params.m2Min ? Number(params.m2Min) : undefined,
-      ciudad: params.ciudad,
-      page,
-      limit,
-    });
-    properties = result.properties;
-    total = result.total;
-  } catch {
-    // DB not seeded yet
-  }
+  // getCachedPropertiesList reads from the Vercel Data Cache (XML feed).
+  // It is shared across ALL Lambda instances, so cold containers return
+  // cached data immediately — no Blob restore or SQLite needed.
+  const { properties, total } = await getCachedPropertiesList({
+    tipo:        params.tipo,
+    subtipo:     params.subtipo,
+    precioMin:   params.precioMin   ? Number(params.precioMin)   : undefined,
+    precioMax:   params.precioMax   ? Number(params.precioMax)   : undefined,
+    habitaciones:params.habitaciones ? Number(params.habitaciones): undefined,
+    m2Min:       params.m2Min       ? Number(params.m2Min)       : undefined,
+    ciudad:      params.ciudad,
+    page,
+    limit,
+  });
 
   const totalPages = Math.ceil(total / limit);
 

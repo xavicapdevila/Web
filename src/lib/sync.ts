@@ -48,6 +48,81 @@ export async function getCachedSlugs(): Promise<{ slug: string; fecha: string }[
   }
 }
 
+// ---------------------------------------------------------------------------
+// Listing page — same XML Data Cache as detail pages, no SQLite needed.
+// Filtering + pagination applied in-memory on the cached array (~200 items).
+// This means the listing page never suffers from cold-start Blob restore delays.
+// ---------------------------------------------------------------------------
+
+type ListFilters = {
+  tipo?: string;
+  subtipo?: string;
+  precioMin?: number;
+  precioMax?: number;
+  habitaciones?: number;
+  m2Min?: number;
+  ciudad?: string;
+  page?: number;
+  limit?: number;
+};
+
+/**
+ * Returns the filtered + paginated property list for /propiedades.
+ * Source: Vercel Data Cache (XML feed) — instant even on cold containers.
+ * Falls back to empty list if the XML cache is unavailable.
+ */
+export async function getCachedPropertiesList(
+  filters: ListFilters = {}
+): Promise<{ properties: Property[]; total: number }> {
+  let all: Property[] = [];
+  try {
+    all = await _getCachedXmlProperties();
+  } catch {
+    return { properties: [], total: 0 };
+  }
+
+  let filtered = all;
+
+  if (filters.tipo) {
+    filtered = filtered.filter((p) => p.tipo === filters.tipo);
+  }
+  if (filters.subtipo) {
+    const vals = filters.subtipo.split(",").map((v) => v.trim()).filter(Boolean);
+    if (vals.length > 0) {
+      filtered = filtered.filter((p) => vals.includes(p.subtipo ?? ""));
+    }
+  }
+  if (filters.precioMin != null) {
+    filtered = filtered.filter((p) => p.precio >= filters.precioMin!);
+  }
+  if (filters.precioMax != null) {
+    filtered = filtered.filter((p) => p.precio <= filters.precioMax!);
+  }
+  if (filters.habitaciones != null) {
+    filtered = filtered.filter((p) => (p.habitaciones ?? 0) >= filters.habitaciones!);
+  }
+  if (filters.m2Min != null) {
+    filtered = filtered.filter((p) => (p.m2Construidos ?? 0) >= filters.m2Min!);
+  }
+  if (filters.ciudad) {
+    const lc = filters.ciudad.toLowerCase();
+    filtered = filtered.filter((p) => p.ciudad.toLowerCase().includes(lc));
+  }
+
+  // Replicate the DB sort: most recently added first
+  filtered.sort((a, b) => b.fecha.localeCompare(a.fecha));
+
+  const total = filtered.length;
+  const page = filters.page ?? 1;
+  const limit = filters.limit ?? 12;
+  const offset = (page - 1) * limit;
+
+  return {
+    properties: filtered.slice(offset, offset + limit),
+    total,
+  };
+}
+
 export interface SyncResult {
   added: number;
   updated: number;
