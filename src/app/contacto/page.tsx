@@ -33,7 +33,7 @@ const schemaLocalBusiness = {
   name: "The Vila Home",
   alternateName: "The Vila Home — Human Real Estate",
   description:
-    "Inmobiliaria boutique en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès.",
+    "Inmobiliaria en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès.",
   url: BASE_URL,
   telephone: "+34936061800",
   email: "info@thevilahome.com",

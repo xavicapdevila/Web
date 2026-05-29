@@ -14,12 +14,12 @@ const PUBLIC = path.join(ROOT, "public");
 const APP = path.join(ROOT, "src", "app");
 
 // ─── Icon design ──────────────────────────────────────────────────────────────
-// "V" monogram — TVH brand gold on near-black background.
-// Works from 16×16 up to 512×512: bold enough to read at any size.
-// viewBox 100×100 so coordinates are easy to reason about.
+// Gold (#C9B99A) tile with a bold dark V cut into it.
+// Gold background = instantly recognisable brand colour even at 16 px.
+// The V negative-space gives ≥4 px arm width at the smallest size (16 px).
 const SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" fill="#0a0a0a"/>
-  <polygon points="14,20 50,84 86,20 70,20 50,68 30,20" fill="#C9B99A"/>
+  <rect width="100" height="100" fill="#C9B99A"/>
+  <polygon points="6,14 50,90 94,14 68,14 50,66 32,14" fill="#0f0f0f"/>
 </svg>`;
 
 // ─── ICO builder (multi-resolution PNG-in-ICO) ───────────────────────────────

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "The Vila Home",
     short_name: "The Vila Home",
     description:
-      "Inmobiliaria boutique en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès.",
+      "Inmobiliaria en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès.",
     start_url: "/",
     display: "browser",
     background_color: "#0a0a0a",

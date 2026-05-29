@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | The Vila Home",
   },
   description:
-    "Inmobiliaria boutique en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès. Human Real Estate — cercanos, honestos y sin corporativismo.",
+    "Inmobiliaria en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès. Human Real Estate — cercanos, honestos y sin corporativismo.",
   keywords: [
     "inmobiliaria Vilanova i la Geltrú",
     "pisos en venta Vilanova",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     "comprar piso Vilanova",
     "vender casa Vilanova",
     "The Vila Home",
-    "inmobiliaria boutique",
+    "inmobiliaria Garraf",
   ],
   authors: [{ name: "The Vila Home", url: BASE_URL }],
   creator: "The Vila Home",
@@ -85,13 +85,13 @@ export const metadata: Metadata = {
     siteName: "The Vila Home",
     title: "The Vila Home | Inmobiliaria en Vilanova i la Geltrú",
     description:
-      "Inmobiliaria boutique en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès. Cercanos, honestos y sin corporativismo.",
+      "Inmobiliaria en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès. Cercanos, honestos y sin corporativismo.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "The Vila Home — Inmobiliaria boutique en Vilanova i la Geltrú",
+        alt: "The Vila Home — Inmobiliaria en Vilanova i la Geltrú",
       },
     ],
   },
@@ -100,7 +100,7 @@ export const metadata: Metadata = {
     site: "@thevilahome",
     creator: "@thevilahome",
     title: "The Vila Home | Human Real Estate",
-    description: "Inmobiliaria boutique en Vilanova i la Geltrú. Garraf y Penedès.",
+    description: "Inmobiliaria en Vilanova i la Geltrú. Garraf y Penedès.",
     images: ["/og-image.jpg"],
   },
   robots: {

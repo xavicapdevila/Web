@@ -20,7 +20,7 @@ const schemaRealEstateAgent = {
   name: "The Vila Home",
   alternateName: "The Vila Home — Human Real Estate",
   description:
-    "Inmobiliaria boutique en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès.",
+    "Inmobiliaria en Vilanova i la Geltrú especializada en venta de pisos, casas, chalets y áticos en el Garraf y Penedès.",
   url: "https://www.thevilahome.com",
   logo: "https://www.thevilahome.com/logo.svg",
   image: "https://www.thevilahome.com/og-image.jpg",
