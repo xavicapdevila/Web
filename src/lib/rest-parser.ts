@@ -165,6 +165,14 @@ export interface RestFetchResult {
   properties: Property[];
   /** ref → fechaact for all fetched properties (store in DB for next diff) */
   fechaacts: Map<string, string>;
+  /**
+   * ref → fechaact for XML-seeded properties (fechaact was null/"" in DB).
+   * These rows already have full data from the XML seed; we just stamp their
+   * REST fechaact so future syncs can do proper differentials — no detail
+   * re-fetch needed. This avoids the N×7.5 s timeout on the first REST sync
+   * after an XML seed.
+   */
+  fechaactUpdates: Map<string, string>;
   /** Refs that should be removed from DB (deactivated or deleted in Inmovilla) */
   removedRefs: string[];
   /** Number of unchanged properties that were skipped */
@@ -303,9 +311,12 @@ function mapDetail(
     consumoEnergetico, emisionesLetra, emisionesEnergeticas,
     energiaExento: energiaExento || undefined,
     imagenes,
-    // REST API does not return tour/video URLs — sync.ts will preserve existing DB values
-    video1: undefined,
-    tour:   undefined,
+    // Tour virtual — try field names used by Inmovilla REST (same as XML export)
+    video1: (d.video1 ? String(d.video1).trim() : undefined) ||
+            (d.urlyoutube ? String(d.urlyoutube).trim() : undefined) || undefined,
+    tour:   (d.tour ? String(d.tour).trim() : undefined) ||
+            (d.url360 ? String(d.url360).trim() : undefined) ||
+            (d.urltour ? String(d.urltour).trim() : undefined) || undefined,
     // REST API uses keyagente (numeric) — agent details preserved from existing DB values
     agente: undefined, agenteEmail: undefined, agenteFoto: undefined, agenteTelefono: undefined,
     fecha, slug,
@@ -344,22 +355,37 @@ export async function fetchFromRestApi(
     (ref) => !activeRefs.has(ref) || !allRefs.has(ref)
   );
 
-  // Differential: only fetch properties whose fechaact changed
-  const toFetch = activeItems.filter(
-    (item) => existingFechacts.get(item.ref) !== item.fechaact
-  );
-  const unchanged = activeItems.length - toFetch.length;
+  // Differential sync — three cases per active item:
+  //
+  //  existing === undefined  → new ref not yet in DB → fetch full details
+  //  existing === ""         → XML-seeded row (fechaact was NULL in DB) → stamp
+  //                            fechaact from the REST list without re-fetching
+  //                            details (avoids N×7.5 s timeout on Hobby plan)
+  //  existing !== fechaact   → REST-synced row whose data changed → re-fetch
+  //  existing === fechaact   → unchanged → skip
+  const fechaactUpdates = new Map<string, string>();
+  const toFetch = activeItems.filter((item) => {
+    const existing = existingFechacts.get(item.ref);
+    if (existing === undefined) return true;   // new property → fetch
+    if (existing === "") {
+      // XML-seeded: stamp fechaact so next sync can diff properly
+      fechaactUpdates.set(item.ref, item.fechaact);
+      return false;
+    }
+    return existing !== item.fechaact;          // REST-synced → fetch if changed
+  });
+  const unchanged = activeItems.length - toFetch.length - fechaactUpdates.size;
 
   if (toFetch.length === 0) {
-    return { properties: [], fechaacts: new Map(), removedRefs, unchanged };
+    return { properties: [], fechaacts: new Map(), fechaactUpdates, removedRefs, unchanged };
   }
 
   // 2. Fetch city enum (cached, non-blocking fallback)
   const cityMap = await getCityMap(token);
 
-  // 3. Fetch property details — rate-limited at ~8 req/min (7.5 s between calls)
-  //    Safe margin below the 10 req/min API limit.
-  const RATE_DELAY = 7_500;
+  // 3. Fetch property details — rate-limited at 50 req/10 min = 5 req/min.
+  //    13 s between calls gives ~4.6 req/min, safely under the limit.
+  const RATE_DELAY = 13_000;
   const properties: Property[] = [];
   const fechaacts  = new Map<string, string>();
 
@@ -380,5 +406,5 @@ export async function fetchFromRestApi(
     }
   }
 
-  return { properties, fechaacts, removedRefs, unchanged };
+  return { properties, fechaacts, fechaactUpdates, removedRefs, unchanged };
 }

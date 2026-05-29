@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
+import { put, list } from "@vercel/blob";
 
 /**
  * Resolve a writable directory for the SQLite DB.
@@ -167,6 +168,7 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`ALTER TABLE properties ADD COLUMN fechaact TEXT`); } catch {}
   // source column on sync_log: which data source was used ('rest' | 'xml')
   try { db.exec(`ALTER TABLE sync_log ADD COLUMN source TEXT DEFAULT 'xml'`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN eninternet INTEGER DEFAULT 1`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);
     CREATE INDEX IF NOT EXISTS idx_properties_ciudad ON properties(ciudad);
@@ -174,4 +176,69 @@ function initSchema(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_properties_fecha ON properties(fecha DESC);
     CREATE INDEX IF NOT EXISTS idx_properties_estado ON properties(estado_ficha);
   `);
+}
+
+// ── Vercel Blob persistence ───────────────────────────────────────────────────
+// On Vercel, /tmp is ephemeral per container. We back up the SQLite DB to
+// Vercel Blob after every sync and restore it on cold container starts.
+
+const BLOB_DB_PATHNAME = "db/properties.db";
+
+/**
+ * Restores the SQLite DB from Vercel Blob on cold container starts.
+ * No-op if the DB file is already populated (warm container) or if
+ * BLOB_READ_WRITE_TOKEN is not set.
+ */
+export async function initDbFromBlob(): Promise<void> {
+  // Skip if the DB file already exists with content (warm container)
+  try {
+    if (fs.statSync(DB_PATH).size > 32_768) return; // > 32 KB → already loaded
+  } catch { /* file doesn't exist → fall through */ }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return;
+
+  try {
+    const { blobs } = await list({
+      prefix: BLOB_DB_PATHNAME,
+      limit: 1,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+    if (!blobs[0]) return; // No backup in Blob yet
+
+    const res = await fetch(blobs[0].url);
+    if (!res.ok) return;
+
+    const data = Buffer.from(await res.arrayBuffer());
+    fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
+    fs.writeFileSync(DB_PATH, data);
+
+    // Reset the cached connection so next getDb() opens the restored file
+    if (_db) { try { _db.close(); } catch {} _db = null; }
+  } catch {
+    // Non-fatal: DB will be empty until first sync
+  }
+}
+
+/**
+ * Uploads the current SQLite DB to Vercel Blob after a successful sync.
+ * This makes the updated data available to all future serverless containers.
+ */
+export async function persistDbToBlob(): Promise<void> {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return;
+
+  try {
+    // Flush WAL log into the main DB file before reading it
+    const db = getDb();
+    db.pragma("wal_checkpoint(TRUNCATE)");
+
+    const data = fs.readFileSync(DB_PATH);
+    await put(BLOB_DB_PATHNAME, data, {
+      access: "public",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+  } catch {
+    // Non-fatal
+  }
 }

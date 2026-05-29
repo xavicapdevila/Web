@@ -1,5 +1,5 @@
 import { unstable_cache, revalidateTag } from "next/cache";
-import { getDb } from "./db";
+import { getDb, persistDbToBlob, initDbFromBlob } from "./db";
 import { fetchAndParseXML } from "./xml-parser";
 import { fetchFromRestApi } from "./rest-parser";
 import type { Property } from "@/types/property";
@@ -29,7 +29,10 @@ export async function getCachedPropertyBySlug(slug: string): Promise<Property | 
     if (found) return found;
   } catch { /* fall through to DB */ }
 
-  // DB fallback: REST-only listings not yet in the XML feed
+  // DB fallback: REST-only listings not yet in the XML feed.
+  // Ensure the DB is restored from Blob — the detail page may run in a fresh
+  // Vercel container that hasn't loaded the DB yet.
+  await initDbFromBlob();
   try {
     return getPropertyBySlug(slug);
   } catch {
@@ -224,7 +227,7 @@ async function syncFromRest(): Promise<SyncResult> {
   const existingFechacts = new Map(existingRows.map((r) => [r.ref, r.fechaact ?? ""]));
   const existingRefs     = new Set(existingRows.map((r) => r.ref));
 
-  const { properties, fechaacts, removedRefs, unchanged } =
+  const { properties, fechaacts, fechaactUpdates, removedRefs, unchanged } =
     await fetchFromRestApi(existingFechacts, existingRefs);
 
   const upsert = buildUpsertStatement(db);
@@ -237,6 +240,17 @@ async function syncFromRest(): Promise<SyncResult> {
   });
 
   insertMany(properties);
+
+  // Stamp fechaact for XML-seeded rows without re-fetching their full details.
+  // This is a fast in-DB update (no API calls) that enables proper differentials
+  // on every subsequent REST sync.
+  if (fechaactUpdates.size > 0) {
+    const stampStmt = db.prepare("UPDATE properties SET fechaact = ? WHERE ref = ?");
+    const stampTx = db.transaction((updates: Map<string, string>) => {
+      for (const [ref, fa] of updates) stampStmt.run(fa, ref);
+    });
+    stampTx(fechaactUpdates);
+  }
 
   // Remove deactivated / deleted properties
   for (const ref of removedRefs) {
@@ -252,6 +266,9 @@ async function syncFromRest(): Promise<SyncResult> {
 
   // Revalidate the Vercel Data Cache so detail pages pick up the new data
   try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
+
+  // Persist DB to Blob so other containers can read the updated data
+  await persistDbToBlob();
 
   return { added, updated, removed, total, source: "rest", unchanged };
 }
@@ -296,6 +313,9 @@ async function syncFromXml(): Promise<SyncResult> {
 
   // Revalidate the Vercel Data Cache so detail pages pick up the new data
   try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
+
+  // Persist DB to Blob so other containers can read the updated data
+  await persistDbToBlob();
 
   return { added, updated, removed, total: properties.length, source: "xml" };
 }
@@ -356,21 +376,36 @@ export async function ensureDbSeeded(): Promise<void> {
 }
 
 /**
- * Full sync: tries REST API first (differential, faster on subsequent runs),
- * falls back to XML if REST is unavailable or fails.
+ * Full sync.
  *
- * Called by the hourly cron job at /api/sync.
+ * @param forceSource
+ *   "rest" — REST-first differential (fast, for the manual admin Sync button)
+ *   "xml"  — full XML sync (complete data incl. tour/video, for the daily cron)
+ *   undefined — same as "rest" when token is set, "xml" otherwise (legacy default)
  */
-export async function syncProperties(): Promise<SyncResult> {
+export async function syncProperties(forceSource?: "rest" | "xml"): Promise<SyncResult> {
   const hasRestToken = Boolean(process.env.INMOVILLA_API_TOKEN);
 
+  // "rest" = REST only, no XML fallback (used by admin manual Sync button).
+  //   Prevents accidentally deleting REST-only listings (e.g. new properties
+  //   that are live via REST but not yet in the XML feed).
+  if (forceSource === "rest") {
+    if (!hasRestToken) throw new Error("INMOVILLA_API_TOKEN no está configurado");
+    return await syncFromRest();
+  }
+
+  // "xml" = XML only (used by the daily cron — complete data, tour/video/agent).
+  if (forceSource === "xml") {
+    return await syncFromXml();
+  }
+
+  // default (no forceSource): REST-first with XML fallback — legacy behaviour.
   if (hasRestToken) {
     try {
       return await syncFromRest();
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
       console.warn(`[sync] REST sync failed (${errMsg}), falling back to XML`);
-      // Fall through to XML sync
     }
   }
 

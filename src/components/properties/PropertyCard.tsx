@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2 } from "lucide-react";
-import { formatPrice, formatM2 } from "@/lib/utils";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2, X } from "lucide-react";
+import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
@@ -17,9 +18,34 @@ interface Props {
 
 export default function PropertyCard({ property, priority = false }: Props) {
   const { t, lang } = useLanguage();
+  const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
   const mainImage = property.imagenes[0]?.url;
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showVideo,      setShowVideo]      = useState(false);
+  const [showTour,       setShowTour]       = useState(false);
+  const [lightboxImg,    setLightboxImg]    = useState<string | null>(null);
+
+  const ytId = property.video1 ? getYouTubeId(property.video1) : null;
+
+  // Close any modal on Escape (stay on grid)
+  const closeAll = useCallback(() => {
+    setShowVideo(false);
+    setShowTour(false);
+    setLightboxImg(null);
+  }, []);
+  // X button → close modal AND navigate to property detail page
+  const closeAndNavigate = useCallback(() => {
+    setShowVideo(false);
+    setShowTour(false);
+    setLightboxImg(null);
+    router.push(`/propiedades/${property.slug}`);
+  }, [router, property.slug]);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeAll(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [closeAll]);
 
   const handleShare = async () => {
     const url = `${window.location.origin}/propiedades/${property.slug}`;
@@ -57,6 +83,26 @@ export default function PropertyCard({ property, priority = false }: Props) {
   const hasVideo = Boolean(property.video1);
   const hasTour = Boolean(property.tour);
 
+  // Media icon handlers — open inline modal, same UX as the property detail page
+  const handleVideoClick = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    if (ytId) setShowVideo(true);
+  };
+  const handleTourClick = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    if (property.tour) setShowTour(true);
+  };
+  const handlePlanoClick = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    const img = property.imagenes.find((i) => i.eti === "plano");
+    if (img) setLightboxImg(img.url);
+  };
+  const handle360Click = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    const img = property.imagenes.find((i) => i.eti === "360");
+    if (img) setLightboxImg(img.url);
+  };
+
   return (
     <>
     {showShareModal && (
@@ -69,43 +115,45 @@ export default function PropertyCard({ property, priority = false }: Props) {
       />
     )}
     <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/40 transition-all duration-500 overflow-hidden">
-      {/* Image */}
-      <Link href={`/propiedades/${property.slug}`} className="block relative aspect-[4/3] overflow-hidden">
-        {mainImage ? (
-          <Image
-            src={mainImage}
-            alt={`${property.tipo} en ${property.ciudad} — ${titulo}`}
-            fill
-            priority={priority}
-            loading={priority ? "eager" : "lazy"}
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
-            <span className="text-[#333] text-sm">{t("cardNoImage")}</span>
-          </div>
-        )}
+      {/* Image area — outer div is the positioning root so media buttons
+          can sit outside the <Link> (no nested anchors) but still overlay the image */}
+      <div className="relative aspect-[4/3]">
+        <Link href={`/propiedades/${property.slug}`} className="absolute inset-0 overflow-hidden">
+          {mainImage ? (
+            <Image
+              src={mainImage}
+              alt={`${property.tipo} en ${property.ciudad} — ${titulo}`}
+              fill
+              priority={priority}
+              loading={priority ? "eager" : "lazy"}
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
+              <span className="text-[#333] text-sm">{t("cardNoImage")}</span>
+            </div>
+          )}
 
-        {/* Reserved overlay */}
-        {isReserved && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-            <span className="text-[#C9B99A] font-display text-2xl tracking-[0.3em] uppercase border border-[#C9B99A] px-6 py-2">
-              {t("cardReserved")}
+          {/* Reserved overlay */}
+          {isReserved && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <span className="text-[#C9B99A] font-display text-2xl tracking-[0.3em] uppercase border border-[#C9B99A] px-6 py-2">
+                {t("cardReserved")}
+              </span>
+            </div>
+          )}
+
+          {/* Tipo badge */}
+          <div className="absolute top-3 left-3">
+            <span className="bg-[#0a0a0a]/80 backdrop-blur-sm text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
+              {getTipoLabel(property.tipo, lang, property.subtipo)}
             </span>
           </div>
-        )}
+        </Link>
 
-        {/* Tipo badge */}
-        <div className="absolute top-3 left-3">
-          <span className="bg-[#0a0a0a]/80 backdrop-blur-sm text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
-            {getTipoLabel(property.tipo, lang, property.subtipo)}
-          </span>
-        </div>
-
-
-        {/* Media icons — bottom left */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10">
+        {/* Media badges — outside Link so each has its own click action */}
+        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10 pointer-events-none">
           {property.imagenes.length > 0 && (
             <span className="flex items-center gap-1 h-7 px-2 bg-black/75 backdrop-blur-sm text-white text-xs" title={`${property.imagenes.length} fotos`}>
               <Images size={12} />
@@ -113,27 +161,43 @@ export default function PropertyCard({ property, priority = false }: Props) {
             </span>
           )}
           {hasPlano && (
-            <span className="w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white" title="Plano disponible">
+            <button
+              onClick={handlePlanoClick}
+              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
+              title="Ver plano"
+            >
               <LayoutGrid size={13} />
-            </span>
+            </button>
           )}
           {hasVideo && (
-            <span className="w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white" title="Vídeo disponible">
+            <button
+              onClick={handleVideoClick}
+              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
+              title="Ver vídeo"
+            >
               <Play size={13} />
-            </span>
+            </button>
           )}
           {has360 && (
-            <span className="w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white" title="Vista 360°">
+            <button
+              onClick={handle360Click}
+              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
+              title="Ver 360°"
+            >
               <RotateCcw size={13} />
-            </span>
+            </button>
           )}
           {hasTour && (
-            <span className="w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white" title="Tour virtual">
+            <button
+              onClick={handleTourClick}
+              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
+              title="Ver tour virtual"
+            >
               <Globe size={13} />
-            </span>
+            </button>
           )}
         </div>
-      </Link>
+      </div>
 
       {/* Content */}
       <div className="p-5">
@@ -200,6 +264,68 @@ export default function PropertyCard({ property, priority = false }: Props) {
         </div>
       </div>
     </article>
+
+    {/* ── Vídeo modal ── */}
+    {showVideo && ytId && (
+      <div className="fixed inset-0 bg-black z-[200] flex flex-col" onClick={closeAll}>
+        <div className="flex items-center justify-between px-5 h-12 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2 text-white/50 text-sm">
+            <Play size={14} className="text-[#C9B99A]" />
+            <span>{titulo}</span>
+          </div>
+          <button onClick={closeAndNavigate} className="text-white hover:text-[#C9B99A] transition-colors p-1">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="flex-1 min-h-0" onClick={(e) => e.stopPropagation()}>
+          <iframe
+            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`}
+            title={titulo}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full border-0"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* ── Tour virtual modal ── */}
+    {showTour && property.tour && (
+      <div className="fixed inset-0 bg-black z-[200] flex flex-col" onClick={closeAll}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e1e1e]" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-3">
+            <Globe size={16} className="text-[#C9B99A]" />
+            <span className="text-white text-sm font-body">Tour virtual — {titulo}</span>
+          </div>
+          <button onClick={closeAndNavigate} className="text-white hover:text-[#C9B99A] transition-colors">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="flex-1" onClick={(e) => e.stopPropagation()}>
+          <iframe
+            src={property.tour}
+            title={`Tour virtual — ${titulo}`}
+            allow="fullscreen; vr; xr"
+            allowFullScreen
+            className="w-full h-full border-0"
+          />
+        </div>
+      </div>
+    )}
+
+    {/* ── Plano / 360 lightbox ── */}
+    {lightboxImg && (
+      <div className="fixed inset-0 bg-black z-[200] flex flex-col" onClick={closeAll}>
+        <div className="flex items-center justify-end px-5 h-12 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <button onClick={closeAndNavigate} className="text-white hover:text-[#C9B99A] transition-colors p-1">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="relative flex-1 min-h-0" onClick={(e) => e.stopPropagation()}>
+          <Image src={lightboxImg} alt={titulo} fill className="object-contain" sizes="100vw" priority />
+        </div>
+      </div>
+    )}
     </>
   );
 }

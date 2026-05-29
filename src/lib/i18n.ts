@@ -96,6 +96,7 @@ const dict = {
     propEmail: "Enviar email",
     propWhatsapp: "Contactar por WhatsApp",
     propShare: "Compartir propiedad",
+    backToListing: "Volver al listado",
 
     // Property details section
     detailsTitle: "Características",
@@ -355,6 +356,7 @@ const dict = {
     propEmail: "Enviar correu",
     propWhatsapp: "Contactar per WhatsApp",
     propShare: "Compartir propietat",
+    backToListing: "Tornar al llistat",
 
     detailsTitle: "Característiques",
     detailsEquipment: "Equipament",
@@ -605,6 +607,7 @@ const dict = {
     propEmail: "Send email",
     propWhatsapp: "Contact via WhatsApp",
     propShare: "Share property",
+    backToListing: "Back to listings",
 
     detailsTitle: "Features",
     detailsEquipment: "Equipment",
@@ -855,6 +858,7 @@ const dict = {
     propEmail: "Envoyer un email",
     propWhatsapp: "Contacter par WhatsApp",
     propShare: "Partager le bien",
+    backToListing: "Retour à la liste",
 
     detailsTitle: "Caractéristiques",
     detailsEquipment: "Équipements",

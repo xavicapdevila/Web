@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Phone, Mail, BedDouble, Bath, Maximize2, Share2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Phone, Mail, BedDouble, Bath, Maximize2, Share2, ArrowLeft } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
@@ -142,6 +143,7 @@ function EnergyCertificate({
 
 export default function PropertyPageContent({ property, agentInfo, contactEmail, waUrl, isReserved }: Props) {
   const { t, lang } = useLanguage();
+  const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
   const [showShareModal, setShowShareModal] = useState(false);
 
@@ -177,7 +179,16 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
         onClose={() => setShowShareModal(false)}
       />
     )}
-    <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+    <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-6 pb-12">
+      {/* Back to listing */}
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-[#666] hover:text-[#C9B99A] transition-colors mb-8 group"
+      >
+        <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+        <span className="font-body text-xs tracking-widest uppercase">{t("backToListing")}</span>
+      </button>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Left — main info: order-2 on mobile so sidebar shows first */}
         <div className="lg:col-span-2 space-y-10 order-2 lg:order-1">

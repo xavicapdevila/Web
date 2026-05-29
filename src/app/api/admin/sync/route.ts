@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const result = await syncProperties();
+    // Manual sync always uses REST — never fall back to XML, which would
+    // delete REST-only properties (new listings not yet in the XML feed).
+    const result = await syncProperties("rest");
     return NextResponse.json({
       success: true,
       ...result,
