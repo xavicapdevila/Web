@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X, LayoutGrid, RotateCcw, Play, Globe } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, LayoutGrid, RotateCcw, Play, Globe, ArrowLeft } from "lucide-react";
 import type { PropertyImage } from "@/types/property";
 import { getYouTubeId } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -18,6 +19,7 @@ interface Props {
 
 export default function PropertyGallery({ images, video, tour, title, ciudad, tipo }: Props) {
   const altBase = [tipo, ciudad].filter(Boolean).join(" en ") || title;
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [showGrid, setShowGrid] = useState(false);
@@ -138,18 +140,41 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
           >
             {mainImage ? (
               <Image
-                key={currentIndex}
                 src={mainImage.url}
                 alt={`${altBase} — foto ${currentIndex + 1} de ${images.length}`}
                 fill
                 className="object-cover cursor-pointer"
-                priority={currentIndex === 0}
+                priority
                 sizes="100vw"
                 onClick={() => openLightbox(currentIndex)}
               />
             ) : (
               <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
                 <span className="text-[#333]">{t("cardNoImage")}</span>
+              </div>
+            )}
+
+            {/* Preload next + previous images so slide navigation is instant */}
+            {images.length > 1 && (
+              <div className="absolute inset-0 pointer-events-none opacity-0 z-0" aria-hidden="true">
+                <Image
+                  src={images[(currentIndex + 1) % images.length].url}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  priority
+                />
+              </div>
+            )}
+            {images.length > 2 && (
+              <div className="absolute inset-0 pointer-events-none opacity-0 z-0" aria-hidden="true">
+                <Image
+                  src={images[(currentIndex - 1 + images.length) % images.length].url}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  priority
+                />
               </div>
             )}
 
@@ -184,11 +209,20 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
               {currentIndex + 1} / {totalMedia}
             </div>
 
-            {/* View all */}
+            {/* Back to listing — top left */}
+            <button
+              onClick={() => router.back()}
+              className="absolute top-4 left-4 z-20 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1.5 hover:bg-[#C9B99A] hover:text-black transition-colors group"
+            >
+              <ArrowLeft size={13} className="group-hover:-translate-x-0.5 transition-transform" />
+              <span className="font-body tracking-widest uppercase hidden sm:inline">{t("backToListing")}</span>
+            </button>
+
+            {/* View all — top right */}
             {images.length > 1 && (
               <button
                 onClick={() => setShowGrid(true)}
-                className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 hover:bg-[#C9B99A] hover:text-black transition-colors"
+                className="absolute top-4 right-4 z-20 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 hover:bg-[#C9B99A] hover:text-black transition-colors"
               >
                 {t("galleryAllPhotos")} ({images.length})
               </button>
