@@ -14,9 +14,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Daily cron always uses XML: complete data including tour/video/agent.
-    // The admin manual Sync button uses REST for immediate new-property detection.
-    const result = await syncProperties("xml");
+    const result = await syncProperties();
     return NextResponse.json({
       success: true,
       ...result,

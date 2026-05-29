@@ -1,7 +1,6 @@
 import { unstable_cache, revalidateTag } from "next/cache";
 import { getDb, persistDbToBlob, initDbFromBlob } from "./db";
 import { fetchAndParseXML } from "./xml-parser";
-import { fetchFromRestApi } from "./rest-parser";
 import type { Property } from "@/types/property";
 
 // ---------------------------------------------------------------------------
@@ -19,8 +18,8 @@ const _getCachedXmlProperties = unstable_cache(
 );
 
 /** Returns a single property by slug.
- *  Primary source: Vercel Data Cache (XML-based, fast, shared across Lambdas).
- *  Fallback: SQLite DB — catches properties published after the XML regenerated.
+ *  Primary source: Vercel Data Cache (XML feed, shared across all Lambdas).
+ *  Fallback: SQLite DB (restored from Blob) — covers stale/cold-start scenarios.
  */
 export async function getCachedPropertyBySlug(slug: string): Promise<Property | null> {
   try {
@@ -29,9 +28,8 @@ export async function getCachedPropertyBySlug(slug: string): Promise<Property | 
     if (found) return found;
   } catch { /* fall through to DB */ }
 
-  // DB fallback: REST-only listings not yet in the XML feed.
-  // Ensure the DB is restored from Blob — the detail page may run in a fresh
-  // Vercel container that hasn't loaded the DB yet.
+  // DB fallback: Vercel Data Cache miss or XML not yet refreshed.
+  // Restore DB from Blob if this is a fresh container.
   await initDbFromBlob();
   try {
     return getPropertyBySlug(slug);
@@ -55,7 +53,7 @@ export interface SyncResult {
   updated: number;
   removed: number;
   total: number;
-  source: "rest" | "xml";
+  source: "xml";
   unchanged?: number;
   error?: string;
 }
@@ -212,69 +210,7 @@ function propertyToRow(p: Property, fechaact?: string | null) {
 }
 
 // ---------------------------------------------------------------------------
-// REST sync
-// ---------------------------------------------------------------------------
-
-async function syncFromRest(): Promise<SyncResult> {
-  const db = getDb();
-  let added = 0, updated = 0, removed = 0;
-
-  // Build existing state maps for differential sync
-  const existingRows = db
-    .prepare("SELECT ref, fechaact FROM properties")
-    .all() as { ref: string; fechaact: string | null }[];
-
-  const existingFechacts = new Map(existingRows.map((r) => [r.ref, r.fechaact ?? ""]));
-  const existingRefs     = new Set(existingRows.map((r) => r.ref));
-
-  const { properties, fechaacts, fechaactUpdates, removedRefs, unchanged } =
-    await fetchFromRestApi(existingFechacts, existingRefs);
-
-  const upsert = buildUpsertStatement(db);
-
-  const insertMany = db.transaction((props: Property[]) => {
-    for (const p of props) {
-      upsert.run(propertyToRow(p, fechaacts.get(p.ref) ?? null));
-      if (existingRefs.has(p.ref)) { updated++; } else { added++; }
-    }
-  });
-
-  insertMany(properties);
-
-  // Stamp fechaact for XML-seeded rows without re-fetching their full details.
-  // This is a fast in-DB update (no API calls) that enables proper differentials
-  // on every subsequent REST sync.
-  if (fechaactUpdates.size > 0) {
-    const stampStmt = db.prepare("UPDATE properties SET fechaact = ? WHERE ref = ?");
-    const stampTx = db.transaction((updates: Map<string, string>) => {
-      for (const [ref, fa] of updates) stampStmt.run(fa, ref);
-    });
-    stampTx(fechaactUpdates);
-  }
-
-  // Remove deactivated / deleted properties
-  for (const ref of removedRefs) {
-    db.prepare("DELETE FROM properties WHERE ref = ?").run(ref);
-    removed++;
-  }
-
-  const total = (existingRefs.size - removed) + added;
-
-  db.prepare(
-    "INSERT INTO sync_log (properties_added, properties_updated, properties_removed, status, source) VALUES (?, ?, ?, 'ok', 'rest')"
-  ).run(added, updated, removed);
-
-  // Revalidate the Vercel Data Cache so detail pages pick up the new data
-  try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
-
-  // Persist DB to Blob so other containers can read the updated data
-  await persistDbToBlob();
-
-  return { added, updated, removed, total, source: "rest", unchanged };
-}
-
-// ---------------------------------------------------------------------------
-// XML sync (original logic, kept as fallback)
+// XML sync
 // ---------------------------------------------------------------------------
 
 async function syncFromXml(): Promise<SyncResult> {
@@ -324,91 +260,20 @@ async function syncFromXml(): Promise<SyncResult> {
 // Public API
 // ---------------------------------------------------------------------------
 
-/**
- * Ensures the DB has properties on cold starts.
- *
- * 1. Seeds from the XML feed (single fast request, <5 s).
- * 2. If INMOVILLA_API_TOKEN is set, does a quick REST delta check:
- *    fetches the REST property list and upserts any refs that the XML
- *    feed doesn't contain yet (new listings published after the last
- *    XML regeneration). Usually 0–1 extra fetch, so negligible overhead.
- */
+/** Seeds the DB from XML if it is empty (cold start without a Blob). */
 export async function ensureDbSeeded(): Promise<void> {
   try {
     const db = getDb();
-    const { c } = db
-      .prepare("SELECT COUNT(*) as c FROM properties")
-      .get() as { c: number };
-
-    if (c > 0) return; // Already seeded — nothing to do
-
-    // Step 1: fast XML seed
+    const { c } = db.prepare("SELECT COUNT(*) as c FROM properties").get() as { c: number };
+    if (c > 0) return;
     await syncFromXml();
-
-    // Step 2: REST delta — catch listings published after the XML regenerated
-    if (!process.env.INMOVILLA_API_TOKEN) return;
-
-    try {
-      const { fetchFromRestApi: restFetch } = await import("./rest-parser");
-      const db2 = getDb();
-      const existingRefs = new Set(
-        (db2.prepare("SELECT ref FROM properties").all() as { ref: string }[]).map((r) => r.ref)
-      );
-      // Pass empty fechaacts so ALL REST-active refs are considered new,
-      // but pass existingRefs so only truly missing ones get fetched.
-      const { properties, fechaacts } = await restFetch(
-        new Map(), // all refs treated as "changed"
-        existingRefs
-      );
-      if (properties.length > 0) {
-        const upsert = buildUpsertStatement(db2);
-        const tx = db2.transaction((props: Property[]) => {
-          for (const p of props) upsert.run(propertyToRow(p, fechaacts.get(p.ref) ?? null));
-        });
-        tx(properties);
-      }
-    } catch {
-      // REST delta is best-effort — XML seed already covers the base case
-    }
   } catch {
     // Never block rendering
   }
 }
 
-/**
- * Full sync.
- *
- * @param forceSource
- *   "rest" — REST-first differential (fast, for the manual admin Sync button)
- *   "xml"  — full XML sync (complete data incl. tour/video, for the daily cron)
- *   undefined — same as "rest" when token is set, "xml" otherwise (legacy default)
- */
-export async function syncProperties(forceSource?: "rest" | "xml"): Promise<SyncResult> {
-  const hasRestToken = Boolean(process.env.INMOVILLA_API_TOKEN);
-
-  // "rest" = REST only, no XML fallback (used by admin manual Sync button).
-  //   Prevents accidentally deleting REST-only listings (e.g. new properties
-  //   that are live via REST but not yet in the XML feed).
-  if (forceSource === "rest") {
-    if (!hasRestToken) throw new Error("INMOVILLA_API_TOKEN no está configurado");
-    return await syncFromRest();
-  }
-
-  // "xml" = XML only (used by the daily cron — complete data, tour/video/agent).
-  if (forceSource === "xml") {
-    return await syncFromXml();
-  }
-
-  // default (no forceSource): REST-first with XML fallback — legacy behaviour.
-  if (hasRestToken) {
-    try {
-      return await syncFromRest();
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      console.warn(`[sync] REST sync failed (${errMsg}), falling back to XML`);
-    }
-  }
-
+/** Full XML sync — fetches all properties from the Inmovilla XML feed. */
+export async function syncProperties(): Promise<SyncResult> {
   try {
     return await syncFromXml();
   } catch (error) {
