@@ -76,11 +76,20 @@ function initSchema(db: Database.Database): void {
       trastero INTEGER DEFAULT 0,
       urbanizacion INTEGER DEFAULT 0,
       piscina INTEGER DEFAULT 0,
+      piscina_privada INTEGER DEFAULT 0,
+      piscina_com INTEGER DEFAULT 0,
       terraza INTEGER DEFAULT 0,
       jardin INTEGER DEFAULT 0,
+      balcon INTEGER DEFAULT 0,
+      solarium INTEGER DEFAULT 0,
+      barbacoa INTEGER DEFAULT 0,
+      chimenea INTEGER DEFAULT 0,
+      vistas_al_mar INTEGER DEFAULT 0,
       amueblado INTEGER DEFAULT 0,
+      arma_empotrado INTEGER DEFAULT 0,
       calefaccion TEXT,
       aire_cond INTEGER DEFAULT 0,
+      bomba_frio_calor INTEGER DEFAULT 0,
       orientacion TEXT,
       antiguedad TEXT,
       estado TEXT,
@@ -155,6 +164,15 @@ function initSchema(db: Database.Database): void {
   try { db.exec(`UPDATE properties SET subtipo = 'dúplex',     tipo = 'piso' WHERE tipo IN ('dúplex', 'duplex')`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN num_plantas INTEGER`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN urbanizacion INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN piscina_privada INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN piscina_com INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN balcon INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN solarium INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN barbacoa INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN chimenea INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN vistas_al_mar INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN arma_empotrado INTEGER DEFAULT 0`); } catch {}
+  try { db.exec(`ALTER TABLE properties ADD COLUMN bomba_frio_calor INTEGER DEFAULT 0`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN periodicidad_comunidad TEXT`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN categoria TEXT DEFAULT ''`); } catch {}
   try { db.exec(`ALTER TABLE blog_posts ADD COLUMN imagen_alt TEXT DEFAULT ''`); } catch {}

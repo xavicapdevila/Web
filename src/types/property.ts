@@ -33,12 +33,21 @@ export interface Property {
   garajeTipo?: "garaje" | "parking";
   trastero?: boolean;
   urbanizacion?: boolean;
-  piscina?: boolean;
+  piscina?: boolean;          // legacy: OR of private+community
+  piscinaPrivada?: boolean;
+  piscinaComunitaria?: boolean;
   terraza?: boolean;
   jardin?: boolean;
+  balcon?: boolean;
+  solarium?: boolean;
+  barbacoa?: boolean;
+  chimenea?: boolean;
+  vistasalmar?: boolean;
   amueblado?: boolean;
+  armaEmpotrado?: boolean;
   calefaccion?: string;
   aireCond?: boolean;
+  bombafriocalor?: boolean;
   orientacion?: string;
   antiguedad?: string;
   estado?: string;

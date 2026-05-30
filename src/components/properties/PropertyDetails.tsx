@@ -249,9 +249,19 @@ export default function PropertyDetails({ property }: Props) {
             <BoolRow label={t("detailsGarage")} value={!!property.garaje} />
             <BoolRow label={t("detailsHeating")} value={!!property.calefaccion} />
             {/* Only appear when true */}
-            {property.piscina && <DetailRow label={t("detailsPool")} value="Sí" />}
             {property.aireCond && <DetailRow label={t("detailsAirCon")} value="Sí" />}
+            {property.bombafriocalor && <DetailRow label={t("detailsHeatPump")} value="Sí" />}
+            {property.piscina && <DetailRow label={t("detailsPool")} value="Sí" />}
+            {property.terraza && <DetailRow label={t("detailsTerrace")} value="Sí" />}
+            {property.jardin && <DetailRow label={t("detailsGarden")} value="Sí" />}
+            {property.balcon && <DetailRow label={t("detailsBalcony")} value="Sí" />}
+            {property.solarium && <DetailRow label={t("detailsSolarium")} value="Sí" />}
+            {property.barbacoa && <DetailRow label={t("detailsBBQ")} value="Sí" />}
+            {property.chimenea && <DetailRow label={t("detailsFireplace")} value="Sí" />}
+            {property.vistasalmar && <DetailRow label={t("detailsSeaViews")} value="Sí" />}
             {property.trastero && <DetailRow label={t("detailsStorage")} value="Sí" />}
+            {property.armaEmpotrado && <DetailRow label={t("detailsFittedWardrobes")} value="Sí" />}
+            {property.amueblado && <DetailRow label={t("detailsFurnished")} value="Sí" />}
             {property.urbanizacion && <DetailRow label={t("detailsUrbanizacion")} value="Sí" />}
           </div>
         </div>

@@ -63,3 +63,15 @@ export function slugify(text: string): string {
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
 }
+
+/**
+ * Deterministic "random" base visit count derived from the slug.
+ * Stable per article across all renders — looks organic (range 800–2499).
+ */
+export function baseVisits(slug: string): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) {
+    h = (Math.imul(31, h) + slug.charCodeAt(i)) | 0;
+  }
+  return 800 + (Math.abs(h) % 1700);
+}

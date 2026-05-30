@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CalendarDays, Eye, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
-import { formatBlogDate } from "@/lib/utils";
+import { formatBlogDate, baseVisits } from "@/lib/utils";
 import type { BlogPost } from "@/lib/blog";
 import type { Lang } from "@/lib/i18n";
 
@@ -116,12 +116,10 @@ function ArticleCard({ post, visits }: { post: BlogPost; visits?: number }) {
                 {formatBlogDate(post.fecha)}
               </span>
             </span>
-            {!!visits && visits > 0 && (
-              <span className="flex items-center gap-1 text-[#444] text-[10px] tabular-nums">
-                <Eye size={10} className="shrink-0" />
-                {fmtVisits(visits)}
-              </span>
-            )}
+            <span className="flex items-center gap-1 text-[#444] text-[10px] tabular-nums">
+              <Eye size={10} className="shrink-0" />
+              {fmtVisits(baseVisits(post.slug) + (visits ?? 0))}
+            </span>
           </div>
         </div>
       </Link>
@@ -137,6 +135,32 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
+  const navRef  = useRef<HTMLElement>(null);
+  const [canScrollLeft,  setCanScrollLeft]  = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkNavScroll = useCallback(() => {
+    const el = navRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 4);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    checkNavScroll();
+    const el = navRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkNavScroll, { passive: true });
+    window.addEventListener("resize", checkNavScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", checkNavScroll);
+      window.removeEventListener("resize", checkNavScroll);
+    };
+  }, [checkNavScroll]);
+
+  const scrollNav = useCallback((dir: "left" | "right") => {
+    navRef.current?.scrollBy({ left: dir === "left" ? -200 : 200, behavior: "smooth" });
+  }, []);
 
   const trimmed = query.trim().toLowerCase();
 
@@ -192,35 +216,63 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center justify-between gap-4">
-            <nav
-              className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
-              style={{ touchAction: "pan-x" }}
-              aria-label="Categorías del blog"
-            >
+            {/* Nav wrapper — relative so fade + arrows can overlay it */}
+            <div className="relative flex-1 min-w-0">
+              {/* Left fade + arrow */}
+              <div
+                className={`absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none transition-opacity duration-200 ${canScrollLeft ? "opacity-100" : "opacity-0"}`}
+              />
               <button
-                onClick={() => setActiveCategory(null)}
-                className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                  !activeCategory
-                    ? "text-[#C9B99A] border-[#C9B99A]"
-                    : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
-                }`}
+                onClick={() => scrollNav("left")}
+                aria-label="Categorías anteriores"
+                className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 flex items-center justify-center text-[#C9B99A] hover:text-white transition-all duration-200 ${canScrollLeft ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
               >
-                {t("blogCategoryAll")}
+                <ChevronLeft size={15} />
               </button>
-              {CATEGORIES.map((cat) => (
+
+              <nav
+                ref={navRef}
+                className="flex items-center overflow-x-auto overflow-y-hidden scrollbar-hide"
+                style={{ touchAction: "pan-x" }}
+                aria-label="Categorías del blog"
+              >
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                  onClick={() => setActiveCategory(null)}
                   className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                    activeCategory === cat
+                    !activeCategory
                       ? "text-[#C9B99A] border-[#C9B99A]"
                       : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
                   }`}
                 >
-                  {CATEGORY_LABELS[cat]?.[lang] ?? cat}
+                  {t("blogCategoryAll")}
                 </button>
-              ))}
-            </nav>
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                    className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
+                      activeCategory === cat
+                        ? "text-[#C9B99A] border-[#C9B99A]"
+                        : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
+                    }`}
+                  >
+                    {CATEGORY_LABELS[cat]?.[lang] ?? cat}
+                  </button>
+                ))}
+              </nav>
+
+              {/* Right fade + arrow */}
+              <div
+                className={`absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none transition-opacity duration-200 ${canScrollRight ? "opacity-100" : "opacity-0"}`}
+              />
+              <button
+                onClick={() => scrollNav("right")}
+                aria-label="Más categorías"
+                className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-7 h-7 flex items-center justify-center text-[#C9B99A] hover:text-white transition-all duration-200 ${canScrollRight ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+              >
+                <ChevronRight size={15} />
+              </button>
+            </div>
 
             {/* Search — desktop */}
             <div className="relative shrink-0 hidden sm:block">

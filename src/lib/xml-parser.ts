@@ -224,13 +224,23 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const garaje     = hasGaraje || hasParking;
       const garajeTipo = hasParking && !hasGaraje ? "parking" : "garaje";
       const trastero = safeBool(item["trastero"]);
-      const piscina = safeBool(item["piscina_prop"] ?? item["piscina_com"] ?? item["piscina"]);
+      // Piscina: parse private and community separately (|| not ??, since both fields are always present)
+      const piscinaPrivada = safeBool(item["piscina_prop"]);
+      const piscinaComunitaria = safeBool(item["piscina_com"]);
+      const piscina = piscinaPrivada || piscinaComunitaria; // legacy compat
       const terraza = safeBool(item["terraza"]);
       const jardin = safeBool(item["jardin"]);
+      const balcon = safeBool(item["balcon"]);
+      const solarium = safeBool(item["solarium"]);
+      const barbacoa = safeBool(item["barbacoa"]);
+      const chimenea = safeBool(item["chimenea"]);
+      const vistasalmar = safeBool(item["vistasalmar"]);
       const amueblado = safeBool(item["muebles"]);
+      const armaEmpotrado = safeBool(item["arma_empo"]);
       // "aire_con" is a type code: 0=none, 1=cold-only, 2=cold+hot, 3=central
       const aireConCode = Number(safeText(item["aire_con"] ?? item["airecentral"] ?? "0"));
       const aireCond = aireConCode > 0;
+      const bombafriocalor = safeBool(item["bombafriocalor"]);
       const urbanizacion = safeBool(item["urbanizacion"]);
 
       // Calefaccion: field is 0 or name
@@ -298,11 +308,20 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         trastero,
         urbanizacion,
         piscina,
+        piscinaPrivada,
+        piscinaComunitaria,
         terraza,
         jardin,
+        balcon,
+        solarium,
+        barbacoa,
+        chimenea,
+        vistasalmar,
         amueblado,
+        armaEmpotrado,
         calefaccion: calefaccion || undefined,
         aireCond,
+        bombafriocalor,
         orientacion: orientacion || undefined,
         antiguedad: antiguedad || undefined,
         estado: estadoInmueble || undefined,

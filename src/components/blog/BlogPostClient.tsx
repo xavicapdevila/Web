@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, CalendarDays, Check, Copy, Eye, Share2, Tag } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
-import { formatBlogDate } from "@/lib/utils";
+import { formatBlogDate, baseVisits } from "@/lib/utils";
 import TranslatableHTML from "@/components/blog/TranslatableHTML";
 import type { BlogPost } from "@/lib/blog";
 
@@ -205,7 +205,7 @@ export default function BlogPostClient({ post, related }: Props) {
   const { t } = useLanguage();
   const translatedTitle   = useAutoTranslate(post.titulo);
   const translatedExcerpt = useAutoTranslate(post.extracto ?? "");
-  const [visitCount, setVisitCount]   = useState<number | null>(null);
+  const [visitCount, setVisitCount]   = useState<number>(() => baseVisits(post.slug));
   const [shareCount, setShareCount]   = useState<number | null>(null);
 
   const articleUrl = `${BASE_URL}/blog/${post.slug}`;
@@ -221,7 +221,7 @@ export default function BlogPostClient({ post, related }: Props) {
       .then((r) => r.json())
       .then((data) => {
         // Always set — incrementVisit always returns ≥ 1
-        if (typeof data.count === "number") setVisitCount(data.count);
+        if (typeof data.count === "number") setVisitCount(baseVisits(post.slug) + data.count);
         if (typeof data.shareCount === "number") setShareCount(data.shareCount);
       })
       .catch(() => {});
@@ -282,12 +282,10 @@ export default function BlogPostClient({ post, related }: Props) {
           {formatBlogDate(post.fecha)}
         </span>
         <div className="flex items-center gap-4 ml-auto">
-          {visitCount !== null && (
-            <span className="flex items-center gap-1.5 text-[#444] text-xs">
-              <Eye size={12} className="text-[#C9B99A]/50" />
-              {visitCount.toLocaleString("es")}
-            </span>
-          )}
+          <span className="flex items-center gap-1.5 text-[#444] text-xs">
+            <Eye size={12} className="text-[#C9B99A]/50" />
+            {visitCount.toLocaleString("es")}
+          </span>
           <ShareButton url={articleUrl} title={post.titulo} direction="down" shareCount={shareCount} onShare={handleShare} />
         </div>
       </div>
