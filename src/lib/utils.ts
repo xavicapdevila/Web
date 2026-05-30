@@ -73,5 +73,5 @@ export function baseVisits(slug: string): number {
   for (let i = 0; i < slug.length; i++) {
     h = (Math.imul(31, h) + slug.charCodeAt(i)) | 0;
   }
-  return 800 + (Math.abs(h) % 1700);
+  return 1000 + (Math.abs(h) % 1500);
 }
