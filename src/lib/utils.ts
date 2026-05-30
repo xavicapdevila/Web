@@ -66,12 +66,18 @@ export function slugify(text: string): string {
 
 /**
  * Deterministic "random" base visit count derived from the slug.
- * Stable per article across all renders — looks organic (range 800–2499).
+ * Stable per article across all renders — looks organic (range 1 000–6 499).
+ * Each slug produces a different number, new articles get theirs automatically.
+ * Real visits accumulate on top with no upper cap.
  */
 export function baseVisits(slug: string): number {
+  // Two independent hash rounds to get more spread
   let h = 0;
   for (let i = 0; i < slug.length; i++) {
     h = (Math.imul(31, h) + slug.charCodeAt(i)) | 0;
   }
-  return 1000 + (Math.abs(h) % 1500);
+  let h2 = h ^ (h >>> 16);
+  h2 = Math.imul(h2, 0x45d9f3b);
+  h2 = h2 ^ (h2 >>> 16);
+  return 1000 + (Math.abs(h2) % 5500); // range 1 000–6 499
 }
