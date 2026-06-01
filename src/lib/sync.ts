@@ -232,6 +232,7 @@ function buildUpsertStatement(db: ReturnType<typeof getDb>) {
       agente_foto     = COALESCE(excluded.agente_foto,     agente_foto),
       agente_telefono = COALESCE(excluded.agente_telefono, agente_telefono),
       slug = excluded.slug,
+      admin_status = 'active',
       updated_at = datetime('now')
   `);
 }
@@ -321,10 +322,12 @@ async function syncFromXml(): Promise<SyncResult> {
     (db.prepare("SELECT ref FROM properties").all() as { ref: string }[]).map((r) => r.ref)
   );
 
-  // Remove properties no longer in XML
+  // Archive properties no longer in XML (preserved for sold tracking)
   for (const ref of existingRefs) {
     if (!incomingRefs.has(ref)) {
-      db.prepare("DELETE FROM properties WHERE ref = ?").run(ref);
+      db.prepare(
+        "UPDATE properties SET admin_status = 'archived', updated_at = datetime('now') WHERE ref = ? AND admin_status != 'archived'"
+      ).run(ref);
       removed++;
     }
   }
