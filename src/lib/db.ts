@@ -187,10 +187,6 @@ function initSchema(db: Database.Database): void {
   // source column on sync_log: which data source was used ('rest' | 'xml')
   try { db.exec(`ALTER TABLE sync_log ADD COLUMN source TEXT DEFAULT 'xml'`); } catch {}
   try { db.exec(`ALTER TABLE properties ADD COLUMN eninternet INTEGER DEFAULT 1`); } catch {}
-  // Admin tracking columns
-  try { db.exec(`ALTER TABLE properties ADD COLUMN admin_status TEXT DEFAULT 'active'`); } catch {}
-  try { db.exec(`ALTER TABLE properties ADD COLUMN sold_by TEXT DEFAULT NULL`); } catch {}
-  try { db.exec(`ALTER TABLE properties ADD COLUMN admin_notes TEXT DEFAULT ''`); } catch {}
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_properties_tipo ON properties(tipo);
     CREATE INDEX IF NOT EXISTS idx_properties_ciudad ON properties(ciudad);

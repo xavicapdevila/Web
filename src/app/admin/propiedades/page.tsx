@@ -4,7 +4,7 @@ import PropertiesClient from "./PropertiesClient";
 export const metadata = { title: "Propiedades — Admin · The Vila Home" };
 export const dynamic  = "force-dynamic";
 
-export interface PropRow {
+interface PropRow {
   ref:            string;
   slug:           string;
   titulo:         string;
@@ -17,11 +17,9 @@ export interface PropRow {
   banos:          number | null;
   m2_construidos: number | null;
   estado_ficha:   number;
-  agente:         string | null;
-  agente_email:   string | null;
+  imagenes:       string;
   fecha:          string;
-  admin_status:   string;
-  sold_by:        string | null;
+  fechaact:       string | null;
 }
 
 function getProperties(): PropRow[] {
@@ -31,8 +29,7 @@ function getProperties(): PropRow[] {
       .prepare(
         `SELECT ref, slug, titulo, tipo, subtipo, operacion, precio,
                 ciudad, habitaciones, banos, m2_construidos,
-                estado_ficha, agente, agente_email,
-                fecha, COALESCE(admin_status, 'active') as admin_status, sold_by
+                estado_ficha, imagenes, fecha, fechaact
          FROM properties
          ORDER BY fecha DESC`
       )

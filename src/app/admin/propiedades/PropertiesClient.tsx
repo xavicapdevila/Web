@@ -3,11 +3,35 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, ExternalLink, Home, RefreshCw, Building2 } from "lucide-react";
-import type { PropRow } from "./page";
+import { Search, ExternalLink, Home, RefreshCw } from "lucide-react";
+
+interface PropRow {
+  ref:            string;
+  slug:           string;
+  titulo:         string;
+  tipo:           string;
+  subtipo:        string | null;
+  operacion:      string;
+  precio:         number;
+  ciudad:         string | null;
+  habitaciones:   number | null;
+  banos:          number | null;
+  m2_construidos: number | null;
+  estado_ficha:   number;
+  imagenes:       string;
+  fecha:          string;
+  fechaact:       string | null;
+}
 
 function formatPrice(n: number) {
   return n.toLocaleString("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+}
+
+function firstImage(imagenes: string): string | null {
+  try {
+    const arr = JSON.parse(imagenes);
+    return arr[0]?.url ?? null;
+  } catch { return null; }
 }
 
 function tipoLabel(tipo: string, subtipo: string | null) {
@@ -20,29 +44,18 @@ function tipoLabel(tipo: string, subtipo: string | null) {
   return base;
 }
 
-const STATUS_TABS = [
-  { key: "active",   label: "Activas"    },
-  { key: "archived", label: "Archivadas" },
+const TABS = [
+  { key: "all",      label: "Todos"     },
+  { key: "venta",    label: "Venta"     },
+  { key: "alquiler", label: "Alquiler"  },
 ];
-
-const OP_TABS = [
-  { key: "all",      label: "Todas"    },
-  { key: "venta",    label: "Venta"    },
-  { key: "alquiler", label: "Alquiler" },
-];
-
-const SOLD_LABEL: Record<string, string> = {
-  tvh:    "TVH",
-  others: "Otros",
-};
 
 export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
   const router = useRouter();
-  const [statusTab, setStatusTab] = useState("active");
-  const [opTab,     setOpTab]     = useState("all");
-  const [search,    setSearch]    = useState("");
-  const [syncing,   setSyncing]   = useState(false);
-  const [syncErr,   setSyncErr]   = useState("");
+  const [tab,     setTab]     = useState("all");
+  const [search,  setSearch]  = useState("");
+  const [syncing, setSyncing] = useState(false);
+  const [syncErr, setSyncErr] = useState("");
 
   async function handleSync() {
     setSyncing(true);
@@ -65,18 +78,11 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter(r => {
-      if (r.admin_status !== statusTab) return false;
-      if (opTab !== "all" && r.operacion !== opTab) return false;
-      if (q && !r.ref.toLowerCase().includes(q) &&
-               !r.titulo.toLowerCase().includes(q) &&
-               !(r.ciudad ?? "").toLowerCase().includes(q) &&
-               !(r.agente ?? "").toLowerCase().includes(q)) return false;
+      if (tab !== "all" && r.operacion !== tab) return false;
+      if (q && !r.ref.toLowerCase().includes(q) && !r.titulo.toLowerCase().includes(q) && !(r.ciudad ?? "").toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [rows, statusTab, opTab, search]);
-
-  const activeCount   = rows.filter(r => r.admin_status === "active").length;
-  const archivedCount = rows.filter(r => r.admin_status === "archived").length;
+  }, [rows, tab, search]);
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -84,59 +90,28 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
       <div className="flex items-end justify-between mb-8">
         <div>
           <h1 className="text-white font-display text-2xl mb-1">Propiedades</h1>
-          <p className="text-[#444] text-xs">
-            {activeCount} activas · {archivedCount} archivadas · sincronizadas desde Inmovilla
-          </p>
+          <p className="text-[#444] text-xs">{rows.length} en total · sincronizadas desde Inmovilla</p>
         </div>
-        <div className="flex items-center gap-3">
-          {syncErr && <span className="text-red-400 text-xs">{syncErr}</span>}
-          <button
-            onClick={handleSync}
-            disabled={syncing}
-            className="flex items-center gap-1.5 border border-[#222] text-[#555] hover:border-[#C9B99A]/50 hover:text-[#C9B99A] transition-colors text-xs px-3 py-1.5 disabled:opacity-40"
-          >
-            <RefreshCw size={11} className={syncing ? "animate-spin" : ""} />
-            {syncing ? "Sync…" : "Sync ahora"}
-          </button>
-          <Link
-            href="/propiedades"
-            target="_blank"
-            className="flex items-center gap-1.5 text-[#444] hover:text-[#C9B99A] text-xs transition-colors"
-          >
-            <ExternalLink size={11} /> Web pública
-          </Link>
-        </div>
-      </div>
-
-      {/* Status tabs */}
-      <div className="flex items-center gap-6 border-b border-[#1a1a1a] mb-5">
-        {STATUS_TABS.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setStatusTab(t.key)}
-            className={`pb-2.5 text-xs transition-colors border-b-2 -mb-px ${
-              statusTab === t.key
-                ? "border-[#C9B99A] text-[#C9B99A]"
-                : "border-transparent text-[#555] hover:text-[#888]"
-            }`}
-          >
-            {t.label}
-            <span className="ml-1.5 text-[#444]">
-              {t.key === "active" ? activeCount : archivedCount}
-            </span>
-          </button>
-        ))}
+        <Link
+          href="/propiedades"
+          target="_blank"
+          className="flex items-center gap-1.5 text-[#444] hover:text-[#C9B99A] text-xs transition-colors"
+        >
+          <ExternalLink size={11} />
+          Ver página pública
+        </Link>
       </div>
 
       {/* Filters */}
       <div className="flex items-center gap-4 mb-5">
+        {/* Tabs */}
         <div className="flex items-center border border-[#1a1a1a]">
-          {OP_TABS.map(t => (
+          {TABS.map(t => (
             <button
               key={t.key}
-              onClick={() => setOpTab(t.key)}
-              className={`px-4 py-1.5 text-xs transition-colors ${
-                opTab === t.key
+              onClick={() => setTab(t.key)}
+              className={`px-4 py-2 text-xs transition-colors ${
+                tab === t.key
                   ? "bg-[#C9B99A] text-black font-body"
                   : "text-[#555] hover:text-[#888] bg-[#0d0d0d]"
               }`}
@@ -146,26 +121,29 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
           ))}
         </div>
 
+        {/* Search */}
         <div className="relative flex-1 max-w-xs">
           <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#444]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar ref, título, ciudad, agente…"
-            className="w-full bg-[#0d0d0d] border border-[#1a1a1a] text-white text-xs pl-8 pr-4 py-1.5 outline-none focus:border-[#C9B99A]/40 transition-colors placeholder-[#333]"
+            placeholder="Buscar ref, título, ciudad…"
+            className="w-full bg-[#0d0d0d] border border-[#1a1a1a] text-white text-xs pl-8 pr-4 py-2 outline-none focus:border-[#C9B99A]/40 transition-colors placeholder-[#333]"
           />
         </div>
 
         <span className="text-[#333] text-xs ml-auto">{filtered.length} resultados</span>
       </div>
 
-      {/* Empty states */}
+      {/* Table */}
       {rows.length === 0 ? (
+        /* DB vacía — nunca se ha sincronizado en este contenedor */
         <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-20 text-center">
-          <Building2 size={20} className="text-[#333] mx-auto mb-4" />
+          <Home size={20} className="text-[#333] mx-auto mb-4" />
           <p className="text-white text-sm mb-1">Base de datos vacía</p>
           <p className="text-[#555] text-xs mb-6 max-w-xs mx-auto">
-            Pulsa Sync para importar las propiedades desde Inmovilla.
+            Pulsa Sync para importar las propiedades desde la API de Inmovilla.
+            La primera sincronización tarda ~2 min.
           </p>
           {syncErr && <p className="text-red-400 text-xs mb-4">{syncErr}</p>}
           <button
@@ -174,12 +152,12 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
             className="inline-flex items-center gap-2 bg-[#C9B99A] text-black font-body text-xs tracking-widest uppercase px-6 py-3 hover:bg-[#DDD0BB] transition-colors disabled:opacity-50"
           >
             <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
-            {syncing ? "Sincronizando…" : "Sincronizar desde Inmovilla"}
+            {syncing ? "Sincronizando… (~2 min)" : "Sincronizar desde Inmovilla"}
           </button>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-16 text-center">
-          <Home size={18} className="text-[#222] mx-auto mb-3" />
+        <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-20 text-center">
+          <Home size={20} className="text-[#222] mx-auto mb-3" />
           <p className="text-[#444] text-sm">Sin resultados para este filtro</p>
         </div>
       ) : (
@@ -187,8 +165,8 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
           <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-[#1a1a1a] bg-[#0d0d0d]">
-                {["Ref", "Propiedad", "Tipo", "Op.", "Precio", "Asesor", "Hab.", "Baños", "Estado", ""].map((h, i) => (
-                  <th key={i} className="text-left text-[#333] font-body tracking-wide uppercase px-4 py-2.5 whitespace-nowrap">
+                {["", "Ref", "Propiedad", "Tipo", "Operación", "Precio", "Ciudad", "Estado", ""].map((h, i) => (
+                  <th key={i} className="text-left text-[#444] font-body tracking-wide uppercase px-4 py-3">
                     {h}
                   </th>
                 ))}
@@ -196,23 +174,39 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
             </thead>
             <tbody>
               {filtered.map((row) => {
+                const img = firstImage(row.imagenes);
                 const isActive   = row.estado_ficha === 1;
                 const isReserved = row.estado_ficha === 7;
                 return (
-                  <tr
-                    key={row.ref}
-                    className="border-b border-[#111] hover:bg-[#0d0d0d] transition-colors cursor-pointer"
-                    onClick={() => router.push(`/admin/propiedades/${row.ref}`)}
-                  >
-                    {/* Ref */}
-                    <td className="px-4 py-3">
-                      <span className="text-[#C9B99A] font-mono text-xs">{row.ref}</span>
+                  <tr key={row.ref} className="border-b border-[#111] hover:bg-[#0d0d0d] transition-colors">
+                    {/* Thumbnail */}
+                    <td className="pl-4 pr-2 py-3 w-12">
+                      {img ? (
+                        <img
+                          src={img}
+                          alt=""
+                          className="w-10 h-8 object-cover bg-[#111]"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-10 h-8 bg-[#111] border border-[#1a1a1a] flex items-center justify-center">
+                          <Home size={10} className="text-[#333]" />
+                        </div>
+                      )}
                     </td>
 
-                    {/* Title + city */}
+                    {/* Ref */}
+                    <td className="px-4 py-3">
+                      <span className="text-[#888] font-mono">{row.ref}</span>
+                    </td>
+
+                    {/* Title */}
                     <td className="px-4 py-3 max-w-xs">
                       <p className="text-white leading-snug line-clamp-1">{row.titulo}</p>
-                      <p className="text-[#444] mt-0.5">{row.ciudad ?? "—"}</p>
+                      <p className="text-[#333] font-mono mt-0.5">
+                        {row.habitaciones ? `${row.habitaciones} hab · ` : ""}
+                        {row.m2_construidos ? `${row.m2_construidos} m²` : ""}
+                      </p>
                     </td>
 
                     {/* Type */}
@@ -222,10 +216,10 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
 
                     {/* Operation */}
                     <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 uppercase tracking-wide font-body ${
+                      <span className={`px-2 py-0.5 text-xs uppercase tracking-wide font-body ${
                         row.operacion === "venta"
-                          ? "text-[#C9B99A]"
-                          : "text-blue-400"
+                          ? "bg-[#C9B99A]/10 text-[#C9B99A] border border-[#C9B99A]/20"
+                          : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                       }`}>
                         {row.operacion}
                       </span>
@@ -236,45 +230,23 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                       {formatPrice(row.precio)}
                     </td>
 
-                    {/* Asesor */}
-                    <td className="px-4 py-3 text-[#666] max-w-[120px]">
-                      <p className="line-clamp-1">{row.agente ?? "—"}</p>
-                    </td>
+                    {/* City */}
+                    <td className="px-4 py-3 text-[#666]">{row.ciudad ?? "—"}</td>
 
-                    {/* Habitaciones */}
-                    <td className="px-4 py-3 text-[#888] text-center">
-                      {row.habitaciones ?? "—"}
-                    </td>
-
-                    {/* Baños */}
-                    <td className="px-4 py-3 text-[#888] text-center">
-                      {row.banos ?? "—"}
-                    </td>
-
-                    {/* Estado */}
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {row.admin_status === "archived" ? (
-                        <span className="text-[#666]">
-                          Archivada
-                          {row.sold_by && (
-                            <span className="ml-1.5 text-[#444]">· {SOLD_LABEL[row.sold_by]}</span>
-                          )}
-                        </span>
-                      ) : isActive ? (
-                        <span className="text-emerald-400">● Activo</span>
-                      ) : isReserved ? (
-                        <span className="text-amber-400">● Reservado</span>
-                      ) : (
-                        <span className="text-[#444]">● Inactivo</span>
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      {isActive   && <span className="text-emerald-400 text-xs">● Activo</span>}
+                      {isReserved && <span className="text-amber-400  text-xs">● Reservado</span>}
+                      {!isActive && !isReserved && (
+                        <span className="text-[#444] text-xs">● Inactivo</span>
                       )}
                     </td>
 
-                    {/* Link to public */}
+                    {/* Link */}
                     <td className="px-4 py-3">
                       <Link
                         href={`/propiedades/${row.slug}`}
                         target="_blank"
-                        onClick={e => e.stopPropagation()}
                         className="text-[#333] hover:text-[#C9B99A] transition-colors"
                         title="Ver en la web"
                       >
