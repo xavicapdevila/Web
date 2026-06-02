@@ -80,14 +80,16 @@ export default async function PropiedadesPage({ searchParams }: Props) {
             <PropertyFilters />
           </Suspense>
 
-          {/* Property grid */}
+          {/* Property grid — Suspense required by Next.js for components using useSearchParams() */}
           <div className="flex-1">
-            <PropertyGrid
-              properties={properties}
-              total={total}
-              page={page}
-              totalPages={totalPages}
-            />
+            <Suspense fallback={<div className="flex-1 h-96 bg-[#111] animate-pulse" />}>
+              <PropertyGrid
+                properties={properties}
+                total={total}
+                page={page}
+                totalPages={totalPages}
+              />
+            </Suspense>
           </div>
         </div>
       </div>

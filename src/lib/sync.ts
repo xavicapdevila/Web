@@ -38,11 +38,18 @@ export async function getCachedPropertyBySlug(slug: string): Promise<Property | 
   }
 }
 
-/** Returns all slugs+dates using the Vercel Data Cache (for generateStaticParams). */
+/** Returns all slugs+dates using the Vercel Data Cache (for generateStaticParams and sitemap).
+ *  Falls back to SQLite/Blob when the XML cache is unavailable (e.g. build time, XML outage).
+ */
 export async function getCachedSlugs(): Promise<{ slug: string; fecha: string }[]> {
   try {
     const properties = await _getCachedXmlProperties();
     return properties.map((p) => ({ slug: p.slug, fecha: p.fecha }));
+  } catch { /* fall through to DB */ }
+
+  await initDbFromBlob();
+  try {
+    return getAllPropertySlugs();
   } catch {
     return [];
   }
