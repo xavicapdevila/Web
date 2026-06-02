@@ -28,7 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       routes.push({
         url: `${BASE_URL}/propiedades/${slug}`,
         lastModified: safeDate(fecha),
-        priority: 0.8,
+        priority: 0.9,
         changeFrequency: "weekly",
       });
     }
