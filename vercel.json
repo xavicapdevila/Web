@@ -11,6 +11,15 @@
     }
   ],
 
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "thevilahome.com" }],
+      "destination": "https://www.thevilahome.com/:path*",
+      "permanent": true
+    }
+  ],
+
   "headers": [
     {
       "source": "/(.*)",
