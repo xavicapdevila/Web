@@ -13,6 +13,9 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   response.headers.set("x-pathname", request.nextUrl.pathname);
+  response.headers.set("x-debug-hostname", request.nextUrl.hostname);
+  response.headers.set("x-debug-host-header", request.headers.get("host") ?? "none");
+  response.headers.set("x-debug-fwd-host", request.headers.get("x-forwarded-host") ?? "none");
   return response;
 }
 
