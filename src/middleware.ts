@@ -5,7 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
  * current path (needed to hide public Navbar/Footer on /admin routes).
  */
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.hostname === "thevilahome.com") {
+  const hostname =
+    request.headers.get("x-forwarded-host")?.split(",")[0].trim() ||
+    request.headers.get("host")?.split(":")[0] ||
+    request.nextUrl.hostname;
+
+  if (hostname === "thevilahome.com") {
     const url = request.nextUrl.clone();
     url.hostname = "www.thevilahome.com";
     return NextResponse.redirect(url.toString(), 301);
@@ -13,9 +18,8 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   response.headers.set("x-pathname", request.nextUrl.pathname);
-  response.headers.set("x-debug-hostname", request.nextUrl.hostname);
-  response.headers.set("x-debug-host-header", request.headers.get("host") ?? "none");
-  response.headers.set("x-debug-fwd-host", request.headers.get("x-forwarded-host") ?? "none");
+  // temporary: remove once redirect is confirmed working
+  response.headers.set("x-debug-hostname", hostname);
   return response;
 }
 
