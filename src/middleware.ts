@@ -5,10 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
  * current path (needed to hide public Navbar/Footer on /admin routes).
  */
 export function middleware(request: NextRequest) {
-  const host = request.headers.get("host") || "";
-  if (host === "thevilahome.com") {
-    const url = new URL(request.url);
-    url.host = "www.thevilahome.com";
+  if (request.nextUrl.hostname === "thevilahome.com") {
+    const url = request.nextUrl.clone();
+    url.hostname = "www.thevilahome.com";
     return NextResponse.redirect(url.toString(), 301);
   }
 
