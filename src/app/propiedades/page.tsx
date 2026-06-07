@@ -10,7 +10,7 @@ import { formatPrice } from "@/lib/utils";
 const BASE_URL = "https://www.thevilahome.com";
 
 export const metadata: Metadata = {
-  title: "Propiedades en venta",
+  title: "Propiedades en venta en Vilanova i la Geltrú y el Garraf",
   description:
     "Explora el catálogo completo de propiedades en venta de The Vila Home: pisos, casas, chalets, áticos y terrenos en Vilanova i la Geltrú, Sitges, Cubelles, Garraf y Penedès.",
   alternates: { canonical: "https://www.thevilahome.com/propiedades" },
@@ -71,6 +71,15 @@ export default async function PropiedadesPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(total / limit);
 
+  const schemaBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: BASE_URL },
+      { "@type": "ListItem", position: 2, name: "Propiedades en venta", item: `${BASE_URL}/propiedades` },
+    ],
+  };
+
   const schemaItemList = properties.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -88,6 +97,11 @@ export default async function PropiedadesPage({ searchParams }: Props) {
 
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      <Script
+        id="schema-breadcrumb-propiedades"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
+      />
       {schemaItemList && (
         <Script
           id="schema-item-list"

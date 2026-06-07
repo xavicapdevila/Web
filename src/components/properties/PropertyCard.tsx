@@ -193,8 +193,13 @@ function PropertyCard({ property, priority = false }: Props) {
 
       {/* Content */}
       <div className="p-5">
+        {/* Title */}
+        <h3 className="text-white font-body text-sm leading-snug mb-2 line-clamp-2">
+          {titulo}
+        </h3>
+
         {/* Price */}
-        <div className="mb-3">
+        <div className="mb-2">
           <span className="text-[#C9B99A] font-display text-2xl">
             {formatPrice(property.precio)}
           </span>
