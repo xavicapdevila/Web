@@ -21,7 +21,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#050505] border-t border-[#1a1a1a]">
       <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex flex-col leading-none items-start">
@@ -82,6 +82,25 @@ export default function Footer() {
                     href={link.href}
                     className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors"
                   >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Zonas */}
+          <div>
+            <h3 className="text-white text-xs font-body tracking-widest uppercase mb-5">Zonas</h3>
+            <ul className="space-y-3">
+              {[
+                { href: "/zona/vilanova",          label: "Vilanova i la Geltrú" },
+                { href: "/zona/sitges",            label: "Sitges" },
+                { href: "/zona/cubelles",          label: "Cubelles" },
+                { href: "/zona/sant-pere-de-ribes",label: "Sant Pere de Ribes" },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors">
                     {link.label}
                   </Link>
                 </li>

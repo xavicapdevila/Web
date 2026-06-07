@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import QuienesSomosContent from "@/components/pages/QuienesSomosContent";
 
 export const metadata: Metadata = {
@@ -23,9 +24,52 @@ export const metadata: Metadata = {
   },
 };
 
+const BASE_URL = "https://www.thevilahome.com";
+
+const schemaPeople = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Ariadna Garcia",
+    jobTitle: "Responsable de equipo — Asesora inmobiliaria",
+    email: "a.garcia@thevilahome.com",
+    url: `${BASE_URL}/quienes-somos`,
+    worksFor: { "@type": "Organization", "@id": `${BASE_URL}/#organization`, name: "The Vila Home" },
+    knowsAbout: ["Compraventa inmobiliaria", "Vilanova i la Geltrú", "Garraf"],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Sofía Pascual",
+    jobTitle: "Asesora inmobiliaria",
+    email: "s.pascual@thevilahome.com",
+    url: `${BASE_URL}/quienes-somos`,
+    worksFor: { "@type": "Organization", "@id": `${BASE_URL}/#organization`, name: "The Vila Home" },
+    knowsAbout: ["Compraventa inmobiliaria", "Vilanova i la Geltrú", "Garraf"],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Xavier Capdevila",
+    jobTitle: "Fundador — Dirección y Marketing",
+    email: "x.capdevila@thevilahome.com",
+    url: `${BASE_URL}/quienes-somos`,
+    worksFor: { "@type": "Organization", "@id": `${BASE_URL}/#organization`, name: "The Vila Home" },
+    knowsAbout: ["Compraventa inmobiliaria", "Marketing inmobiliario", "Vilanova i la Geltrú", "Garraf"],
+  },
+];
+
 export default function QuienesSomosPage() {
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      {schemaPeople.map((person, i) => (
+        <Script
+          key={i}
+          id={`schema-person-${i}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }}
+        />
+      ))}
       <QuienesSomosContent />
     </div>
   );

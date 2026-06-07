@@ -9,9 +9,21 @@ import { formatBlogDate, baseVisits } from "@/lib/utils";
 import type { BlogPost } from "@/lib/blog";
 import type { Lang } from "@/lib/i18n";
 
+const CATEGORY_TO_SLUG: Record<string, string> = {
+  "Mercado":        "mercado",
+  "Procesos":       "procesos",
+  "Documentación":  "documentacion",
+  "Hipotecas":      "hipotecas",
+  "Impuestos":      "impuestos",
+  "Herencias":      "herencias",
+  "Consejos":       "consejos",
+  "Vivir en...":    "vivir-en",
+};
+
 interface Props {
   posts: BlogPost[];
   visitCounts?: Record<string, number>;
+  currentCategory?: string;
 }
 
 const PAGE_SIZE = 12;
@@ -129,10 +141,9 @@ function ArticleCard({ post, visits }: { post: BlogPost; visits?: number }) {
 
 // ── Main listing component ────────────────────────────────────────────────────
 
-export default function BlogContent({ posts, visitCounts = {} }: Props) {
+export default function BlogContent({ posts, visitCounts = {}, currentCategory }: Props) {
   const { t, lang } = useLanguage();
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const gridRef = useRef<HTMLDivElement>(null);
   const navRef  = useRef<HTMLElement>(null);
@@ -166,9 +177,6 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
 
   const filtered = useMemo(() => {
     let result = posts;
-    if (activeCategory) {
-      result = result.filter((p) => p.categoria === activeCategory);
-    }
     if (trimmed) {
       // Search across ALL posts regardless of page
       result = result.filter(
@@ -182,15 +190,15 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
     return [...result].sort(
       (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
     );
-  }, [posts, activeCategory, trimmed]);
+  }, [posts, trimmed]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  // Reset to page 1 when filter/search changes
+  // Reset to page 1 when search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeCategory, trimmed]);
+  }, [trimmed]);
 
   const goToPage = useCallback((p: number) => {
     setCurrentPage(p);
@@ -236,28 +244,28 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
                 style={{ touchAction: "pan-x" }}
                 aria-label="Categorías del blog"
               >
-                <button
-                  onClick={() => setActiveCategory(null)}
+                <Link
+                  href="/blog"
                   className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                    !activeCategory
+                    !currentCategory
                       ? "text-[#C9B99A] border-[#C9B99A]"
                       : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
                   }`}
                 >
                   {t("blogCategoryAll")}
-                </button>
+                </Link>
                 {CATEGORIES.map((cat) => (
-                  <button
+                  <Link
                     key={cat}
-                    onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+                    href={`/blog/categoria/${CATEGORY_TO_SLUG[cat] ?? cat.toLowerCase()}`}
                     className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-                      activeCategory === cat
+                      currentCategory === cat
                         ? "text-[#C9B99A] border-[#C9B99A]"
                         : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
                     }`}
                   >
                     {CATEGORY_LABELS[cat]?.[lang] ?? cat}
-                  </button>
+                  </Link>
                 ))}
               </nav>
 
@@ -352,7 +360,7 @@ export default function BlogContent({ posts, visitCounts = {} }: Props) {
                 </p>
               )}
               <button
-                onClick={() => { setQuery(""); setActiveCategory(null); }}
+                onClick={() => { setQuery(""); }}
                 className="mt-6 text-xs font-body tracking-widest uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#222] hover:border-[#C9B99A] px-5 py-2.5"
               >
                 {t("blogSeeAll")}

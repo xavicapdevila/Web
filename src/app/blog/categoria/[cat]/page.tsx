@@ -175,7 +175,7 @@ export default async function BlogCategoriaPage({ params }: Props) {
         </div>
       </div>
 
-      <BlogContent posts={posts} visitCounts={visitCounts} />
+      <BlogContent posts={posts} visitCounts={visitCounts} currentCategory={categoriaDB} />
     </div>
   );
 }

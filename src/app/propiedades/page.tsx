@@ -1,9 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Script from "next/script";
 import PropertyFilters from "@/components/properties/PropertyFilters";
 import PropertyGrid from "@/components/properties/PropertyGrid";
 import PropiedadesHeader from "@/components/properties/PropiedadesHeader";
 import { getCachedPropertiesList } from "@/lib/sync";
+import { formatPrice } from "@/lib/utils";
+
+const BASE_URL = "https://www.thevilahome.com";
 
 export const metadata: Metadata = {
   title: "Propiedades en venta",
@@ -67,8 +71,30 @@ export default async function PropiedadesPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(total / limit);
 
+  const schemaItemList = properties.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Propiedades en venta — The Vila Home",
+    url: `${BASE_URL}/propiedades`,
+    numberOfItems: total,
+    itemListElement: properties.map((p, i) => ({
+      "@type": "ListItem",
+      position: (page - 1) * 12 + i + 1,
+      name: `${p.tipo} en ${p.ciudad}${p.zona ? ` — ${p.zona}` : ""}`,
+      url: `${BASE_URL}/propiedades/${p.slug}`,
+      description: `${p.tipo} en venta en ${p.ciudad}. ${formatPrice(p.precio)}.`,
+    })),
+  } : null;
+
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      {schemaItemList && (
+        <Script
+          id="schema-item-list"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItemList) }}
+        />
+      )}
       {/* Page header */}
       <PropiedadesHeader total={total} />
 

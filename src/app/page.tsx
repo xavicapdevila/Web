@@ -14,6 +14,20 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.thevilahome.com" },
 };
 
+const schemaWebSite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://www.thevilahome.com/#website",
+  name: "The Vila Home",
+  url: "https://www.thevilahome.com",
+  inLanguage: "es-ES",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://www.thevilahome.com/propiedades?ciudad={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
 const schemaRealEstateAgent = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
@@ -105,6 +119,11 @@ export default async function HomePage() {
 
   return (
     <>
+      <Script
+        id="schema-website"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaWebSite) }}
+      />
       <Script
         id="schema-real-estate-agent"
         type="application/ld+json"
