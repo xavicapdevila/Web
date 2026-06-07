@@ -80,7 +80,7 @@ export default function Testimonials({ reviews, rating, totalReviews }: Props) {
   const duration = reviews.length * 7; // ~35s para 5 reseñas
 
   return (
-    <section ref={ref} className="py-32 bg-[#0a0a0a] relative overflow-hidden">
+    <section ref={ref} className="pt-32 pb-16 bg-[#0a0a0a] relative overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-gradient-to-b from-[#C9B99A]/20 to-transparent" />
       </div>
