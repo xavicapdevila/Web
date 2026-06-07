@@ -8,6 +8,7 @@ import Testimonials from "@/components/home/Testimonials";
 import ValuationCTA from "@/components/home/ValuationCTA";
 import SocialSection from "@/components/home/SocialSection";
 import { getFeaturedProperties, ensureDbSeeded } from "@/lib/sync";
+import { getGooglePlaceData } from "@/lib/googlePlaces";
 
 export const metadata: Metadata = {
   alternates: { canonical: "https://www.thevilahome.com" },
@@ -74,17 +75,14 @@ const schemaRealEstateAgent = {
     "https://www.facebook.com/profile.php?id=100093001283637",
     "https://www.tiktok.com/@thevilahome",
   ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "106",
-    bestRating: "5",
-    worstRating: "1",
-  },
+  // aggregateRating injected at runtime from Google Places API
 };
 
 export default async function HomePage() {
-  await ensureDbSeeded();
+  const [placeData] = await Promise.all([
+    getGooglePlaceData(),
+    ensureDbSeeded(),
+  ]);
 
   let featured: import("@/types/property").Property[] = [];
   try {
@@ -93,19 +91,34 @@ export default async function HomePage() {
     // DB not yet seeded — first load before sync
   }
 
+  const schema = {
+    ...schemaRealEstateAgent,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: String(placeData.rating),
+      reviewCount: String(placeData.totalReviews),
+      bestRating: "5",
+      worstRating: "1",
+    },
+  };
+
   return (
     <>
       <Script
         id="schema-real-estate-agent"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaRealEstateAgent) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <Hero />
       <HowWeWork />
       <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
         <FeaturedProperties properties={featured} />
       </Suspense>
-      <Testimonials />
+      <Testimonials
+        reviews={placeData.reviews}
+        rating={placeData.rating}
+        totalReviews={placeData.totalReviews}
+      />
       <ValuationCTA />
       <SocialSection />
     </>

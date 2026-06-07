@@ -328,11 +328,30 @@ async function syncFromXml(): Promise<SyncResult> {
     (db.prepare("SELECT ref FROM properties").all() as { ref: string }[]).map((r) => r.ref)
   );
 
-  // Remove properties no longer in XML
+  // Properties no longer in the Inmovilla XML feed.
+  // Instead of deleting silently, create a pending notification so the admin
+  // can decide the final action (sold by us, sold by others, withdrawn, delete).
+  // If a pending notification already exists for this ref (from a previous sync
+  // cycle), skip creating another one to avoid duplicates.
   for (const ref of existingRefs) {
     if (!incomingRefs.has(ref)) {
-      db.prepare("DELETE FROM properties WHERE ref = ?").run(ref);
-      removed++;
+      const alreadyPending = db.prepare(
+        `SELECT 1 FROM operaciones_pendientes WHERE ref = ? AND resuelta = 0`
+      ).get(ref);
+      if (!alreadyPending) {
+        const prop = db.prepare(`SELECT titulo FROM properties WHERE ref = ?`).get(ref) as
+          | { titulo: string }
+          | undefined;
+        db.prepare(`
+          INSERT INTO operaciones_pendientes (ref, titulo, descripcion)
+          VALUES (?, ?, ?)
+        `).run(
+          ref,
+          prop?.titulo ?? ref,
+          "Esta propiedad ha desaparecido del feed de Inmovilla. Decide qué hacer con ella."
+        );
+      }
+      // Keep the property in the DB until the admin resolves the pending action.
     }
   }
 
@@ -340,6 +359,29 @@ async function syncFromXml(): Promise<SyncResult> {
 
   const insertMany = db.transaction((props: Property[]) => {
     for (const p of props) {
+      // Detect if a closed/archived property is reappearing in the feed.
+      // This can happen when an owner withdraws a property, then re-lists it.
+      const closedOp = db.prepare(
+        `SELECT estado FROM operaciones WHERE ref = ? AND estado IN ('archivado', 'vendido')`
+      ).get(p.ref) as { estado: string } | undefined;
+
+      if (closedOp) {
+        const alreadyPending = db.prepare(
+          `SELECT 1 FROM operaciones_pendientes WHERE ref = ? AND tipo = 'reaparicion' AND resuelta = 0`
+        ).get(p.ref);
+        if (!alreadyPending) {
+          const estadoLabel = closedOp.estado === "vendido" ? "vendida" : "archivada";
+          db.prepare(`
+            INSERT INTO operaciones_pendientes (ref, titulo, tipo, descripcion)
+            VALUES (?, ?, 'reaparicion', ?)
+          `).run(
+            p.ref,
+            p.titulo,
+            `Esta propiedad estaba ${estadoLabel} en el CRM pero ha vuelto a aparecer en el feed de Inmovilla. ¿Quieres reactivarla?`
+          );
+        }
+      }
+
       upsert.run(propertyToRow(p, null));
       if (existingRefs.has(p.ref)) { updated++; } else { added++; }
     }

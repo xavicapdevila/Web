@@ -1,42 +1,56 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useInView } from "framer-motion";
-import { siteConfig } from "@/lib/config";
 import { useLanguage } from "@/context/LanguageContext";
+import type { GoogleReview } from "@/lib/googlePlaces";
 
-const reviews = [
-  {
-    author: "Jordi Pons",
-    text: "Grans professionals i millors persones. La seva gestió ha estat impecable",
-    rating: 5,
-  },
-  {
-    author: "Marta",
-    text: "Un tracte molt professional i proper, transparència des del principi i acompanyant-nos en tot el procés. Moltes gràcies Xavier",
-    rating: 5,
-  },
-  {
-    author: "Yohel Arce",
-    text: "Equipo muy profesional. Facilitadores en la tramitación y proceso inmueble. Como cliente muy satisfecho. Recomendable totalmente",
-    rating: 5,
-  },
-  {
-    author: "Patricia Reyes",
-    text: "Muy buena experiencia. El trato fue muy profesional y cercano durante todo el proceso de venta. Ari fue especialmente amable, siempre atenta y dispuesta a ayudarnos",
-    rating: 5,
-  },
-  {
-    author: "Yolee Seth",
-    text: "La forma en la que trabajan es honesta, eficiente, con un trato personal excelente, con empatía y sobre todo con una visión muy clara y mucha profesionalidad",
-    rating: 5,
-  },
-  {
-    author: "Laura Cano",
-    text: "Ha sido un privilegio contar con ellos. Son súper profesionales y facilitan todo. Recomiendo 100%, trato cercano y transparente",
-    rating: 5,
-  },
-];
+function ReviewCard({ review, index, inView }: { review: GoogleReview; index: number; inView: boolean }) {
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const textRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      setOverflows(textRef.current.scrollHeight > textRef.current.clientHeight);
+    }
+  }, []);
+
+  return (
+    <div
+      className="bg-[#111] border border-[#1e1e1e] p-6 hover:border-[#C9B99A]/30 transition-all duration-500 flex flex-col"
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(40px)",
+        transition: `opacity 0.7s ease ${index * 100}ms, transform 0.7s ease ${index * 100}ms, border-color 0.3s ease`,
+      }}
+    >
+      <StarRating rating={review.rating} />
+      <div className="my-4 flex-1">
+        <p
+          ref={textRef}
+          className={`text-[#bbb] text-sm leading-relaxed${expanded ? "" : " line-clamp-5"}`}
+        >
+          &ldquo;{review.text}&rdquo;
+        </p>
+        {!expanded && overflows && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="mt-1 text-[#C9B99A] text-xs font-body hover:text-white transition-colors cursor-pointer"
+          >
+            Leer más
+          </button>
+        )}
+      </div>
+      <div className="flex items-center gap-3 border-t border-[#1e1e1e] pt-4">
+        <div className="w-8 h-8 rounded-full bg-[#C9B99A]/20 flex items-center justify-center shrink-0">
+          <span className="text-[#C9B99A] text-xs font-display">{review.author.charAt(0)}</span>
+        </div>
+        <span className="text-white text-sm font-body">{review.author}</span>
+      </div>
+    </div>
+  );
+}
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -57,7 +71,13 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export default function Testimonials() {
+interface Props {
+  reviews: GoogleReview[];
+  rating: number;
+  totalReviews: number;
+}
+
+export default function Testimonials({ reviews, rating, totalReviews }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const { t } = useLanguage();
@@ -104,13 +124,13 @@ export default function Testimonials() {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
-                  <span className="text-white font-display text-2xl">{siteConfig.googleReviews.rating}</span>
+                  <span className="text-white font-display text-2xl">{rating}</span>
                 </div>
                 <StarRating rating={5} />
               </div>
               <div className="h-10 w-px bg-[#2a2a2a]" />
               <div className="text-center">
-                <div className="text-white font-display text-xl">{siteConfig.googleReviews.total}</div>
+                <div className="text-white font-display text-xl">{totalReviews}</div>
                 <div className="text-[#666] text-xs font-body">{t("testimonialsReviews")}</div>
               </div>
             </div>
@@ -120,24 +140,7 @@ export default function Testimonials() {
         {/* Reviews grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reviews.map((review, i) => (
-            <div
-              key={i}
-              className="bg-[#111] border border-[#1e1e1e] p-6 hover:border-[#C9B99A]/30 transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateY(0)" : "translateY(40px)",
-                transition: `opacity 0.7s ease ${i * 100}ms, transform 0.7s ease ${i * 100}ms, border-color 0.3s ease`,
-              }}
-            >
-              <StarRating rating={review.rating} />
-              <p className="text-[#bbb] text-sm leading-relaxed my-4">&ldquo;{review.text}&rdquo;</p>
-              <div className="flex items-center gap-3 border-t border-[#1e1e1e] pt-4">
-                <div className="w-8 h-8 rounded-full bg-[#C9B99A]/20 flex items-center justify-center shrink-0">
-                  <span className="text-[#C9B99A] text-xs font-display">{review.author.charAt(0)}</span>
-                </div>
-                <span className="text-white text-sm font-body">{review.author}</span>
-              </div>
-            </div>
+            <ReviewCard key={i} review={review} index={i} inView={inView} />
           ))}
         </div>
       </div>
