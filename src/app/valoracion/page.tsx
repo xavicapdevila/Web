@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import ValoracionContent from "@/components/pages/ValoracionContent";
 
 export const metadata: Metadata = {
@@ -23,9 +24,61 @@ export const metadata: Metadata = {
   },
 };
 
+const schemaFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "¿Cuánto vale mi casa en Vilanova i la Geltrú?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "El precio depende de la zona, los metros cuadrados, el estado de conservación y la demanda actual del mercado. En The Vila Home hacemos una valoración gratuita basada en ventas reales realizadas y propiedades activas en tu zona. Contacta con nosotros y te respondemos en menos de 24 horas.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Es gratuita la valoración de mi propiedad?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Sí, la valoración es completamente gratuita y sin compromiso de venta. Puedes solicitar una estimación orientativa online ahora mismo, y si quieres una valoración ajustada a la realidad, uno de nuestros agentes visitará la vivienda sin ningún coste.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cuánto tarda en llegar la valoración?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "La estimación orientativa es inmediata. Si solicitas una valoración personalizada, un agente de The Vila Home se pondrá en contacto contigo en menos de 24 horas para acordar una visita.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué documentación necesito para valorar mi piso o casa?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Para la valoración orientativa no necesitas ningún documento. Para la valoración completa y personalizada, es útil tener la referencia catastral, la superficie en m², el año de construcción y cualquier reforma reciente. Nuestros agentes te guiarán en todo momento.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿En qué zonas realizáis valoraciones?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Realizamos valoraciones en Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes y en general en toda la comarca del Garraf y el Penedès. Somos especialistas en el mercado local de esta zona.",
+      },
+    },
+  ],
+};
+
 export default function ValoracionPage() {
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      <Script
+        id="schema-faq-valoracion"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFaq) }}
+      />
       <ValoracionContent />
     </div>
   );

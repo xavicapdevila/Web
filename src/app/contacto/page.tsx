@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import ContactoContent from "@/components/pages/ContactoContent";
+import { getGooglePlaceData } from "@/lib/googlePlaces";
 
 const BASE_URL = "https://www.thevilahome.com";
 
@@ -39,6 +40,7 @@ const schemaLocalBusiness = {
   email: "info@thevilahome.com",
   legalName: "Projectes Immobiliaris Costa Daurada SL",
   taxID: "B13683529",
+  priceRange: "€€",
   image: `${BASE_URL}/og-image.jpg`,
   logo: `${BASE_URL}/logo.svg`,
   address: {
@@ -86,22 +88,28 @@ const schemaLocalBusiness = {
     "https://www.facebook.com/profile.php?id=100093001283637",
     "https://www.tiktok.com/@thevilahome",
   ],
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.9",
-    reviewCount: "106",
-    bestRating: "5",
-    worstRating: "1",
-  },
 };
 
-export default function ContactoPage() {
+export default async function ContactoPage() {
+  const placeData = await getGooglePlaceData();
+
+  const schema = {
+    ...schemaLocalBusiness,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: String(placeData.rating),
+      reviewCount: String(placeData.totalReviews),
+      bestRating: "5",
+      worstRating: "1",
+    },
+  };
+
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
       <Script
         id="schema-local-business"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaLocalBusiness) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
       <ContactoContent />
     </div>

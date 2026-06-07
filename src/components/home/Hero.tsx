@@ -53,14 +53,17 @@ export default function Hero() {
       {/* Content — left-aligned */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 lg:px-10 pt-24 pb-28">
         <div className="max-w-2xl">
-          <h1
+          <h1 className="sr-only">
+            Inmobiliaria en Vilanova i la Geltrú — The Vila Home
+          </h1>
+          <h2
             ref={titleRef}
             className="font-display text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-10"
           >
             <span className="text-white">Human</span>
             <br />
             <span className="text-[#C9B99A] italic">Real Estate</span>
-          </h1>
+          </h2>
 
           <div
             ref={ctaRef}

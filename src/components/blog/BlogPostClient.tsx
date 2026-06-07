@@ -363,7 +363,7 @@ export default function BlogPostClient({ post, related }: Props) {
       )}
 
       {/* Bottom CTA */}
-      <div className="mt-16 pt-12 border-t border-[#1a1a1a] bg-[#111] border border-[#1e1e1e] p-8">
+      <div className="mt-16 bg-[#111] border border-[#1e1e1e] p-8">
         <h3 className="font-display text-2xl text-white font-normal mb-3">
           {t("blogCtaTitle")}
         </h3>

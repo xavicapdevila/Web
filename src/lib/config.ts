@@ -18,6 +18,6 @@ export const siteConfig = {
   googleReviews: {
     total: 106,
     rating: 4.9,
-    placeId: "", // fill when Google Places API key is ready
+    placeId: "ChIJhciFmN6HoxIRfBIcpyI-w6Q",
   },
 };

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function BlogPage() {
   let posts: import("@/lib/blog").BlogPost[] = [];
@@ -74,6 +74,9 @@ export default async function BlogPage() {
 
   return (
     <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      <h1 className="sr-only">
+        Blog inmobiliario — Consejos, guías y mercado inmobiliario en Vilanova i la Geltrú
+      </h1>
       <Script
         id="schema-blog"
         type="application/ld+json"

@@ -9,12 +9,24 @@ const BASE_URL = "https://www.thevilahome.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
-    { url: BASE_URL,                          lastModified: new Date(), priority: 1,   changeFrequency: "weekly"  },
-    { url: `${BASE_URL}/propiedades`,          lastModified: new Date(), priority: 0.9, changeFrequency: "daily"   },
-    { url: `${BASE_URL}/valoracion`,           lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
-    { url: `${BASE_URL}/blog`,                 lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
-    { url: `${BASE_URL}/quienes-somos`,        lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
-    { url: `${BASE_URL}/contacto`,             lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
+    { url: BASE_URL,                                        lastModified: new Date(), priority: 1,   changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/propiedades`,                       lastModified: new Date(), priority: 0.9, changeFrequency: "daily"   },
+    { url: `${BASE_URL}/valoracion`,                        lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/blog`,                              lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/quienes-somos`,                     lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/contacto`,                          lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/zona/vilanova`,                     lastModified: new Date(), priority: 0.8, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/zona/sitges`,                       lastModified: new Date(), priority: 0.8, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/zona/cubelles`,                     lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/zona/sant-pere-de-ribes`,           lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/mercado`,            lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/hipotecas`,          lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/procesos`,           lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/documentacion`,      lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/impuestos`,          lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/herencias`,          lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/consejos`,           lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
+    { url: `${BASE_URL}/blog/categoria/vivir-en`,           lastModified: new Date(), priority: 0.6, changeFrequency: "weekly"  },
   ];
 
   const safeDate = (s: string) => {

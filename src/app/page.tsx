@@ -62,6 +62,7 @@ const schemaRealEstateAgent = {
       closes: "14:00",
     },
   ],
+  priceRange: "€€",
   areaServed: [
     { "@type": "City", name: "Vilanova i la Geltrú" },
     { "@type": "AdministrativeArea", name: "Garraf" },

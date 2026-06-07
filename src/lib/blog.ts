@@ -100,24 +100,27 @@ async function writeBlobPosts(posts: BlogPost[]): Promise<void> {
 
 export async function getBlogPosts(
   limit = 10,
-  offset = 0
+  offset = 0,
+  categoria?: string
 ): Promise<{ posts: BlogPost[]; total: number }> {
   if (USE_BLOB) {
     const all = await readBlobPosts();
     const published = all
-      .filter((p) => p.publicado)
+      .filter((p) => p.publicado && (!categoria || p.categoria === categoria))
       .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
     return { posts: published.slice(offset, offset + limit), total: published.length };
   }
 
   // Local dev — SQLite
   const db = getDb();
+  const catClause = categoria ? "AND categoria = ?" : "";
+  const countArgs = categoria ? [categoria] : [];
   const total = (
-    db.prepare("SELECT COUNT(*) as c FROM blog_posts WHERE publicado = 1").get() as { c: number }
+    db.prepare(`SELECT COUNT(*) as c FROM blog_posts WHERE publicado = 1 ${catClause}`).get(...countArgs) as { c: number }
   ).c;
   const rows = db
-    .prepare("SELECT * FROM blog_posts WHERE publicado = 1 ORDER BY fecha DESC LIMIT ? OFFSET ?")
-    .all(limit, offset) as Record<string, unknown>[];
+    .prepare(`SELECT * FROM blog_posts WHERE publicado = 1 ${catClause} ORDER BY fecha DESC LIMIT ? OFFSET ?`)
+    .all(...countArgs, limit, offset) as Record<string, unknown>[];
   return { posts: rows.map(rowToPost), total };
 }
 
