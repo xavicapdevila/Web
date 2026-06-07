@@ -206,9 +206,7 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
               <span className="text-[#666] text-xs">Ref. {property.ref}</span>
             </div>
 
-            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl text-white font-light mb-2 leading-snug">
-              {titulo}
-            </h1>
+            <h1 className="sr-only">{titulo}</h1>
 
             <p className="text-[#888] text-sm mb-6">
               {[property.zona, property.ciudad, property.provincia].filter(Boolean).join(", ")}
