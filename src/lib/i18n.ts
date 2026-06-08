@@ -95,6 +95,7 @@ const dict = {
     propCall: "Llamar · 936 061 800",
     propEmail: "Enviar email",
     propWhatsapp: "Contactar por WhatsApp",
+    propReservedAlert: "Este inmueble está reservado. Para más información, contacta con nosotros.",
     propShare: "Compartir propiedad",
     backToListing: "Volver al listado",
 
@@ -364,6 +365,7 @@ const dict = {
     propCall: "Trucar · 936 061 800",
     propEmail: "Enviar correu",
     propWhatsapp: "Contactar per WhatsApp",
+    propReservedAlert: "Aquest immoble està reservat. Per a més informació, contacta amb nosaltres.",
     propShare: "Compartir propietat",
     backToListing: "Tornar al llistat",
 
@@ -624,6 +626,7 @@ const dict = {
     propCall: "Call · 936 061 800",
     propEmail: "Send email",
     propWhatsapp: "Contact via WhatsApp",
+    propReservedAlert: "This property is reserved. For more information, please contact us.",
     propShare: "Share property",
     backToListing: "Back to listings",
 
@@ -884,6 +887,7 @@ const dict = {
     propCall: "Appeler · 936 061 800",
     propEmail: "Envoyer un email",
     propWhatsapp: "Contacter par WhatsApp",
+    propReservedAlert: "Ce bien est réservé. Pour plus d'informations, contactez-nous.",
     propShare: "Partager le bien",
     backToListing: "Retour à la liste",
 
