@@ -254,6 +254,14 @@ const dict = {
     contactValuateTitle: "¿Quieres valorar tu propiedad?",
     contactValuateDesc: "Gratis, sin compromiso y con datos reales del mercado.",
 
+    // Legal pages
+    legalLangNotice: "",
+    legalUpdated: "Última actualización: mayo 2026",
+    legalBack: "← Volver al inicio",
+    legalBackPrivacy: "Política de privacidad →",
+    legalBackCookies: "Política de cookies →",
+    legalBackLegal: "Aviso legal →",
+
     // Cookie consent
     cookieBannerTitle: "Usamos cookies",
     cookieBannerText: "Utilizamos cookies propias y de terceros para analizar el uso del sitio web y, si lo aceptas, elaborar perfiles basados en tus hábitos de navegación para mostrarte publicidad personalizada.",
@@ -514,6 +522,14 @@ const dict = {
     contactSchHours3: "Tancat",
     contactValuateTitle: "Vols valorar la teva propietat?",
     contactValuateDesc: "Gratuït, sense compromís i amb dades reals del mercat.",
+
+    // Legal pages
+    legalLangNotice: "Aquest document legal és redactat en castellà, que és la llengua legalment vàlida.",
+    legalUpdated: "Última actualització: maig 2026",
+    legalBack: "← Tornar a l'inici",
+    legalBackPrivacy: "Política de privacitat →",
+    legalBackCookies: "Política de cookies →",
+    legalBackLegal: "Avís legal →",
 
     // Cookie consent
     cookieBannerTitle: "Fem servir cookies",
@@ -776,6 +792,14 @@ const dict = {
     contactValuateTitle: "Want to value your property?",
     contactValuateDesc: "Free, no commitment, and based on real market data.",
 
+    // Legal pages
+    legalLangNotice: "This legal document is written in Spanish, the legally binding language.",
+    legalUpdated: "Last updated: May 2026",
+    legalBack: "← Back to home",
+    legalBackPrivacy: "Privacy policy →",
+    legalBackCookies: "Cookie policy →",
+    legalBackLegal: "Legal notice →",
+
     // Cookie consent
     cookieBannerTitle: "We use cookies",
     cookieBannerText: "We use our own and third-party cookies to analyse website usage and, if you agree, to build profiles based on your browsing habits in order to show you personalised advertising.",
@@ -1036,6 +1060,14 @@ const dict = {
     contactSchHours3: "Fermé",
     contactValuateTitle: "Vous souhaitez estimer votre bien ?",
     contactValuateDesc: "Gratuit, sans engagement et avec des données réelles du marché.",
+
+    // Legal pages
+    legalLangNotice: "Ce document légal est rédigé en espagnol, la langue juridiquement contraignante.",
+    legalUpdated: "Dernière mise à jour : mai 2026",
+    legalBack: "← Retour à l'accueil",
+    legalBackPrivacy: "Politique de confidentialité →",
+    legalBackCookies: "Politique de cookies →",
+    legalBackLegal: "Mentions légales →",
 
     // Cookie consent
     cookieBannerTitle: "Nous utilisons des cookies",

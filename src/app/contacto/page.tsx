@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 const schemaLocalBusiness = {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
+  "@type": "RealEstateAgent",
   "@id": `${BASE_URL}/#organization`,
   name: "The Vila Home",
   alternateName: "The Vila Home — Human Real Estate",
@@ -82,6 +82,7 @@ const schemaLocalBusiness = {
     { "@type": "AdministrativeArea", name: "Penedès" },
     { "@type": "City", name: "Sitges" },
     { "@type": "City", name: "Cubelles" },
+    { "@type": "City", name: "Sant Pere de Ribes" },
   ],
   sameAs: [
     "https://www.instagram.com/thevilahome",
