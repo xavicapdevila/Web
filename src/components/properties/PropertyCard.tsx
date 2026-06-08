@@ -22,10 +22,11 @@ function PropertyCard({ property, priority = false }: Props) {
   const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
   const mainImage = property.imagenes[0]?.url;
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [showVideo,      setShowVideo]      = useState(false);
-  const [showTour,       setShowTour]       = useState(false);
-  const [lightboxImg,    setLightboxImg]    = useState<string | null>(null);
+  const [showShareModal,    setShowShareModal]    = useState(false);
+  const [showVideo,         setShowVideo]         = useState(false);
+  const [showTour,          setShowTour]          = useState(false);
+  const [lightboxImg,       setLightboxImg]       = useState<string | null>(null);
+  const [showReservedAlert, setShowReservedAlert] = useState(false);
 
   const ytId = property.video1 ? getYouTubeId(property.video1) : null;
 
@@ -69,6 +70,13 @@ function PropertyCard({ property, priority = false }: Props) {
   const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${property.titulo}\n${propertyUrl}`)}`;
   const isReserved = property.estadoFicha === 7;
   const hasDiscount = property.outlet && property.precioAnterior;
+
+  const handleContactAttempt = (e: React.MouseEvent) => {
+    if (isReserved) {
+      e.preventDefault();
+      setShowReservedAlert(true);
+    }
+  };
 
   const hasPlano = property.imagenes.some((img) => img.eti === "plano");
   const has360 = property.imagenes.some((img) => img.eti === "360");
@@ -236,14 +244,24 @@ function PropertyCard({ property, priority = false }: Props) {
           <div className="ml-auto flex items-center gap-2">
             <a
               href="tel:936061800"
-              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              onClick={handleContactAttempt}
+              className={`p-2 border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A] ${
+                isReserved
+                  ? "border-[#2a2a2a] text-[#444] cursor-not-allowed"
+                  : "border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A]"
+              }`}
               aria-label="Llamar a The Vila Home"
             >
               <Phone size={13} aria-hidden="true" />
             </a>
             <a
               href={`mailto:info@thevilahome.com?subject=Información sobre ${property.ref}`}
-              className="p-2 border border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              onClick={handleContactAttempt}
+              className={`p-2 border transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A] ${
+                isReserved
+                  ? "border-[#2a2a2a] text-[#444] cursor-not-allowed"
+                  : "border-[#2a2a2a] hover:border-[#C9B99A] hover:text-[#C9B99A]"
+              }`}
               aria-label="Enviar email sobre esta propiedad"
             >
               <Mail size={13} aria-hidden="true" />
@@ -257,6 +275,15 @@ function PropertyCard({ property, priority = false }: Props) {
             </button>
           </div>
         </div>
+
+        {/* Reserved alert — aparece al intentar contactar */}
+        {showReservedAlert && (
+          <div className="mt-3 bg-[#C9B99A]/10 border border-[#C9B99A]/40 px-3 py-2 text-center">
+            <p className="text-[#C9B99A] text-xs font-body leading-relaxed">
+              {t("propReservedAlert")}
+            </p>
+          </div>
+        )}
       </div>
     </article>
 
