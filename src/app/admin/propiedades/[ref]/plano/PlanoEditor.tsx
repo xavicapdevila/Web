@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Save, ArrowLeft, Check, MapPin } from "lucide-react";
+import { Plus, Trash2, Save, ArrowLeft, Check, MapPin, X } from "lucide-react";
 import type { FloorPlanPin, PropertyImage } from "@/types/property";
 
 interface Props {
@@ -22,7 +22,6 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
   const router = useRouter();
   const [pins, setPins] = useState<FloorPlanPin[]>(initialPins);
   const [activePinId, setActivePinId] = useState<string | null>(null);
-  const [placingNew, setPlacingNew] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedOk, setSavedOk] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
@@ -42,23 +41,22 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
     imagenes.filter(i => i.eti === eti).some(i => !assignedUrls.has(i.url))
   );
 
-  // Handle click on floor plan to place/move pin
+  // Click on "Añadir pin" → create new pin at center of floor plan, select it
+  const addPinAtCenter = useCallback(() => {
+    const newPin: FloorPlanPin = { id: uid(), x: 50, y: 50, label: "", fotos: [] };
+    setPins(prev => [...prev, newPin]);
+    setActivePinId(newPin.id);
+  }, []);
+
+  // Handle click on floor plan — moves the active pin to the clicked position
   const handlePlanoClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!activePinId) return;
     const rect = imgRef.current?.getBoundingClientRect();
     if (!rect) return;
     const x = ((e.clientX - rect.left) / rect.width)  * 100;
     const y = ((e.clientY - rect.top)  / rect.height) * 100;
-
-    if (placingNew) {
-      const newPin: FloorPlanPin = { id: uid(), x, y, label: "", fotos: [] };
-      setPins(prev => [...prev, newPin]);
-      setActivePinId(newPin.id);
-      setPlacingNew(false);
-    } else if (activePinId) {
-      // Move active pin
-      setPins(prev => prev.map(p => p.id === activePinId ? { ...p, x, y } : p));
-    }
-  }, [placingNew, activePinId]);
+    setPins(prev => prev.map(p => p.id === activePinId ? { ...p, x, y } : p));
+  }, [activePinId]);
 
   const updateActiveLabel = (label: string) => {
     if (!activePinId) return;
@@ -138,15 +136,11 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
           {/* Add pin button */}
           <div className="p-4 border-b border-[#1a1a1a]">
             <button
-              onClick={() => { setPlacingNew(true); setActivePinId(null); }}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 text-xs font-body tracking-widest uppercase border transition-colors ${
-                placingNew
-                  ? "bg-[#C9B99A] text-black border-[#C9B99A]"
-                  : "border-[#2a2a2a] text-[#888] hover:border-[#C9B99A] hover:text-[#C9B99A]"
-              }`}
+              onClick={addPinAtCenter}
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-body tracking-widest uppercase border border-[#2a2a2a] text-[#888] hover:border-[#C9B99A] hover:text-[#C9B99A] transition-colors"
             >
               <Plus size={13} />
-              {placingNew ? "Haz click en el plano…" : "Añadir pin"}
+              Añadir pin
             </button>
           </div>
 
@@ -241,7 +235,7 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
               <MapPin size={24} className="text-[#222] mb-3" />
               <p className="text-[#555] text-xs">
                 {pins.length === 0
-                  ? "Haz click en \"Añadir pin\" y luego click en el plano para colocar el primer pin."
+                  ? "Haz click en \"Añadir pin\" para crear el primer pin en el centro del plano."
                   : "Haz click en un pin del plano para editarlo, o añade uno nuevo."}
               </p>
             </div>
@@ -267,7 +261,7 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
             ref={imgRef}
             onClick={handlePlanoClick}
             className={`relative inline-block max-w-full max-h-full ${
-              placingNew ? "cursor-crosshair" : activePinId ? "cursor-move" : "cursor-default"
+              activePinId ? "cursor-move" : "cursor-default"
             }`}
             style={{ maxHeight: "calc(100vh - 120px)" }}
           >
@@ -284,37 +278,55 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
             {pins.map(pin => {
               const isActive = pin.id === activePinId;
               return (
-                <button
+                <div
                   key={pin.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!placingNew) setActivePinId(isActive ? null : pin.id);
-                  }}
-                  className={`absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-0.5 group transition-all ${
+                  className={`absolute -translate-x-1/2 -translate-y-1/2 group ${
                     isActive ? "z-20" : "z-10 hover:z-20"
                   }`}
                   style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
-                  title={pin.label || "Sin etiqueta"}
                 >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 transition-all ${
-                    isActive
-                      ? "bg-[#C9B99A] border-white scale-125"
-                      : "bg-[#1a1a1a]/90 border-[#C9B99A] group-hover:scale-110"
-                  }`}>
-                    {/* Camera icon */}
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isActive ? "#000" : "#C9B99A"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                  </div>
-                  {pin.label && (
-                    <span className={`text-[10px] font-body whitespace-nowrap px-1.5 py-0.5 rounded shadow ${
-                      isActive ? "bg-[#C9B99A] text-black" : "bg-black/80 text-white"
+                  {/* × delete button — visible on hover or when active */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setPins(prev => prev.filter(p => p.id !== pin.id));
+                      if (activePinId === pin.id) setActivePinId(null);
+                    }}
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-[#444] hover:bg-red-500 rounded-full flex items-center justify-center text-white z-30 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Eliminar pin"
+                  >
+                    <X size={8} />
+                  </button>
+
+                  {/* Pin circle + label */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePinId(isActive ? null : pin.id);
+                    }}
+                    className="flex flex-col items-center gap-0.5 transition-all"
+                    title={pin.label || "Sin etiqueta"}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg border-2 transition-all ${
+                      isActive
+                        ? "bg-[#C9B99A] border-white scale-125"
+                        : "bg-[#1a1a1a]/90 border-[#C9B99A] group-hover:scale-110"
                     }`}>
-                      {pin.label} ({pin.fotos.length})
-                    </span>
-                  )}
-                </button>
+                      {/* Camera icon */}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isActive ? "#000" : "#C9B99A"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                    </div>
+                    {pin.label && (
+                      <span className={`text-[10px] font-body whitespace-nowrap px-1.5 py-0.5 rounded shadow ${
+                        isActive ? "bg-[#C9B99A] text-black" : "bg-black/80 text-white"
+                      }`}>
+                        {pin.label} ({pin.fotos.length})
+                      </span>
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>

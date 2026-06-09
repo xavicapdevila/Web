@@ -19,6 +19,7 @@ interface PropRow {
   m2_construidos: number | null;
   estado_ficha:   number;
   imagenes:       string;
+  plano_pins:     string;
   fecha:          string;
   fechaact:       string | null;
 }
@@ -39,6 +40,13 @@ function hasPlanoImage(imagenes: string): boolean {
     const arr = JSON.parse(imagenes);
     return arr.some((i: { eti?: string }) => i.eti === "plano");
   } catch { return false; }
+}
+
+function getPinCount(plano_pins: string): number {
+  try {
+    const arr = JSON.parse(plano_pins ?? "[]");
+    return Array.isArray(arr) ? arr.length : 0;
+  } catch { return 0; }
 }
 
 function tipoLabel(tipo: string, subtipo: string | null) {
@@ -252,15 +260,26 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                     {/* Links */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {hasPlanoImage(row.imagenes) && (
-                          <Link
-                            href={`/admin/propiedades/${row.ref}/plano`}
-                            className="text-[#333] hover:text-[#C9B99A] transition-colors"
-                            title="Editar plano interactivo"
-                          >
-                            <Map size={13} />
-                          </Link>
-                        )}
+                        {hasPlanoImage(row.imagenes) && (() => {
+                          const pinCount = getPinCount(row.plano_pins);
+                          const hasPins = pinCount > 0;
+                          return (
+                            <div className="relative">
+                              <Link
+                                href={`/admin/propiedades/${row.ref}/plano`}
+                                className={`transition-colors ${hasPins ? "text-[#C9B99A]" : "text-[#333] hover:text-[#C9B99A]"}`}
+                                title={hasPins ? `Plano interactivo · ${pinCount} pin${pinCount !== 1 ? "s" : ""}` : "Configurar plano interactivo"}
+                              >
+                                <Map size={13} />
+                              </Link>
+                              {hasPins && (
+                                <span className="absolute -top-1.5 -right-1.5 min-w-[14px] h-[14px] bg-[#C9B99A] rounded-full text-black text-[8px] font-bold flex items-center justify-center px-0.5 leading-none pointer-events-none">
+                                  {pinCount}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                         <Link
                           href={`/propiedades/${row.slug}`}
                           target="_blank"

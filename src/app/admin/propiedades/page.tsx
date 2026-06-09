@@ -18,6 +18,7 @@ interface PropRow {
   m2_construidos: number | null;
   estado_ficha:   number;
   imagenes:       string;
+  plano_pins:     string;
   fecha:          string;
   fechaact:       string | null;
 }
@@ -29,7 +30,7 @@ function getProperties(): PropRow[] {
       .prepare(
         `SELECT ref, slug, titulo, tipo, subtipo, operacion, precio,
                 ciudad, habitaciones, banos, m2_construidos,
-                estado_ficha, imagenes, fecha, fechaact
+                estado_ficha, imagenes, plano_pins, fecha, fechaact
          FROM properties
          ORDER BY fecha DESC`
       )

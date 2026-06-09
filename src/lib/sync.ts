@@ -20,13 +20,35 @@ const _getCachedXmlProperties = unstable_cache(
 /** Returns a single property by slug.
  *  Primary source: Vercel Data Cache (XML feed, shared across all Lambdas).
  *  Fallback: SQLite DB (restored from Blob) — covers stale/cold-start scenarios.
+ *
+ *  NOTE: plano_pins is our custom data stored only in SQLite (not in the
+ *  Inmovilla XML feed). When the property is found in XML, we enrich it with
+ *  plano_pins from the DB before returning.
  */
 export async function getCachedPropertyBySlug(slug: string): Promise<Property | null> {
+  let property: Property | null = null;
   try {
     const properties = await _getCachedXmlProperties();
-    const found = properties.find((p) => p.slug === slug);
-    if (found) return found;
+    property = properties.find((p) => p.slug === slug) ?? null;
   } catch { /* fall through to DB */ }
+
+  if (property) {
+    // Enrich with plano_pins from DB — not available in the XML feed.
+    try {
+      await initDbFromBlob();
+      const db = getDb();
+      const row = db
+        .prepare("SELECT plano_pins FROM properties WHERE slug = ?")
+        .get(slug) as { plano_pins?: string } | undefined;
+      if (row?.plano_pins) {
+        const pins = JSON.parse(row.plano_pins);
+        if (Array.isArray(pins) && pins.length > 0) {
+          property = { ...property, planoPins: pins };
+        }
+      }
+    } catch { /* non-fatal — plano_pins enrichment is best-effort */ }
+    return property;
+  }
 
   // DB fallback: Vercel Data Cache miss or XML not yet refreshed.
   // Restore DB from Blob if this is a fresh container.
