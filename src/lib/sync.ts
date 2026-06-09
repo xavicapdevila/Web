@@ -584,5 +584,6 @@ function rowToProperty(row: Record<string, unknown>): Property {
     agenteFoto:  row.agente_foto  ? String(row.agente_foto)  : undefined,
     agenteTelefono: row.agente_telefono ? String(row.agente_telefono) : undefined,
     slug:      String(row.slug ?? ""),
+    planoPins: (() => { try { return JSON.parse(String(row.plano_pins ?? "[]")); } catch { return []; } })(),
   };
 }

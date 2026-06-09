@@ -3,6 +3,14 @@ export interface PropertyImage {
   eti?: string;
 }
 
+export interface FloorPlanPin {
+  id: string;       // unique identifier
+  x: number;        // left position as % of image width (0–100)
+  y: number;        // top position as % of image height (0–100)
+  label: string;    // room name (e.g. "Dormitorio 1", "Salón")
+  fotos: string[];  // array of image URLs assigned to this pin
+}
+
 export interface Property {
   id: string;
   ref: string;
@@ -68,6 +76,7 @@ export interface Property {
   agenteFoto?: string;
   agenteTelefono?: string;
   slug: string;
+  planoPins?: FloorPlanPin[];
   rawXml?: string;
 }
 

@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, ExternalLink, Home, RefreshCw } from "lucide-react";
+import { Search, ExternalLink, Home, RefreshCw, Map } from "lucide-react";
 
 interface PropRow {
   ref:            string;
@@ -32,6 +32,13 @@ function firstImage(imagenes: string): string | null {
     const arr = JSON.parse(imagenes);
     return arr[0]?.url ?? null;
   } catch { return null; }
+}
+
+function hasPlanoImage(imagenes: string): boolean {
+  try {
+    const arr = JSON.parse(imagenes);
+    return arr.some((i: { eti?: string }) => i.eti === "plano");
+  } catch { return false; }
 }
 
 function tipoLabel(tipo: string, subtipo: string | null) {
@@ -242,16 +249,27 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                       )}
                     </td>
 
-                    {/* Link */}
+                    {/* Links */}
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/propiedades/${row.slug}`}
-                        target="_blank"
-                        className="text-[#333] hover:text-[#C9B99A] transition-colors"
-                        title="Ver en la web"
-                      >
-                        <ExternalLink size={13} />
-                      </Link>
+                      <div className="flex items-center gap-3">
+                        {hasPlanoImage(row.imagenes) && (
+                          <Link
+                            href={`/admin/propiedades/${row.ref}/plano`}
+                            className="text-[#333] hover:text-[#C9B99A] transition-colors"
+                            title="Editar plano interactivo"
+                          >
+                            <Map size={13} />
+                          </Link>
+                        )}
+                        <Link
+                          href={`/propiedades/${row.slug}`}
+                          target="_blank"
+                          className="text-[#333] hover:text-[#C9B99A] transition-colors"
+                          title="Ver en la web"
+                        >
+                          <ExternalLink size={13} />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 );

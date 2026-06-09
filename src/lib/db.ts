@@ -256,6 +256,8 @@ function initSchema(db: Database.Database): void {
     agente      TEXT,
     created_at  TEXT DEFAULT (datetime('now'))
   )`); } catch {}
+  // plano_pins: JSON array of FloorPlanPin for interactive floor plan
+  try { db.exec(`ALTER TABLE properties ADD COLUMN plano_pins TEXT DEFAULT '[]'`); } catch {}
   // fechaact: Inmovilla REST API last-modified timestamp (for differential sync)
   try { db.exec(`ALTER TABLE properties ADD COLUMN fechaact TEXT`); } catch {}
   // source column on sync_log: which data source was used ('rest' | 'xml')

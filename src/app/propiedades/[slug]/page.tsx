@@ -178,6 +178,7 @@ export default async function PropertyPage({ params }: Props) {
         title={property.titulo}
         ciudad={property.ciudad}
         tipo={property.tipo}
+        planoPins={property.planoPins}
       />
       <PropertyPageContent
         property={property}
