@@ -26,6 +26,7 @@ function PropertyCard({ property, priority = false }: Props) {
   const [showVideo,         setShowVideo]         = useState(false);
   const [showTour,          setShowTour]          = useState(false);
   const [lightboxImg,       setLightboxImg]       = useState<string | null>(null);
+  const [showGallery,       setShowGallery]       = useState(false);
   const [showReservedAlert, setShowReservedAlert] = useState(false);
 
   const ytId = property.video1 ? getYouTubeId(property.video1) : null;
@@ -35,19 +36,26 @@ function PropertyCard({ property, priority = false }: Props) {
     setShowVideo(false);
     setShowTour(false);
     setLightboxImg(null);
+    setShowGallery(false);
   }, []);
   // X button → close modal AND navigate to property detail page
   const closeAndNavigate = useCallback(() => {
     setShowVideo(false);
     setShowTour(false);
     setLightboxImg(null);
+    setShowGallery(false);
     router.push(`/propiedades/${property.slug}`);
   }, [router, property.slug]);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeAll(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      // Si hay lightbox encima de la galería, solo cierra el lightbox
+      if (lightboxImg) { setLightboxImg(null); return; }
+      closeAll();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [closeAll]);
+  }, [closeAll, lightboxImg]);
 
   const handleShare = async () => {
     const url = `${window.location.origin}/propiedades/${property.slug}`;
@@ -102,6 +110,10 @@ function PropertyCard({ property, priority = false }: Props) {
     const img = property.imagenes.find((i) => i.eti === "360");
     if (img) setLightboxImg(img.url);
   };
+  const handleGalleryClick = (e: React.MouseEvent) => {
+    e.preventDefault(); e.stopPropagation();
+    setShowGallery(true);
+  };
 
   return (
     <>
@@ -155,10 +167,14 @@ function PropertyCard({ property, priority = false }: Props) {
         {/* Media badges — outside Link so each has its own click action */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10 pointer-events-none">
           {property.imagenes.length > 0 && (
-            <span className="flex items-center gap-1 h-7 px-2 bg-black/75 backdrop-blur-sm text-white text-xs" title={`${property.imagenes.length} fotos`}>
+            <button
+              onClick={handleGalleryClick}
+              className="pointer-events-auto flex items-center gap-1 h-7 px-2 bg-black/75 backdrop-blur-sm text-white text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+              title={`Ver ${property.imagenes.length} fotos`}
+            >
               <Camera size={12} />
               {property.imagenes.length}
-            </span>
+            </button>
           )}
           {hasPlano && (
             <button
@@ -341,11 +357,57 @@ function PropertyCard({ property, priority = false }: Props) {
       </div>
     )}
 
-    {/* ── Plano / 360 lightbox ── */}
-    {lightboxImg && (
+    {/* ── Galería de fotos ── */}
+    {showGallery && (
       <div className="fixed inset-0 bg-black z-[200] flex flex-col" onClick={closeAll}>
-        <div className="flex items-center justify-end px-5 h-12 shrink-0" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 h-12 shrink-0 border-b border-[#1e1e1e]" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-2 text-white/60 text-sm">
+            <Camera size={14} className="text-[#C9B99A]" />
+            <span>{titulo} &mdash; {property.imagenes.length} fotos</span>
+          </div>
           <button onClick={closeAndNavigate} className="text-white hover:text-[#C9B99A] transition-colors p-1">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-3" onClick={(e) => e.stopPropagation()}>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {property.imagenes.map((img, i) => (
+              <button
+                key={i}
+                onClick={() => setLightboxImg(img.url)}
+                className="relative aspect-[4/3] overflow-hidden group/thumb focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#C9B99A]"
+              >
+                <Image
+                  src={img.url}
+                  alt={`${titulo} — foto ${i + 1}`}
+                  fill
+                  loading="eager"
+                  className="object-cover group-hover/thumb:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                />
+                {img.eti && (
+                  <span className="absolute bottom-1 left-1 bg-black/70 text-[#C9B99A] text-[9px] uppercase tracking-wider px-1.5 py-0.5">
+                    {img.eti}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* ── Plano / 360 / galería lightbox ── */}
+    {lightboxImg && (
+      <div
+        className="fixed inset-0 bg-black z-[210] flex flex-col"
+        onClick={() => showGallery ? setLightboxImg(null) : closeAll()}
+      >
+        <div className="flex items-center justify-end px-5 h-12 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={showGallery ? () => setLightboxImg(null) : closeAndNavigate}
+            className="text-white hover:text-[#C9B99A] transition-colors p-1"
+          >
             <X size={24} />
           </button>
         </div>
