@@ -3,10 +3,20 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Script from 'next/script'
+import JobsModal from './JobsModal'
 
 type Lang = 'ca' | 'es' | 'en' | 'fr'
 
-const i18n = {
+type LinkItem = {
+  label: string
+  desc: string
+  href: string
+  external: boolean
+  icon: string
+  comingSoon?: boolean
+}
+
+const i18n: Record<Lang, { sections: { section: string; items: LinkItem[] }[] }> = {
   ca: {
     sections: [
       {
@@ -20,10 +30,11 @@ const i18n = {
       {
         section: 'El que fem',
         items: [
-          { label: 'Propietats',         desc: 'Cases de veritat, per a persones de veritat', href: '/propiedades',   external: false, icon: 'props'   },
-          { label: 'Vull vendre casa meva', desc: "Et diem el que val. Sense embuts.",          href: '/valoracion',   external: false, icon: 'sell'    },
-          { label: 'Com som',            desc: 'Per què fem les coses diferent',               href: '/quienes-somos',external: false, icon: 'work'    },
-          { label: 'Parlem',             desc: 'Sense compromís. De veritat.',                 href: '/contacto',     external: false, icon: 'contact' },
+          { label: 'Propietats',            desc: 'Cases de veritat, per a persones de veritat', href: '/propiedades',    external: false, icon: 'props'   },
+          { label: 'Vull vendre casa meva', desc: "Et diem el que val. Sense embuts.",            href: '/valoracion',    external: false, icon: 'sell'    },
+          { label: 'Com som',               desc: 'Per què fem les coses diferent',               href: '/quienes-somos', external: false, icon: 'work'    },
+          { label: 'Parlem',                desc: 'Sense compromís. De veritat.',                 href: '/contacto',      external: false, icon: 'contact' },
+          { label: 'Treballa amb nosaltres',desc: 'Potser ets tu qui busquem',                    href: '',               external: false, icon: 'jobs', comingSoon: true },
         ],
       },
     ],
@@ -41,10 +52,11 @@ const i18n = {
       {
         section: 'Lo que hacemos',
         items: [
-          { label: 'Propiedades',        desc: 'Casas de verdad, para personas de verdad',   href: '/propiedades',   external: false, icon: 'props'   },
-          { label: 'Quiero vender mi casa', desc: 'Te decimos lo que vale. Sin rodeos.',     href: '/valoracion',   external: false, icon: 'sell'    },
-          { label: 'Cómo somos',         desc: 'Por qué hacemos esto diferente',             href: '/quienes-somos',external: false, icon: 'work'    },
-          { label: 'Hablamos',           desc: 'Sin compromiso. En serio.',                  href: '/contacto',     external: false, icon: 'contact' },
+          { label: 'Propiedades',           desc: 'Casas de verdad, para personas de verdad',   href: '/propiedades',    external: false, icon: 'props'   },
+          { label: 'Quiero vender mi casa', desc: 'Te decimos lo que vale. Sin rodeos.',         href: '/valoracion',    external: false, icon: 'sell'    },
+          { label: 'Cómo somos',            desc: 'Por qué hacemos esto diferente',             href: '/quienes-somos', external: false, icon: 'work'    },
+          { label: 'Hablamos',              desc: 'Sin compromiso. En serio.',                  href: '/contacto',      external: false, icon: 'contact' },
+          { label: 'Trabaja con nosotros',  desc: 'Quizás eres tú quien buscamos',              href: '',               external: false, icon: 'jobs', comingSoon: true },
         ],
       },
     ],
@@ -62,10 +74,11 @@ const i18n = {
       {
         section: 'What we do',
         items: [
-          { label: 'Properties',         desc: 'Real homes, for real people',                href: '/propiedades',   external: false, icon: 'props'   },
-          { label: 'I want to sell',     desc: "We tell you what it's worth. No nonsense.",  href: '/valoracion',   external: false, icon: 'sell'    },
-          { label: 'Who we are',         desc: 'Why we do things differently',               href: '/quienes-somos',external: false, icon: 'work'    },
-          { label: "Let's talk",         desc: 'No commitment. Seriously.',                  href: '/contacto',     external: false, icon: 'contact' },
+          { label: 'Properties',         desc: 'Real homes, for real people',                href: '/propiedades',    external: false, icon: 'props'   },
+          { label: 'I want to sell',     desc: "We tell you what it's worth. No nonsense.",  href: '/valoracion',    external: false, icon: 'sell'    },
+          { label: 'Who we are',         desc: 'Why we do things differently',               href: '/quienes-somos', external: false, icon: 'work'    },
+          { label: "Let's talk",         desc: 'No commitment. Seriously.',                  href: '/contacto',      external: false, icon: 'contact' },
+          { label: 'Work with us',       desc: 'Maybe you\'re who we\'re looking for',       href: '',               external: false, icon: 'jobs', comingSoon: true },
         ],
       },
     ],
@@ -83,10 +96,11 @@ const i18n = {
       {
         section: 'Ce que nous faisons',
         items: [
-          { label: 'Propriétés',         desc: 'Vraies maisons, pour de vraies personnes',  href: '/propiedades',   external: false, icon: 'props'   },
-          { label: 'Je veux vendre',     desc: 'On vous dit ce que ça vaut. Sans détour.',  href: '/valoracion',   external: false, icon: 'sell'    },
-          { label: 'Qui sommes-nous',    desc: 'Pourquoi nous faisons les choses autrement',href: '/quienes-somos',external: false, icon: 'work'    },
-          { label: 'Parlons',            desc: 'Sans engagement. Vraiment.',                href: '/contacto',     external: false, icon: 'contact' },
+          { label: 'Propriétés',         desc: 'Vraies maisons, pour de vraies personnes',  href: '/propiedades',    external: false, icon: 'props'   },
+          { label: 'Je veux vendre',     desc: 'On vous dit ce que ça vaut. Sans détour.',  href: '/valoracion',    external: false, icon: 'sell'    },
+          { label: 'Qui sommes-nous',    desc: 'Pourquoi nous faisons les choses autrement',href: '/quienes-somos', external: false, icon: 'work'    },
+          { label: 'Parlons',            desc: 'Sans engagement. Vraiment.',                href: '/contacto',      external: false, icon: 'contact' },
+          { label: 'Travailler avec nous',desc: 'Peut-être êtes-vous qui nous cherchons',   href: '',               external: false, icon: 'jobs', comingSoon: true },
         ],
       },
     ],
@@ -101,6 +115,7 @@ const iconStyles: Record<string, { bg: string; color: string }> = {
   sell:    { bg: '#fff8e1', color: '#f57f17' },
   work:    { bg: '#e8eaf6', color: '#283593' },
   contact: { bg: '#fbe9e7', color: '#bf360c' },
+  jobs:    { bg: '#f0fdf4', color: '#166534' },
 }
 
 const iconSvgs: Record<string, React.ReactNode> = {
@@ -147,6 +162,14 @@ const iconSvgs: Record<string, React.ReactNode> = {
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 5.61 5.61l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
     </svg>
   ),
+  jobs: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      <line x1="12" y1="12" x2="12" y2="16"/>
+      <line x1="10" y1="14" x2="14" y2="14"/>
+    </svg>
+  ),
 }
 
 const ArrowRight = () => (
@@ -171,9 +194,9 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
 export default function LinksClient() {
   const [lang, setLang] = useState<Lang>('ca')
+  const [jobsOpen, setJobsOpen] = useState(false)
   const { sections } = i18n[lang]
 
-  // Track page view on mount (GA4 + server-side)
   useEffect(() => {
     if (GA_ID && window.gtag) {
       window.gtag('event', 'page_view', { page_location: window.location.href, page_title: 'Links' })
@@ -186,15 +209,18 @@ export default function LinksClient() {
   }, [])
 
   const trackClick = useCallback((label: string, href: string, iconKey: string) => {
-    // GA4
     window.gtag?.('event', 'links_click', { link_label: label, link_url: href })
-    // Server-side (stable key, independent of language)
     fetch('/api/links-track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'click', key: iconKey }),
     }).catch(() => {})
   }, [])
+
+  const handleJobsClick = useCallback((label: string, iconKey: string) => {
+    trackClick(label, '', iconKey)
+    setJobsOpen(true)
+  }, [trackClick])
 
   return (
     <>
@@ -241,6 +267,31 @@ export default function LinksClient() {
             </p>
             {group.items.map((item) => {
               const style = iconStyles[item.icon]
+
+              if (item.comingSoon) {
+                return (
+                  <button
+                    key={item.icon}
+                    onClick={() => handleJobsClick(item.label, item.icon)}
+                    className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors text-left group"
+                  >
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: style.bg, color: style.color }}
+                    >
+                      {iconSvgs[item.icon]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-neutral-100 leading-tight">{item.label}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5 leading-tight">{item.desc}</p>
+                    </div>
+                    <span className="text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0">
+                      <ArrowRight />
+                    </span>
+                  </button>
+                )
+              }
+
               return (
                 <a
                   key={item.icon}
@@ -275,6 +326,8 @@ export default function LinksClient() {
         </div>
       </div>
     </main>
+
+    <JobsModal open={jobsOpen} onClose={() => setJobsOpen(false)} lang={lang} />
     </>
   )
 }
