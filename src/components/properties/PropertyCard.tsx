@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { memo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutGrid, Play, RotateCcw, Globe, Images, Share2, X } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, LayoutDashboard, Play, RotateCcw, Globe, Images, Share2, X } from "lucide-react";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
@@ -166,7 +166,7 @@ function PropertyCard({ property, priority = false }: Props) {
               className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
               title="Ver plano"
             >
-              <LayoutGrid size={13} />
+              <LayoutDashboard size={13} />
             </button>
           )}
           {hasVideo && (
