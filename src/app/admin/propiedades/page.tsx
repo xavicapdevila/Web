@@ -14,6 +14,7 @@ interface PropRow {
   precio:         number;
   ciudad:         string | null;
   zona:           string | null;
+  direccion:      string | null;
   habitaciones:   number | null;
   banos:          number | null;
   m2_construidos: number | null;
@@ -32,7 +33,7 @@ async function getProperties(): Promise<PropRow[]> {
     return db
       .prepare(
         `SELECT ref, slug, titulo, tipo, subtipo, operacion, precio,
-                ciudad, zona, habitaciones, banos, m2_construidos,
+                ciudad, zona, direccion, habitaciones, banos, m2_construidos,
                 estado_ficha, imagenes, plano_pins, fecha, fechaact
          FROM properties
          ORDER BY fecha DESC`

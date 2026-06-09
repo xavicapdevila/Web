@@ -172,6 +172,8 @@ export async function fetchAndParseXML(): Promise<Property[]> {
       const cp = safeText(item["cp"] ?? "");
       const zona = safeText(item["zona"] ?? "");
       const direccion = safeText(item["direccion"] ?? "");
+      const latitud  = safeNum(item["latitud"]  ?? 0);
+      const longitud = safeNum(item["altitud"]  ?? 0); // XML uses "altitud" for longitude
 
       // Title: titulo1 (CDATA)
       const titulo = safeText(
@@ -295,6 +297,8 @@ export async function fetchAndParseXML(): Promise<Property[]> {
         cp: cp || undefined,
         zona: zona || undefined,
         direccion: direccion || undefined,
+        latitud:  latitud  > 0 ? latitud  : undefined,
+        longitud: longitud > 0 ? longitud : undefined,
         habitaciones: habitaciones || undefined,
         banos: banos || undefined,
         m2Construidos: m2Construidos || undefined,

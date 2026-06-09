@@ -29,6 +29,8 @@ export interface Property {
   cp?: string;
   zona?: string;
   direccion?: string;
+  latitud?: number;
+  longitud?: number;
   habitaciones?: number;
   banos?: number;
   m2Construidos?: number;

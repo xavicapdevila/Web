@@ -415,6 +415,9 @@ async function syncFromXml(): Promise<SyncResult> {
     "INSERT INTO sync_log (properties_added, properties_updated, properties_removed, status, source) VALUES (?, ?, ?, 'ok', 'xml')"
   ).run(added, updated, removed);
 
+  // Geocode properties that have coordinates but no address yet
+  await geocodeNewAddresses(db, properties);
+
   // Revalidate the Vercel Data Cache so detail pages pick up the new data
   try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
 
@@ -422,6 +425,58 @@ async function syncFromXml(): Promise<SyncResult> {
   await persistDbToBlob();
 
   return { added, updated, removed, total: properties.length, source: "xml" };
+}
+
+// ---------------------------------------------------------------------------
+// Geocoding — Nominatim (OpenStreetMap) reverse geocoding
+// Fills in the direccion column for properties with coordinates but no address.
+// Rate limit: 1 request/second per Nominatim usage policy.
+// Only runs for properties that don't already have a direccion.
+// ---------------------------------------------------------------------------
+
+async function geocodeNewAddresses(
+  db: ReturnType<typeof getDb>,
+  properties: Property[]
+): Promise<void> {
+  try {
+    // Find refs that still have no direccion in the DB
+    const missing = new Set(
+      (db.prepare("SELECT ref FROM properties WHERE direccion IS NULL OR direccion = ''")
+        .all() as { ref: string }[]).map((r) => r.ref)
+    );
+
+    const toGeocode = properties.filter(
+      (p) => missing.has(p.ref) && p.latitud && p.longitud
+    );
+
+    if (toGeocode.length === 0) return;
+
+    const updateStmt = db.prepare("UPDATE properties SET direccion = ? WHERE ref = ?");
+
+    for (const prop of toGeocode) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${prop.latitud}&lon=${prop.longitud}&format=json&addressdetails=1`;
+        const res = await fetch(url, {
+          headers: { "User-Agent": "TheVilaHome/1.0 (x.capdevila@thevilahome.com)" },
+        });
+        if (res.ok) {
+          const data = await res.json() as { address?: Record<string, string> };
+          const addr = data.address ?? {};
+          const road   = addr.road ?? addr.street ?? "";
+          const number = addr.house_number ?? "";
+          const town   = addr.town ?? addr.city ?? addr.village ?? addr.municipality ?? "";
+          const parts  = [road, number].filter(Boolean).join(", ");
+          const formatted = [parts, town].filter(Boolean).join(", ");
+          if (formatted) {
+            updateStmt.run(formatted, prop.ref);
+          }
+        }
+      } catch { /* non-fatal per-property error */ }
+
+      // Nominatim: max 1 request per second
+      await new Promise((r) => setTimeout(r, 1100));
+    }
+  } catch { /* non-fatal — geocoding is best-effort */ }
 }
 
 // ---------------------------------------------------------------------------
