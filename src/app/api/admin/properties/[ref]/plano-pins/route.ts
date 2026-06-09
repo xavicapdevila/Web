@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { revalidateTag } from "next/cache";
+import { getDb, persistDbToBlob } from "@/lib/db";
 import type { FloorPlanPin } from "@/types/property";
 
 type Ctx = { params: Promise<{ ref: string }> };
@@ -32,6 +33,12 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
       .run(JSON.stringify(pins), ref);
 
     if (result.changes === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    // Persist to Blob so other Lambda instances (public pages) can read the pins
+    await persistDbToBlob();
+    // Invalidate the Vercel Data Cache so the property page picks up the new pins
+    try { revalidateTag("properties", "default"); } catch { /* non-fatal in local dev */ }
+
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
