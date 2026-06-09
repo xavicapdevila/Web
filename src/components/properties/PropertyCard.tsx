@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { memo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BedDouble, Bath, Maximize2, Phone, Mail, Play, RotateCcw, Globe, Images, Share2, X } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Clapperboard, RotateCcw, Globe, Compass, Camera, Share2, X } from "lucide-react";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
@@ -156,7 +156,7 @@ function PropertyCard({ property, priority = false }: Props) {
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10 pointer-events-none">
           {property.imagenes.length > 0 && (
             <span className="flex items-center gap-1 h-7 px-2 bg-black/75 backdrop-blur-sm text-white text-xs" title={`${property.imagenes.length} fotos`}>
-              <Images size={12} />
+              <Camera size={12} />
               {property.imagenes.length}
             </span>
           )}
@@ -179,16 +179,16 @@ function PropertyCard({ property, priority = false }: Props) {
               className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
               title="Ver vídeo"
             >
-              <Play size={13} />
+              <Clapperboard size={13} />
             </button>
           )}
           {has360 && (
             <button
               onClick={handle360Click}
-              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
+              className="pointer-events-auto h-7 px-2 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:text-black transition-colors"
               title="Ver 360°"
             >
-              <RotateCcw size={13} />
+              360°
             </button>
           )}
           {hasTour && (
@@ -197,7 +197,7 @@ function PropertyCard({ property, priority = false }: Props) {
               className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
               title="Ver tour virtual"
             >
-              <Globe size={13} />
+              <Compass size={13} />
             </button>
           )}
         </div>
