@@ -87,7 +87,7 @@ export default function PlanoEditor({ ref_, titulo, planoUrl, imagenes, initialP
         body: JSON.stringify({ pins }),
       });
       setSavedOk(true);
-      setTimeout(() => setSavedOk(false), 2000);
+      setTimeout(() => router.push("/admin/propiedades"), 800);
     } finally {
       setSaving(false);
     }
