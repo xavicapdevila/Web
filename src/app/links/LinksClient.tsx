@@ -173,14 +173,27 @@ export default function LinksClient() {
   const [lang, setLang] = useState<Lang>('ca')
   const { sections } = i18n[lang]
 
-  // Track page view on mount
+  // Track page view on mount (GA4 + server-side)
   useEffect(() => {
-    if (!GA_ID || !window.gtag) return
-    window.gtag('event', 'page_view', { page_location: window.location.href, page_title: 'Links' })
+    if (GA_ID && window.gtag) {
+      window.gtag('event', 'page_view', { page_location: window.location.href, page_title: 'Links' })
+    }
+    fetch('/api/links-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'pageview' }),
+    }).catch(() => {})
   }, [])
 
-  const trackClick = useCallback((label: string, href: string) => {
+  const trackClick = useCallback((label: string, href: string, iconKey: string) => {
+    // GA4
     window.gtag?.('event', 'links_click', { link_label: label, link_url: href })
+    // Server-side (stable key, independent of language)
+    fetch('/api/links-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'click', key: iconKey }),
+    }).catch(() => {})
   }, [])
 
   return (
@@ -233,7 +246,7 @@ export default function LinksClient() {
                   key={item.icon}
                   href={item.href}
                   target="_blank" rel="noopener noreferrer"
-                  onClick={() => trackClick(item.label, item.href)}
+                  onClick={() => trackClick(item.label, item.href, item.icon)}
                   className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors no-underline text-inherit group"
                 >
                   <div
