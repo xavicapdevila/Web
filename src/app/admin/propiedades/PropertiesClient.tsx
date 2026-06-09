@@ -14,6 +14,8 @@ interface PropRow {
   operacion:      string;
   precio:         number;
   ciudad:         string | null;
+  zona:           string | null;
+  direccion:      string | null;
   habitaciones:   number | null;
   banos:          number | null;
   m2_construidos: number | null;
@@ -218,7 +220,12 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                     {/* Title */}
                     <td className="px-4 py-3 max-w-xs">
                       <p className="text-white leading-snug line-clamp-1">{row.titulo}</p>
-                      <p className="text-[#333] font-mono mt-0.5">
+                      {(row.direccion || row.zona) && (
+                        <p className="text-[#555] text-[11px] mt-0.5 line-clamp-1">
+                          {[row.direccion, row.zona].filter(Boolean).join(" · ")}
+                        </p>
+                      )}
+                      <p className="text-[#333] font-mono text-[10px] mt-0.5">
                         {row.habitaciones ? `${row.habitaciones} hab · ` : ""}
                         {row.m2_construidos ? `${row.m2_construidos} m²` : ""}
                       </p>
