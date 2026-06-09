@@ -222,13 +222,6 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                       <p className="text-white leading-snug line-clamp-1">
                         {[row.direccion, row.ciudad].filter(Boolean).join(", ") || row.titulo}
                       </p>
-                      {row.zona && (
-                        <p className="text-[#555] text-[11px] mt-0.5 line-clamp-1">{row.zona}</p>
-                      )}
-                      <p className="text-[#333] font-mono text-[10px] mt-0.5">
-                        {row.habitaciones ? `${row.habitaciones} hab · ` : ""}
-                        {row.m2_construidos ? `${row.m2_construidos} m²` : ""}
-                      </p>
                     </td>
 
                     {/* Type */}
