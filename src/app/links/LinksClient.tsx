@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import Script from 'next/script'
 
 type Lang = 'ca' | 'es' | 'en' | 'fr'
 
@@ -162,11 +163,39 @@ const LANGS: { code: Lang; label: string }[] = [
   { code: 'fr', label: 'FR' },
 ]
 
+declare global {
+  interface Window { gtag?: (...args: unknown[]) => void }
+}
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
+
 export default function LinksClient() {
   const [lang, setLang] = useState<Lang>('ca')
   const { sections } = i18n[lang]
 
+  // Track page view on mount
+  useEffect(() => {
+    if (!GA_ID || !window.gtag) return
+    window.gtag('event', 'page_view', { page_location: window.location.href, page_title: 'Links' })
+  }, [])
+
+  const trackClick = useCallback((label: string, href: string) => {
+    window.gtag?.('event', 'links_click', { link_label: label, link_url: href })
+  }, [])
+
   return (
+    <>
+      {GA_ID && (
+        <>
+          <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
+          <Script id="ga-init" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}', { page_path: '/links' });
+          `}</Script>
+        </>
+      )}
     <main className="min-h-screen bg-[#0a0a0a]">
       <div className="mx-auto max-w-[480px] px-4 py-10">
 
@@ -204,6 +233,7 @@ export default function LinksClient() {
                   key={item.icon}
                   href={item.href}
                   target="_blank" rel="noopener noreferrer"
+                  onClick={() => trackClick(item.label, item.href)}
                   className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors no-underline text-inherit group"
                 >
                   <div
@@ -232,5 +262,6 @@ export default function LinksClient() {
         </div>
       </div>
     </main>
+    </>
   )
 }
