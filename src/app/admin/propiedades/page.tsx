@@ -1,4 +1,4 @@
-import { getDb } from "@/lib/db";
+import { getDb, initDbFromBlob } from "@/lib/db";
 import PropertiesClient from "./PropertiesClient";
 
 export const metadata = { title: "Propiedades — Admin · The Vila Home" };
@@ -14,7 +14,6 @@ interface PropRow {
   precio:         number;
   ciudad:         string | null;
   zona:           string | null;
-  direccion:      string | null;
   habitaciones:   number | null;
   banos:          number | null;
   m2_construidos: number | null;
@@ -25,13 +24,15 @@ interface PropRow {
   fechaact:       string | null;
 }
 
-function getProperties(): PropRow[] {
+async function getProperties(): Promise<PropRow[]> {
+  // Restore DB from Blob on cold-start Vercel containers
+  await initDbFromBlob();
   try {
     const db = getDb();
     return db
       .prepare(
         `SELECT ref, slug, titulo, tipo, subtipo, operacion, precio,
-                ciudad, zona, direccion, habitaciones, banos, m2_construidos,
+                ciudad, zona, habitaciones, banos, m2_construidos,
                 estado_ficha, imagenes, plano_pins, fecha, fechaact
          FROM properties
          ORDER BY fecha DESC`
@@ -42,7 +43,7 @@ function getProperties(): PropRow[] {
   }
 }
 
-export default function AdminPropertiesPage() {
-  const rows = getProperties();
+export default async function AdminPropertiesPage() {
+  const rows = await getProperties();
   return <PropertiesClient rows={rows} />;
 }
