@@ -124,6 +124,7 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") ?? "";
   const isAdmin = pathname.startsWith("/admin");
+  const isStandalone = pathname.startsWith("/links");
 
   return (
     <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>
@@ -131,7 +132,7 @@ export default async function RootLayout({
         {/* GA is loaded conditionally by CookieConsentProvider once analytics consent is given */}
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
-        {isAdmin ? (
+        {isAdmin || isStandalone ? (
           // Admin routes: no public chrome
           <>{children}</>
         ) : (

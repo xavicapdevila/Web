@@ -167,7 +167,7 @@ export default function LinksClient() {
   const { sections } = i18n[lang]
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] pt-20">
+    <main className="min-h-screen bg-[#0a0a0a]">
       <div className="mx-auto max-w-[480px] px-4 py-10">
 
         <div className="flex flex-col items-center mb-10">
@@ -203,7 +203,7 @@ export default function LinksClient() {
                 <a
                   key={item.icon}
                   href={item.href}
-                  {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  target="_blank" rel="noopener noreferrer"
                   className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors no-underline text-inherit group"
                 >
                   <div
