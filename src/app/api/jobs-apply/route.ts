@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import Anthropic from '@anthropic-ai/sdk'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
+const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]) // %PDF
 
 export async function POST(request: Request) {
   try {
@@ -24,6 +26,45 @@ export async function POST(request: Request) {
     const buffer   = Buffer.from(await cv.arrayBuffer())
     const filename = cv.name || `cv-${name.replace(/\s+/g, '-').toLowerCase()}.pdf`
 
+    // ── 1. Magic bytes — verify it's a real PDF ──────────────────────────────
+    const magic = buffer.slice(0, 4)
+    if (!magic.equals(PDF_MAGIC)) {
+      return NextResponse.json({ error: 'invalid_pdf' }, { status: 400 })
+    }
+
+    // ── 2. CV validation with Claude (only if API key is configured) ─────────
+    if (process.env.ANTHROPIC_API_KEY) {
+      const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+      const base64    = buffer.toString('base64')
+
+      const response = await anthropic.messages.create({
+        model:      'claude-haiku-4-5',
+        max_tokens: 50,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type:   'document',
+              source: { type: 'base64', media_type: 'application/pdf', data: base64 },
+            },
+            {
+              type: 'text',
+              text: 'Does this document look like a CV or resume? Reply with only YES or NO.',
+            },
+          ],
+        }],
+      })
+
+      const answer = response.content[0].type === 'text'
+        ? response.content[0].text.trim().toUpperCase()
+        : ''
+
+      if (!answer.includes('YES')) {
+        return NextResponse.json({ error: 'not_a_cv' }, { status: 400 })
+      }
+    }
+
+    // ── 3. Send email with CV attached ───────────────────────────────────────
     const resend = new Resend(process.env.RESEND_API_KEY)
 
     await resend.emails.send({

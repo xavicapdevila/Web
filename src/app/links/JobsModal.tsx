@@ -19,6 +19,7 @@ const i18n: Record<Lang, {
   submit: string; sending: string
   success: string; successSub: string
   errorGeneral: string; errorPdfOnly: string; errorTooLarge: string
+  errorInvalidPdf: string; errorNotACv: string
 }> = {
   ca: {
     title:           "Treballa amb nosaltres",
@@ -39,6 +40,8 @@ const i18n: Record<Lang, {
     errorGeneral:    "Alguna cosa ha fallat. Torna-ho a intentar.",
     errorPdfOnly:    "Només s'accepten fitxers PDF.",
     errorTooLarge:   "El fitxer supera els 2 MB.",
+    errorInvalidPdf: "El fitxer no és un PDF vàlid.",
+    errorNotACv:     "El document no sembla un CV. Comprova que has adjuntat el fitxer correcte.",
   },
   es: {
     title:           "Trabaja con nosotros",
@@ -59,6 +62,8 @@ const i18n: Record<Lang, {
     errorGeneral:    "Algo ha fallado. Inténtalo de nuevo.",
     errorPdfOnly:    "Solo se aceptan archivos PDF.",
     errorTooLarge:   "El archivo supera los 2 MB.",
+    errorInvalidPdf: "El archivo no es un PDF válido.",
+    errorNotACv:     "El documento no parece un CV. Comprueba que has adjuntado el archivo correcto.",
   },
   en: {
     title:           "Work with us",
@@ -79,6 +84,8 @@ const i18n: Record<Lang, {
     errorGeneral:    "Something went wrong. Please try again.",
     errorPdfOnly:    "Only PDF files are accepted.",
     errorTooLarge:   "File exceeds 2 MB.",
+    errorInvalidPdf: "The file is not a valid PDF.",
+    errorNotACv:     "The document doesn't look like a CV. Please check you've attached the right file.",
   },
   fr: {
     title:           "Travailler avec nous",
@@ -99,6 +106,8 @@ const i18n: Record<Lang, {
     errorGeneral:    "Une erreur s'est produite. Réessayez.",
     errorPdfOnly:    "Seuls les fichiers PDF sont acceptés.",
     errorTooLarge:   "Le fichier dépasse 2 Mo.",
+    errorInvalidPdf: "Le fichier n'est pas un PDF valide.",
+    errorNotACv:     "Le document ne ressemble pas à un CV. Vérifiez que vous avez joint le bon fichier.",
   },
 }
 
@@ -157,8 +166,17 @@ export default function JobsModal({ open, onClose, lang }: Props) {
     fd.append('cv',      file)
 
     try {
-      const res = await fetch('/api/jobs-apply', { method: 'POST', body: fd })
-      if (!res.ok) throw new Error(await res.text())
+      const res  = await fetch('/api/jobs-apply', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) {
+        const msg =
+          json.error === 'invalid_pdf' ? t.errorInvalidPdf :
+          json.error === 'not_a_cv'    ? t.errorNotACv     :
+          t.errorGeneral
+        setStatus('error')
+        setErrorMsg(msg)
+        return
+      }
       setStatus('success')
     } catch {
       setStatus('error')
