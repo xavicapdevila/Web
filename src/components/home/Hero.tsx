@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowDown } from "lucide-react";
@@ -8,25 +7,7 @@ import CountUp from "@/components/ui/CountUp";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function Hero() {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const ctaRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-
-  useEffect(() => {
-    const els = [titleRef, ctaRef, statsRef];
-    els.forEach((ref, i) => {
-      const el = ref.current;
-      if (!el) return;
-      el.style.opacity = "0";
-      el.style.transform = "translateY(24px)";
-      setTimeout(() => {
-        el.style.transition = "opacity 0.9s ease, transform 0.9s ease";
-        el.style.opacity = "1";
-        el.style.transform = "translateY(0)";
-      }, 200 + i * 160);
-    });
-  }, []);
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
@@ -53,21 +34,19 @@ export default function Hero() {
       {/* Content — left-aligned */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 lg:px-10 pt-24 pb-28">
         <div className="max-w-2xl">
-          <h1 className="sr-only">
-            Inmobiliaria en Vilanova i la Geltrú — The Vila Home
-          </h1>
-          <h2
-            ref={titleRef}
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-10"
+          <h1
+            className="font-display text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-10 animate-fade-up"
+            style={{ animationDelay: "200ms", animationFillMode: "both" }}
           >
             <span className="text-white">Human</span>
             <br />
             <span className="text-[#C9B99A] italic">Real Estate</span>
-          </h2>
+            <span className="sr-only"> — Inmobiliaria en Vilanova i la Geltrú</span>
+          </h1>
 
           <div
-            ref={ctaRef}
-            className="flex flex-col sm:flex-row items-start gap-4"
+            className="flex flex-col sm:flex-row items-start gap-4 animate-fade-up"
+            style={{ animationDelay: "360ms", animationFillMode: "both" }}
           >
             <Link
               href="/propiedades"
@@ -85,8 +64,8 @@ export default function Hero() {
 
           {/* Stats */}
           <div
-            ref={statsRef}
-            className="flex items-center gap-12 mt-14 pt-8 border-t border-white/15"
+            className="flex items-center gap-12 mt-14 pt-8 border-t border-white/15 animate-fade-up"
+            style={{ animationDelay: "520ms", animationFillMode: "both" }}
           >
             <div>
               <div className="font-display text-3xl text-[#C9B99A]">

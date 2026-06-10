@@ -1,11 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+ poweredByHeader: false,
+ reactStrictMode: true,
+
  serverExternalPackages: ["better-sqlite3", "sharp"],
+
+ experimental: {
+   optimizePackageImports: ["lucide-react", "framer-motion"],
+ },
 
  images: {
    formats: ["image/avif", "image/webp"],
-   minimumCacheTTL: 86400,
+   minimumCacheTTL: 604800, // 7 days — property images rarely change
    remotePatterns: [
      { protocol: "https", hostname: "**" },
      { protocol: "http",  hostname: "**" },

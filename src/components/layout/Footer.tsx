@@ -95,9 +95,10 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { href: "/zona/vilanova",          label: "Vilanova i la Geltrú" },
-                { href: "/zona/sitges",            label: "Sitges" },
-                { href: "/zona/cubelles",          label: "Cubelles" },
-                { href: "/zona/sant-pere-de-ribes",label: "Sant Pere de Ribes" },
+                { href: "/zona/cunit",             label: "Cunit" },
+                { href: "/zona/canyelles",         label: "Canyelles" },
+                { href: "/zona/olivella",          label: "Olivella" },
+                { href: "/zona/vilafranca",        label: "Vilafranca del Penedès" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors">

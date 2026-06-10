@@ -129,7 +129,11 @@ export default async function RootLayout({
   return (
     <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>
       <head>
-        {/* GA is loaded conditionally by CookieConsentProvider once analytics consent is given */}
+        {/* Preconnect to external origins used on every page */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
         {isAdmin || isStandalone ? (

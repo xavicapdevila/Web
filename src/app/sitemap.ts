@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { getCachedSlugs } from "@/lib/sync";
 import { getBlogPosts } from "@/lib/blog";
 
-// Force dynamic so sitemap reflects new blog posts and properties without a redeploy
-export const dynamic = "force-dynamic";
+// Revalidate every 6 hours so the sitemap reflects new content without a full redeploy
+export const revalidate = 21600;
 
 const BASE_URL = "https://www.thevilahome.com";
 

@@ -93,6 +93,45 @@ const schemaRealEstateAgent = {
   // aggregateRating injected at runtime from Google Places API
 };
 
+const schemaFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "¿Cuánto cuesta una inmobiliaria en Vilanova i la Geltrú?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Los honorarios estándar de una inmobiliaria en Vilanova i la Geltrú oscilan entre el 3% y el 5% del precio de venta. En The Vila Home trabajamos con condiciones claras y transparentes, acordadas antes de empezar. Consulta sin compromiso.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cuánto tiempo tarda en venderse un piso en Vilanova?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Con una valoración correcta y buena presentación, la mayoría de propiedades se venden en 60–90 días en Vilanova i la Geltrú. Las viviendas bien ubicadas y a precio de mercado pueden cerrarse en menos de 30 días.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué zonas cubre The Vila Home?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The Vila Home opera principalmente en Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit y toda la comarca del Garraf. También trabajamos en el Penedès, especialmente en Vilafranca del Penedès.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cómo valoro mi casa gratis en Vilanova?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Puedes solicitar una valoración gratuita de tu propiedad en Vilanova a través del formulario de valoración de nuestra web. Respondemos en menos de 24 horas con una estimación real basada en el mercado actual.",
+      },
+    },
+  ],
+};
+
 export default async function HomePage() {
   const [placeData] = await Promise.all([
     getGooglePlaceData(),
@@ -128,6 +167,11 @@ export default async function HomePage() {
         id="schema-real-estate-agent"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <Script
+        id="schema-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFaq) }}
       />
       <Hero />
       <HowWeWork />
