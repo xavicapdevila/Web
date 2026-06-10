@@ -124,7 +124,7 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") ?? "";
   const isAdmin = pathname.startsWith("/admin");
-  const isStandalone = pathname.startsWith("/links");
+  const isStandalone = pathname.startsWith("/links") || pathname.startsWith("/trabaja");
 
   return (
     <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>

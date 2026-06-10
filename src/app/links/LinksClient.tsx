@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Script from 'next/script'
 import JobsModal from './JobsModal'
@@ -194,7 +195,8 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
 export default function LinksClient() {
   const [lang, setLang] = useState<Lang>('ca')
-  const [jobsOpen, setJobsOpen] = useState(false)
+  const params = useSearchParams()
+  const [jobsOpen, setJobsOpen] = useState(() => params.get('jobs') === '1')
   const { sections } = i18n[lang]
 
   useEffect(() => {
