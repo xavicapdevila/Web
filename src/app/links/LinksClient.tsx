@@ -193,10 +193,10 @@ declare global {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
-export default function LinksClient() {
+export default function LinksClient({ defaultJobsOpen = false }: { defaultJobsOpen?: boolean }) {
   const [lang, setLang] = useState<Lang>('ca')
   const params = useSearchParams()
-  const [jobsOpen, setJobsOpen] = useState(() => params.get('jobs') === '1')
+  const [jobsOpen, setJobsOpen] = useState(() => defaultJobsOpen || params.get('jobs') === '1')
   const { sections } = i18n[lang]
 
   useEffect(() => {
