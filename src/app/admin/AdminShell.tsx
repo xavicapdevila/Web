@@ -53,6 +53,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [showModal,  setShowModal]  = useState(false);
   const [resolving,  setResolving]  = useState<number | null>(null); // id being resolved
   const [activeCard, setActiveCard] = useState<number | null>(null); // which card is expanded
+  const [resolveErr, setResolveErr] = useState<string | null>(null);
 
   const fetchPendientes = useCallback(async () => {
     try {
@@ -67,6 +68,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
   async function handleResolve(id: number, accion: string) {
     setResolving(id);
+    setResolveErr(null);
     try {
       const res = await fetch(`/api/admin/pendientes/${id}`, {
         method:  "PATCH",
@@ -77,8 +79,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         setPendientes(prev => prev.filter(p => p.id !== id));
         setActiveCard(null);
         router.refresh();
+      } else {
+        const data = await res.json().catch(() => null);
+        setResolveErr(data?.error ?? `Error al guardar (${res.status}). Inténtalo de nuevo.`);
       }
-    } catch { /* non-fatal */ } finally {
+    } catch {
+      setResolveErr("Error de conexión. Inténtalo de nuevo.");
+    } finally {
       setResolving(null);
     }
   }
@@ -262,6 +269,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                       {/* Action selector */}
                       {activeCard === p.id ? (
                         <div className="space-y-2">
+                          {resolveErr && (
+                            <p className="text-red-400 text-xs bg-red-900/20 border border-red-900/40 px-3 py-2">
+                              {resolveErr}
+                            </p>
+                          )}
                           <p className="text-[#555] text-xs mb-3">
                             {p.tipo === "reaparicion"
                               ? "¿Quieres reactivar esta propiedad en el CRM?"

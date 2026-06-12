@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbRestored, persistDbToBlob } from "@/lib/db";
 
 function isAuth(req: NextRequest) {
   return req.cookies.get("tvh_admin")?.value === "authenticated";
@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ ref:
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const { ref } = await params;
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const property = db.prepare(`
       SELECT ref, slug, titulo, tipo, subtipo, operacion, precio, ciudad,
              habitaciones, banos, m2_construidos, imagenes, agente, agente_email
@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const { ref } = await params;
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const property = db.prepare(`SELECT ref FROM properties WHERE ref = ?`).get(ref);
     if (!property) return NextResponse.json({ error: "Propiedad no encontrada" }, { status: 404 });
 
@@ -100,6 +100,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
 
     const operacion = db.prepare(`SELECT * FROM operaciones WHERE ref = ?`).get(ref);
     const historial = db.prepare(`SELECT * FROM operaciones_historial WHERE ref = ? ORDER BY created_at DESC`).all(ref);
+
+    // Persist to Blob so the change survives container recycling
+    await persistDbToBlob();
+
     return NextResponse.json({ operacion, historial });
   } catch (e) {
     console.error(e);

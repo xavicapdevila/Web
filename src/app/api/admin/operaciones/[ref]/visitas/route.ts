@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbRestored, persistDbToBlob } from "@/lib/db";
 
 function isAuth(req: NextRequest) {
   return req.cookies.get("tvh_admin")?.value === "authenticated";
@@ -9,7 +9,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ref
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const { ref } = await params;
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const { fecha, nombre_contacto, telefono_contacto, valoracion, notas, agente } = await req.json();
     if (!fecha) return NextResponse.json({ error: "Falta fecha" }, { status: 400 });
     const result = db.prepare(`
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ ref
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(ref, fecha, nombre_contacto ?? null, telefono_contacto ?? null, valoracion ?? "neutral", notas ?? null, agente ?? null);
     const entry = db.prepare(`SELECT * FROM operaciones_visitas WHERE id = ?`).get(result.lastInsertRowid);
+    await persistDbToBlob();
     return NextResponse.json({ entry }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Error al guardar" }, { status: 500 });
@@ -27,11 +28,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ r
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   const { ref } = await params;
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Falta id" }, { status: 400 });
     db.prepare(`DELETE FROM operaciones_visitas WHERE id = ? AND ref = ?`).run(id, ref);
+    await persistDbToBlob();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Error al eliminar" }, { status: 500 });

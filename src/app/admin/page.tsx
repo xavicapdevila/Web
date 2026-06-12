@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Building2, FileText, Clock } from "lucide-react";
-import { getDb } from "@/lib/db";
+import { getDbRestored } from "@/lib/db";
 import { getAllBlogPostsAdmin } from "@/lib/blog";
 
 export const metadata = { title: "Admin — The Vila Home" };
@@ -15,9 +15,9 @@ interface SyncRow {
   source:               string;
 }
 
-function getStats() {
+async function getStats() {
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const q  = (sql: string) =>
       (db.prepare(sql).get() as { c: number }).c;
 
@@ -48,7 +48,7 @@ function relativeTime(raw: string) {
 }
 
 export default async function AdminPage() {
-  const s = getStats();
+  const s = await getStats();
   let blogCount = 0;
   try { blogCount = (await getAllBlogPostsAdmin()).length; } catch {}
 

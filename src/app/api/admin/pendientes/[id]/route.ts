@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbRestored, persistDbToBlob } from "@/lib/db";
 
 function isAuth(req: NextRequest) {
   return req.cookies.get("tvh_admin")?.value === "authenticated";
@@ -51,7 +51,7 @@ export async function PATCH(
     const { accion } = await req.json();
     if (!ACCIONES[accion]) return NextResponse.json({ error: "Acción no válida" }, { status: 400 });
 
-    const db = getDb();
+    const db = await getDbRestored();
     const pendiente = db.prepare(`SELECT * FROM operaciones_pendientes WHERE id = ?`).get(id) as
       | { ref: string; titulo: string } | undefined;
     if (!pendiente) return NextResponse.json({ error: "No encontrado" }, { status: 404 });
@@ -97,6 +97,11 @@ export async function PATCH(
     `).run(accion, id);
 
     const remaining = (db.prepare(`SELECT COUNT(*) as n FROM operaciones_pendientes WHERE resuelta = 0`).get() as { n: number }).n;
+
+    // Persist to Blob so the change survives container recycling and is
+    // visible to every other serverless instance.
+    await persistDbToBlob();
+
     return NextResponse.json({ ok: true, remaining });
   } catch (e) {
     console.error(e);

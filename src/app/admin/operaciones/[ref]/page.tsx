@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getDb } from "@/lib/db";
+import { getDbRestored } from "@/lib/db";
 import OperacionDetail from "./OperacionDetail";
 
 export const dynamic = "force-dynamic";
@@ -43,9 +43,9 @@ export interface HistorialEntry {
   descripcion: string | null; agente: string | null; created_at: string;
 }
 
-function getData(ref: string) {
+async function getData(ref: string) {
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const property = db.prepare(`
       SELECT ref, slug, titulo, tipo, subtipo, operacion, precio, ciudad,
              habitaciones, banos, m2_construidos, imagenes, agente, agente_email
@@ -72,7 +72,7 @@ function getData(ref: string) {
 
 export default async function OperacionDetailPage({ params }: { params: Promise<{ ref: string }> }) {
   const { ref } = await params;
-  const data = getData(ref);
+  const data = await getData(ref);
   if (!data) notFound();
   return <OperacionDetail {...data} />;
 }

@@ -24,6 +24,7 @@ interface PropRow {
   plano_pins:     string;
   fecha:          string;
   fechaact:       string | null;
+  estado_op:      string;
 }
 
 function formatPrice(n: number) {
@@ -194,15 +195,17 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                 const img = firstImage(row.imagenes);
                 const isActive   = row.estado_ficha === 1;
                 const isReserved = row.estado_ficha === 7;
+                // Operación cerrada en el CRM (vendida o archivada) → fila atenuada y tachada
+                const isClosed   = row.estado_op === "vendido" || row.estado_op === "archivado";
                 return (
-                  <tr key={row.ref} className="border-b border-[#111] hover:bg-[#0d0d0d] transition-colors">
+                  <tr key={row.ref} className={`border-b border-[#111] hover:bg-[#0d0d0d] transition-colors ${isClosed ? "opacity-50" : ""}`}>
                     {/* Thumbnail */}
                     <td className="pl-4 pr-2 py-3 w-12">
                       {img ? (
                         <img
                           src={img}
                           alt=""
-                          className="w-10 h-8 object-cover bg-[#111]"
+                          className={`w-10 h-8 object-cover bg-[#111] ${isClosed ? "grayscale" : ""}`}
                           loading="lazy"
                         />
                       ) : (
@@ -219,7 +222,7 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
 
                     {/* Title */}
                     <td className="px-4 py-3 max-w-xs">
-                      <p className="text-white leading-snug line-clamp-1">
+                      <p className={`leading-snug line-clamp-1 ${isClosed ? "text-[#666] line-through" : "text-white"}`}>
                         {row.direccion || [row.zona, row.ciudad].filter(Boolean).join(", ") || row.titulo}
                       </p>
                     </td>
@@ -241,19 +244,27 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                     </td>
 
                     {/* Price */}
-                    <td className="px-4 py-3 text-white whitespace-nowrap font-mono">
+                    <td className={`px-4 py-3 whitespace-nowrap font-mono ${isClosed ? "text-[#666] line-through" : "text-white"}`}>
                       {formatPrice(row.precio)}
                     </td>
 
                     {/* City */}
                     <td className="px-4 py-3 text-[#666]">{row.ciudad ?? "—"}</td>
 
-                    {/* Status */}
+                    {/* Status — CRM estado takes precedence over feed estado */}
                     <td className="px-4 py-3">
-                      {isActive   && <span className="text-emerald-400 text-xs">● Activo</span>}
-                      {isReserved && <span className="text-amber-400  text-xs">● Reservado</span>}
-                      {!isActive && !isReserved && (
-                        <span className="text-[#444] text-xs">● Inactivo</span>
+                      {row.estado_op === "vendido" ? (
+                        <span className="text-purple-400 text-xs">● Vendida</span>
+                      ) : row.estado_op === "archivado" ? (
+                        <span className="text-[#555] text-xs">● Archivada</span>
+                      ) : (
+                        <>
+                          {isActive   && <span className="text-emerald-400 text-xs">● Activo</span>}
+                          {isReserved && <span className="text-amber-400  text-xs">● Reservado</span>}
+                          {!isActive && !isReserved && (
+                            <span className="text-[#444] text-xs">● Inactivo</span>
+                          )}
+                        </>
                       )}
                     </td>
 

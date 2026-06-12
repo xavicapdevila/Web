@@ -1,4 +1,4 @@
-import { getDb } from "@/lib/db";
+import { getDbRestored } from "@/lib/db";
 import OperacionesClient from "./OperacionesClient";
 
 export const metadata = { title: "Operaciones — Admin · The Vila Home" };
@@ -24,9 +24,9 @@ export interface OpRow {
   fecha_inicio:       string | null;
 }
 
-function getOperaciones(): OpRow[] {
+async function getOperaciones(): Promise<OpRow[]> {
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     return db.prepare(`
       SELECT
         p.ref, p.slug, p.titulo, p.tipo, p.subtipo,
@@ -48,7 +48,7 @@ function getOperaciones(): OpRow[] {
   }
 }
 
-export default function OperacionesPage() {
-  const rows = getOperaciones();
+export default async function OperacionesPage() {
+  const rows = await getOperaciones();
   return <OperacionesClient rows={rows} />;
 }

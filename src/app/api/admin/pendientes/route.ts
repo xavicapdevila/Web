@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { getDbRestored } from "@/lib/db";
 
 function isAuth(req: NextRequest) {
   return req.cookies.get("tvh_admin")?.value === "authenticated";
@@ -9,7 +9,7 @@ function isAuth(req: NextRequest) {
 export async function GET(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   try {
-    const db = getDb();
+    const db = await getDbRestored();
     const pendientes = db.prepare(`
       SELECT p.*, o.estado as op_estado
       FROM operaciones_pendientes p

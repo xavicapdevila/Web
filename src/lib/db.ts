@@ -43,6 +43,18 @@ export function getDb(): Database.Database {
   return _db;
 }
 
+/**
+ * getDb() preceded by a Blob restore — REQUIRED in every API route / server
+ * component that reads or writes CRM data (operaciones, pendientes, blog…).
+ * Without the restore, a cold Vercel container opens an EMPTY /tmp database:
+ * reads return nothing and writes land in a DB that is later persisted to
+ * Blob, wiping the real data.
+ */
+export async function getDbRestored(): Promise<Database.Database> {
+  await initDbFromBlob();
+  return getDb();
+}
+
 function initSchema(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS properties (

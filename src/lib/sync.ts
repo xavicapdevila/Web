@@ -345,6 +345,10 @@ function propertyToRow(p: Property, fechaact?: string | null) {
 // ---------------------------------------------------------------------------
 
 async function syncFromXml(): Promise<SyncResult> {
+  // Restore the latest DB from Blob BEFORE syncing. Without this, a sync on a
+  // cold container would upsert the XML into an empty DB and then persist it,
+  // wiping all CRM data (operaciones, pendientes, blog, pins) from the Blob.
+  await initDbFromBlob();
   const db = getDb();
   let added = 0, updated = 0, removed = 0;
 
@@ -491,6 +495,7 @@ async function geocodeNewAddresses(
 /** Seeds the DB from XML if it is empty (cold start without a Blob). */
 export async function ensureDbSeeded(): Promise<void> {
   try {
+    await initDbFromBlob();
     const db = getDb();
     const { c } = db.prepare("SELECT COUNT(*) as c FROM properties").get() as { c: number };
     if (c > 0) return;
