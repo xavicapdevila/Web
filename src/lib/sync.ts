@@ -138,8 +138,13 @@ export async function getCachedPropertiesList(
     filtered = filtered.filter((p) => p.ciudad.toLowerCase().includes(lc));
   }
 
-  // Replicate the DB sort: most recently added first
-  filtered.sort((a, b) => b.fecha.localeCompare(a.fecha));
+  // Price filter active → sort by price ascending (cheapest first)
+  // No price filter → most recently added first
+  if (filters.precioMin != null || filters.precioMax != null) {
+    filtered.sort((a, b) => a.precio - b.precio);
+  } else {
+    filtered.sort((a, b) => b.fecha.localeCompare(a.fecha));
+  }
 
   const total = filtered.length;
   const page = filters.page ?? 1;
