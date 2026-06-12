@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, CalendarDays, Check, Copy, Eye, Share2, Tag } from "lucide-react";
+import { CalendarDays, Check, Copy, Eye, Share2, Tag } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate, baseVisits } from "@/lib/utils";
 import TranslatableHTML from "@/components/blog/TranslatableHTML";
@@ -241,15 +241,6 @@ export default function BlogPostClient({ post, related }: Props) {
 
   return (
     <article className="max-w-3xl mx-auto px-6 lg:px-0 py-16">
-      {/* Back */}
-      <Link
-        href="/blog"
-        className="flex items-center gap-2 text-[#666] hover:text-[#C9B99A] transition-colors text-sm mb-10"
-      >
-        <ArrowLeft size={14} />
-        {t("blogBackToList")}
-      </Link>
-
       {/* Category + tags */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
         {post.categoria && (

@@ -28,12 +28,12 @@ const dict = {
     howTitle1: "Cómo",
     howTitle2: "trabajamos",
     howIntro: "Vender o comprar una casa es de las decisiones más importantes que tomarás. Merece que alguien se lo tome igual de en serio que tú.",
-    howStep1Title: "Primero, entender tu situación",
-    howStep1Desc: "No empezamos por el precio. Empezamos por entender qué tienes, en qué momento estás y qué es lo que realmente necesitas. Porque cada situación es distinta y merece un planteamiento propio.",
-    howStep2Title: "Cuidar lo que presentamos",
-    howStep2Desc: "Cada vivienda recibe una atención cuidada: buenas fotos, textos bien trabajados y difusión en los canales que realmente importan. Hacemos un seguimiento constante para que cada propiedad tenga la visibilidad que merece.",
-    howStep3Title: "Estar cuando hace falta",
-    howStep3Desc: "Acompañamos en cada paso: visitas, negociación, documentación y todo lo que haga falta hasta el final. Respondemos con rapidez y no desaparecemos cuando el proceso se complica. Que es justo cuando más se nos necesita.",
+    howStep1Title: "Las personas primero",
+    howStep1Desc: "Antes que propietarios o compradores, vemos personas. Por eso nos interesa entender qué necesitas, qué te preocupa y qué esperas conseguir. A partir de ahí empieza nuestro trabajo.",
+    howStep2Title: "Menos anuncios, más estrategia",
+    howStep2Desc: "Una vivienda no se vende por estar publicada. Se vende cuando se presenta bien, llega a las personas adecuadas y cuenta con una estrategia detrás. Por eso cuidamos cada detalle y damos a cada propiedad la atención que merece.",
+    howStep3Title: "A tu lado de principio a fin",
+    howStep3Desc: "Estamos presentes en los momentos importantes y también en los complicados. Resolviendo dudas, gestionando documentación, negociando cuando hace falta y acompañándote hasta la firma. Sin desaparecer a mitad del camino.",
 
     // Featured
     featuredLabel: "Propiedades destacadas",
@@ -282,7 +282,6 @@ const dict = {
     cookiePolicyLink: "Política de cookies",
 
     // Blog post page
-    blogBackToList: "Volver al blog",
     blogRelatedTitle: "También te puede interesar",
     blogCtaTitle: "¿Tienes alguna pregunta?",
     blogCtaText: "Nuestro equipo está disponible para resolver cualquier duda sobre el mercado inmobiliario en Vilanova.",
@@ -314,12 +313,12 @@ const dict = {
     howTitle1: "No creiem en vendre",
     howTitle2: "de qualsevol manera",
     howIntro: "Vendre o comprar un habitatge implica decisions importants. Per això no ens agrada el soroll, les presses ni els discursos buits. Treballem amb criteri, transparència i presència real a cada pas del procés.",
-    howStep1Title: "Començar amb els peus a terra",
-    howStep1Desc: "Abans de parlar de preus ni d'estratègies, escoltem. Volem entendre què necessites, en quina situació estàs i què és important per a tu. Una bona operació comença per una conversa honesta, no per una promesa.",
-    howStep2Title: "Cuidar el procés",
-    howStep2Desc: "Cada habitatge que treballem rep atenció real: bones fotos, textos treballats, difusió als canals que importen i seguiment constant. No llancem i esperem. Estem a sobre perquè la visibilitat de la teva propietat sigui la màxima possible.",
-    howStep3Title: "Ser-hi quan importa",
-    howStep3Desc: "Els dubtes no avisen. Per això estem disponibles de debò, responem amb rapidesa i acompanyem en cada pas: visites, negociació, documentació i tot el que faci falta fins al final. Sense desaparèixer a mig camí.",
+    howStep1Title: "Les persones primer",
+    howStep1Desc: "Abans que propietaris o compradors, veiem persones. Per això ens interessa entendre què necessites, què et preocupa i què esperes aconseguir. A partir d'aquí comença la nostra feina.",
+    howStep2Title: "Menys anuncis, més estratègia",
+    howStep2Desc: "Un habitatge no es ven per estar publicat. Es ven quan es presenta bé, arriba a les persones adequades i compta amb una estratègia al darrere. Per això cuidem cada detall i donem a cada propietat l'atenció que mereix.",
+    howStep3Title: "Al teu costat de principi a fi",
+    howStep3Desc: "Estem presents en els moments importants i també en els complicats. Resolent dubtes, gestionant documentació, negociant quan cal i acompanyant-te fins a la firma. Sense desaparèixer a mig camí.",
 
     featuredLabel: "Propietats destacades",
     featuredTitle: "Les més recents",
@@ -551,7 +550,6 @@ const dict = {
     cookiePolicyLink: "Política de cookies",
 
     // Blog post page
-    blogBackToList: "Tornar al blog",
     blogRelatedTitle: "També et pot interessar",
     blogCtaTitle: "Tens alguna pregunta?",
     blogCtaText: "El nostre equip està disponible per resoldre qualsevol dubte sobre el mercat immobiliari a Vilanova.",
@@ -583,12 +581,12 @@ const dict = {
     howTitle1: "We don't believe in selling",
     howTitle2: "any way possible",
     howIntro: "Buying or selling a home involves important decisions. That's why we dislike noise, rush, and empty speeches. We work with judgement, transparency, and real presence at every step of the process.",
-    howStep1Title: "Starting with both feet on the ground",
-    howStep1Desc: "Before talking about prices or strategies, we listen. We want to understand what you need, what your situation is, and what matters to you. A good deal starts with an honest conversation, not a promise.",
-    howStep2Title: "Taking care of the process",
-    howStep2Desc: "Every property we work with receives real attention: great photos, crafted descriptions, promotion on the channels that matter, and constant follow-up. We don't just launch and wait — we stay on top to give your property the maximum visibility possible.",
-    howStep3Title: "Being there when it matters",
-    howStep3Desc: "Questions come unannounced. That's why we're genuinely available, respond quickly, and accompany you at every step: viewings, negotiation, paperwork, and everything needed until the end. Without disappearing halfway through.",
+    howStep1Title: "People first",
+    howStep1Desc: "Before owners or buyers, we see people. That's why we're interested in understanding what you need, what worries you, and what you hope to achieve. From there, our work begins.",
+    howStep2Title: "Less listings, more strategy",
+    howStep2Desc: "A home doesn't sell just by being listed. It sells when it's presented well, reaches the right people, and has a strategy behind it. That's why we take care of every detail and give each property the attention it deserves.",
+    howStep3Title: "By your side from start to finish",
+    howStep3Desc: "We're present in the important moments and the difficult ones too. Resolving doubts, handling paperwork, negotiating when needed, and accompanying you all the way to signing. Without disappearing halfway through.",
 
     featuredLabel: "Featured properties",
     featuredTitle: "Most recent",
@@ -820,7 +818,6 @@ const dict = {
     cookiePolicyLink: "Cookie policy",
 
     // Blog post page
-    blogBackToList: "Back to blog",
     blogRelatedTitle: "You might also like",
     blogCtaTitle: "Do you have a question?",
     blogCtaText: "Our team is available to answer any questions about the real estate market in Vilanova.",
@@ -852,12 +849,12 @@ const dict = {
     howTitle1: "Nous ne croyons pas à vendre",
     howTitle2: "de n'importe quelle façon",
     howIntro: "Acheter ou vendre un bien immobilier implique des décisions importantes. C'est pourquoi nous n'aimons pas le bruit, la précipitation ni les discours vides. Nous travaillons avec discernement, transparence et présence réelle à chaque étape du processus.",
-    howStep1Title: "Commencer les pieds sur terre",
-    howStep1Desc: "Avant de parler de prix ou de stratégies, nous écoutons. Nous voulons comprendre ce dont vous avez besoin, votre situation et ce qui est important pour vous. Une bonne transaction commence par une conversation honnête, pas par une promesse.",
-    howStep2Title: "Soigner le processus",
-    howStep2Desc: "Chaque bien que nous travaillons reçoit une attention réelle : belles photos, textes soignés, diffusion sur les canaux qui comptent et suivi constant. Nous ne lançons pas et attendons — nous restons sur le coup pour que la visibilité de votre bien soit maximale.",
-    howStep3Title: "Être là quand ça compte",
-    howStep3Desc: "Les questions ne préviennent pas. C'est pourquoi nous sommes vraiment disponibles, répondons rapidement et vous accompagnons à chaque étape : visites, négociation, documents et tout ce qu'il faut jusqu'à la fin. Sans disparaître en cours de route.",
+    howStep1Title: "Les personnes d'abord",
+    howStep1Desc: "Avant d'être propriétaires ou acheteurs, nous voyons des personnes. C'est pourquoi nous cherchons à comprendre ce dont vous avez besoin, ce qui vous préoccupe et ce que vous espérez obtenir. C'est là que commence notre travail.",
+    howStep2Title: "Moins d'annonces, plus de stratégie",
+    howStep2Desc: "Un logement ne se vend pas simplement parce qu'il est publié. Il se vend quand il est bien présenté, qu'il atteint les bonnes personnes et qu'il y a une stratégie derrière. C'est pourquoi nous soignons chaque détail et accordons à chaque bien l'attention qu'il mérite.",
+    howStep3Title: "À vos côtés du début à la fin",
+    howStep3Desc: "Nous sommes présents dans les moments importants et aussi dans les moments difficiles. Répondant à vos questions, gérant les documents, négociant quand il le faut et vous accompagnant jusqu'à la signature. Sans disparaître en cours de route.",
 
     featuredLabel: "Propriétés en vedette",
     featuredTitle: "Les plus récentes",
@@ -1089,7 +1086,6 @@ const dict = {
     cookiePolicyLink: "Politique de cookies",
 
     // Blog post page
-    blogBackToList: "Retour au blog",
     blogRelatedTitle: "Vous pourriez aussi aimer",
     blogCtaTitle: "Vous avez une question ?",
     blogCtaText: "Notre équipe est disponible pour répondre à toutes vos questions sur le marché immobilier de Vilanova.",

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
-import Link from "next/link";
 import { getBlogPosts } from "@/lib/blog";
 import BlogContent from "@/components/pages/BlogContent";
 import { getAllVisitCounts } from "@/lib/visits";
@@ -155,25 +154,6 @@ export default async function BlogCategoriaPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
       />
-
-      {/* Category header */}
-      <div className="bg-[#0a0a0a] border-b border-[#1a1a1a] py-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <nav className="text-[#555] text-xs font-body tracking-wide mb-4 flex items-center gap-2">
-            <Link href="/blog" className="hover:text-[#C9B99A] transition-colors">Blog</Link>
-            <span>/</span>
-            <span className="text-[#888]">{config.nombre}</span>
-          </nav>
-          <div className="flex items-center gap-4 mb-3">
-            <span className="h-px w-8 bg-[#C9B99A]" />
-            <span className="text-[#C9B99A] text-xs font-body tracking-[0.3em] uppercase">Categoría</span>
-          </div>
-          <p className="font-display text-4xl lg:text-5xl text-white font-light">{config.nombre}</p>
-          <p className="text-[#555] text-sm mt-2 font-body">
-            {posts.length} {posts.length === 1 ? "artículo" : "artículos"}
-          </p>
-        </div>
-      </div>
 
       <BlogContent posts={posts} visitCounts={visitCounts} currentCategory={categoriaDB} />
     </div>

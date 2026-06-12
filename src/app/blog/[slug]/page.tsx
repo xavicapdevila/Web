@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from "@/lib/blog";
 import BlogPostClient from "@/components/blog/BlogPostClient";
+import BlogCategoryNav from "@/components/blog/BlogCategoryNav";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -151,6 +152,14 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }}
       />
+
+      {/* Category bar — same nav as the blog listing; "Todos" leads back to /blog */}
+      <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <BlogCategoryNav currentCategory={post.categoria} />
+        </div>
+      </div>
+
       <BlogPostClient post={post} related={related} />
     </div>
   );
