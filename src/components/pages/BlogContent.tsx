@@ -6,8 +6,12 @@ import Image from "next/image";
 import { CalendarDays, Eye, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import { formatBlogDate, baseVisits } from "@/lib/utils";
-import BlogCategoryNav from "@/components/blog/BlogCategoryNav";
+import BlogCategoryNav, { CATEGORY_TO_SLUG } from "@/components/blog/BlogCategoryNav";
 import type { BlogPost } from "@/lib/blog";
+
+const SLUG_TO_CATEGORY: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_TO_SLUG).map(([cat, slug]) => [slug, cat])
+);
 
 interface Props {
   posts: BlogPost[];
@@ -112,12 +116,39 @@ export default function BlogContent({ posts, visitCounts = {}, currentCategory }
   const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  // Category filtering happens client-side so switching tabs is instant;
+  // the URL is kept in sync via pushState (server pages still exist for SEO).
+  const [activeCategory, setActiveCategory] = useState(currentCategory);
   const gridRef = useRef<HTMLDivElement>(null);
+
+  const selectCategory = useCallback((cat: string | undefined, href: string) => {
+    setActiveCategory(cat);
+    setCurrentPage(1);
+    window.history.pushState(null, "", href);
+    // Only scroll back up if the user had scrolled past the top of the grid
+    if (gridRef.current && gridRef.current.getBoundingClientRect().top < 0) {
+      gridRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
+  // Back/forward across pushState entries: re-derive the category from the URL
+  useEffect(() => {
+    const onPopState = () => {
+      const match = window.location.pathname.match(/^\/blog\/categoria\/([^/]+)/);
+      setActiveCategory(match ? SLUG_TO_CATEGORY[match[1]] : undefined);
+      setCurrentPage(1);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   const trimmed = query.trim().toLowerCase();
 
   const filtered = useMemo(() => {
     let result = posts;
+    if (activeCategory) {
+      result = result.filter((p) => p.categoria === activeCategory);
+    }
     if (trimmed) {
       // Search across ALL posts regardless of page
       result = result.filter(
@@ -131,7 +162,7 @@ export default function BlogContent({ posts, visitCounts = {}, currentCategory }
     return [...result].sort(
       (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
     );
-  }, [posts, trimmed]);
+  }, [posts, trimmed, activeCategory]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const visible = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -165,7 +196,7 @@ export default function BlogContent({ posts, visitCounts = {}, currentCategory }
       <div className="border-b border-[#1a1a1a] sticky top-20 z-30 bg-[#0a0a0a]/95 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <div className="flex items-center justify-between gap-4">
-            <BlogCategoryNav currentCategory={currentCategory} />
+            <BlogCategoryNav currentCategory={activeCategory} onSelect={selectCategory} />
 
             {/* Search — desktop */}
             <div className="relative shrink-0 hidden sm:block">
@@ -245,7 +276,10 @@ export default function BlogContent({ posts, visitCounts = {}, currentCategory }
                 </p>
               )}
               <button
-                onClick={() => { setQuery(""); }}
+                onClick={() => {
+                  setQuery("");
+                  if (activeCategory) selectCategory(undefined, "/blog");
+                }}
                 className="mt-6 text-xs font-body tracking-widest uppercase text-[#C9B99A] hover:text-white transition-colors border border-[#222] hover:border-[#C9B99A] px-5 py-2.5"
               >
                 {t("blogSeeAll")}

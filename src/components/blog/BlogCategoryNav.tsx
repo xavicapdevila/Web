@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import type { Lang } from "@/lib/i18n";
 
-const CATEGORY_TO_SLUG: Record<string, string> = {
+export const CATEGORY_TO_SLUG: Record<string, string> = {
   "Mercado":        "mercado",
   "Procesos":       "procesos",
   "Documentación":  "documentacion",
@@ -41,13 +41,19 @@ const CATEGORY_LABELS: Record<string, Record<Lang, string>> = {
 
 interface Props {
   currentCategory?: string;
+  /**
+   * When provided, tab clicks are handled client-side (instant filtering)
+   * instead of navigating; the parent is responsible for updating the URL.
+   * Modifier-clicks (new tab) still navigate normally.
+   */
+  onSelect?: (category: string | undefined, href: string) => void;
 }
 
 /**
  * Horizontal scrollable category tabs shared by the blog listing,
  * category pages and individual articles. "Todos" links back to /blog.
  */
-export default function BlogCategoryNav({ currentCategory }: Props) {
+export default function BlogCategoryNav({ currentCategory, onSelect }: Props) {
   const { t, lang } = useLanguage();
   const navRef = useRef<HTMLElement>(null);
   const [canScrollLeft,  setCanScrollLeft]  = useState(false);
@@ -76,6 +82,17 @@ export default function BlogCategoryNav({ currentCategory }: Props) {
     navRef.current?.scrollBy({ left: dir === "left" ? -200 : 200, behavior: "smooth" });
   }, []);
 
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>, category: string | undefined, href: string) => {
+      if (!onSelect) return;
+      // Let the browser handle new-tab/window clicks
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      onSelect(category, href);
+    },
+    [onSelect]
+  );
+
   return (
     <div className="relative flex-1 min-w-0">
       {/* Left fade + arrow */}
@@ -98,6 +115,7 @@ export default function BlogCategoryNav({ currentCategory }: Props) {
       >
         <Link
           href="/blog"
+          onClick={(e) => handleClick(e, undefined, "/blog")}
           className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
             !currentCategory
               ? "text-[#C9B99A] border-[#C9B99A]"
@@ -106,19 +124,23 @@ export default function BlogCategoryNav({ currentCategory }: Props) {
         >
           {t("blogCategoryAll")}
         </Link>
-        {CATEGORIES.map((cat) => (
-          <Link
-            key={cat}
-            href={`/blog/categoria/${CATEGORY_TO_SLUG[cat] ?? cat.toLowerCase()}`}
-            className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
-              currentCategory === cat
-                ? "text-[#C9B99A] border-[#C9B99A]"
-                : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
-            }`}
-          >
-            {CATEGORY_LABELS[cat]?.[lang] ?? cat}
-          </Link>
-        ))}
+        {CATEGORIES.map((cat) => {
+          const href = `/blog/categoria/${CATEGORY_TO_SLUG[cat] ?? cat.toLowerCase()}`;
+          return (
+            <Link
+              key={cat}
+              href={href}
+              onClick={(e) => handleClick(e, cat, href)}
+              className={`shrink-0 px-5 py-4 text-xs font-body tracking-[0.2em] uppercase transition-all duration-200 border-b-2 -mb-px ${
+                currentCategory === cat
+                  ? "text-[#C9B99A] border-[#C9B99A]"
+                  : "text-[#555] border-transparent hover:text-[#aaa] hover:border-[#333]"
+              }`}
+            >
+              {CATEGORY_LABELS[cat]?.[lang] ?? cat}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Right fade + arrow */}

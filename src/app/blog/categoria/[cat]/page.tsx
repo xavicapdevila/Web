@@ -123,11 +123,13 @@ export default async function BlogCategoriaPage({ params }: Props) {
   const categoriaDB = SLUG_TO_CATEGORIA[cat];
   const canonicalUrl = `${BASE_URL}/blog/categoria/${cat}`;
 
+  // All posts are passed down; BlogContent filters by category client-side
+  // so switching tabs is instant. SSR still renders only this category.
   let posts: import("@/lib/blog").BlogPost[] = [];
   let visitCounts: Record<string, number> = {};
   try {
     const [result, counts] = await Promise.all([
-      getBlogPosts(500, 0, categoriaDB),
+      getBlogPosts(500, 0),
       getAllVisitCounts(),
     ]);
     posts = result.posts;
