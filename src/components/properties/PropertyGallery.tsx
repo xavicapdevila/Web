@@ -3,7 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X, LayoutGrid, RotateCcw, Play, Globe, ArrowLeft, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, RotateCcw, Play, Globe, ArrowLeft, MapPin, Camera, Rotate3d } from "lucide-react";
+import { FloorPlanIcon } from "./icons";
 import type { PropertyImage, FloorPlanPin } from "@/types/property";
 import { getYouTubeId } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -102,8 +103,12 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxIndex, closeLightbox, prevImage, nextImage]);
 
+  const chipClass =
+    "group/chip flex items-center gap-2 h-9 pl-3 pr-3.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white text-xs font-body hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300";
+  const chipIconClass = "text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300";
+
   const MediaIcons = () => (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {hasPlano && (
         <button
           onClick={(e) => {
@@ -117,9 +122,9 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
               if (planoIdx >= 0) openLightbox(planoIdx);
             }
           }}
-          className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+          className={chipClass}
         >
-          <LayoutGrid size={12} />
+          <FloorPlanIcon size={13} className={chipIconClass} />
           <span>{t("galleryPlan")}</span>
         </button>
       )}
@@ -130,27 +135,27 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             const idx360 = images.findIndex((img) => img.eti === "360");
             if (idx360 >= 0) openLightbox(idx360);
           }}
-          className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+          className={chipClass}
         >
-          <RotateCcw size={12} />
+          <RotateCcw size={13} className={chipIconClass} />
           <span>{t("gallery360")}</span>
         </button>
       )}
       {hasVideo && ytId && (
         <button
           onClick={(e) => { e.stopPropagation(); setShowVideo(true); }}
-          className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+          className={chipClass}
         >
-          <Play size={12} />
+          <Play size={13} fill="currentColor" className={chipIconClass} />
           <span>{t("galleryVideo")}</span>
         </button>
       )}
       {hasTour && (
         <button
           onClick={(e) => { e.stopPropagation(); setShowTour(true); }}
-          className="flex items-center gap-1.5 bg-black/75 backdrop-blur-sm text-white px-2.5 py-1.5 text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+          className={chipClass}
         >
-          <Globe size={12} />
+          <Rotate3d size={13} className={chipIconClass} />
           <span>{t("galleryVirtualTour")}</span>
         </button>
       )}
@@ -242,7 +247,8 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             </div>
 
             {/* Counter */}
-            <div className="absolute bottom-4 right-4 z-20 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5">
+            <div className="absolute bottom-4 right-4 z-20 flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 text-white text-xs tabular-nums">
+              <Camera size={13} className="text-[#C9B99A]" />
               {currentIndex + 1} / {totalMedia}
             </div>
 

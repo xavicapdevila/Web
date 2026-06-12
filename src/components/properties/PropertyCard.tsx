@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { memo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Video, RotateCcw, Globe, Camera, Share2, X } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X } from "lucide-react";
+import { FloorPlanIcon } from "./icons";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel } from "@/lib/i18n";
 import type { Property } from "@/types/property";
@@ -169,41 +170,45 @@ function PropertyCard({ property, priority = false }: Props) {
           {property.imagenes.length > 0 && (
             <button
               onClick={handleGalleryClick}
-              className="pointer-events-auto flex items-center gap-1 h-7 px-2 bg-black/75 backdrop-blur-sm text-white text-xs hover:bg-[#C9B99A] hover:text-black transition-colors"
+              className="pointer-events-auto group/chip flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white text-[11px] font-body tabular-nums hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
               title={`Ver ${property.imagenes.length} fotos`}
             >
-              <Camera size={12} />
+              <Camera size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
               {property.imagenes.length}
             </button>
           )}
           {hasPlano && (
             <button
               onClick={handlePlanoClick}
-              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
-              title="Ver plano"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              title={t("galleryPlan")}
             >
-              {/* Plano: rectángulo exterior + paredes interiores + arco de puerta */}
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <rect x="2" y="2" width="20" height="20" rx="1"/>
-                <line x1="13" y1="2" x2="13" y2="13"/>
-                <line x1="2" y1="13" x2="13" y2="13"/>
-                <path d="M13 13 A7 7 0 0 0 6 6"/>
-              </svg>
+              <span className="w-8 h-8 flex items-center justify-center shrink-0">
+                <FloorPlanIcon size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
+              </span>
+              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-all duration-300">
+                {t("galleryPlan")}
+              </span>
             </button>
           )}
           {hasVideo && (
             <button
               onClick={handleVideoClick}
-              className="pointer-events-auto w-7 h-7 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#C9B99A] hover:text-black transition-colors"
-              title="Ver vídeo"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              title={t("galleryVideo")}
             >
-              <Video size={13} />
+              <span className="w-8 h-8 flex items-center justify-center shrink-0">
+                <Play size={13} fill="currentColor" className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
+              </span>
+              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-all duration-300">
+                {t("galleryVideo")}
+              </span>
             </button>
           )}
           {has360 && (
             <button
               onClick={handle360Click}
-              className="pointer-events-auto h-7 px-2 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:text-black transition-colors"
+              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
               title="Ver 360°"
             >
               360°
@@ -212,8 +217,8 @@ function PropertyCard({ property, priority = false }: Props) {
           {hasTour && (
             <button
               onClick={handleTourClick}
-              className="pointer-events-auto h-7 px-2 bg-black/75 backdrop-blur-sm flex items-center justify-center text-white text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:text-black transition-colors"
-              title="Ver tour virtual"
+              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              title={t("galleryVirtualTour")}
             >
               3D
             </button>
