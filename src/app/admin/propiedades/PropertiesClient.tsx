@@ -316,15 +316,22 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                     {/* Links */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        {/* Ocultar / mostrar */}
+                        {/* Ocultar / mostrar — control principal de visibilidad en la web */}
                         <button
                           onClick={() => toggleHidden(row.ref)}
                           disabled={toggling === row.ref}
-                          className={`transition-colors disabled:opacity-40 ${isHidden ? "text-[#888] hover:text-[#C9B99A]" : "text-[#333] hover:text-amber-400"}`}
-                          title={isHidden ? "Mostrar en la web" : "Ocultar de la web"}
+                          className={`flex items-center gap-1.5 px-2.5 py-1 border text-[11px] font-body transition-colors disabled:opacity-40 ${
+                            isHidden
+                              ? "border-amber-400/40 bg-amber-400/10 text-amber-400 hover:bg-amber-400/20"
+                              : "border-[#2a2a2a] text-[#666] hover:border-[#C9B99A]/50 hover:text-[#C9B99A]"
+                          }`}
+                          title={isHidden ? "Mostrar en la web (volver a publicar)" : "Ocultar de la web (sin esperar a Inmovilla)"}
                         >
-                          {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
+                          {isHidden ? <EyeOff size={12} /> : <Eye size={12} />}
+                          {isHidden ? "Mostrar" : "Ocultar"}
                         </button>
+
+                        <span className="w-px h-4 bg-[#1a1a1a]" />
 
                         {hasPlanoImage(row.imagenes) && (() => {
                           const pinCount = getPinCount(row.plano_pins);
