@@ -37,9 +37,9 @@ export default function Navbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+          "fixed top-0 left-0 right-0 z-50 transition-colors duration-500",
           scrolled || !isHome
-            ? "bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#2a2a2a]"
+            ? "bg-[#0a0a0a]/95 border-b border-[#2a2a2a]"
             : "bg-transparent"
         )}
       >
@@ -75,7 +75,7 @@ export default function Navbar() {
                 {link.label}
                 <span
                   className={cn(
-                    "absolute -bottom-1 left-0 h-px bg-[#C9B99A] transition-all duration-300",
+                    "absolute -bottom-1 left-0 h-px bg-[#C9B99A] transition-[width] duration-300",
                     pathname.startsWith(link.href) ? "w-full" : "w-0 group-hover:w-full"
                   )}
                 />
@@ -112,7 +112,7 @@ export default function Navbar() {
             </a>
             <Link
               href="/valoracion"
-              className="px-5 py-2.5 text-xs font-body tracking-widest uppercase border border-[#C9B99A] text-[#C9B99A] hover:bg-[#C9B99A] hover:text-black transition-all duration-300"
+              className="px-5 py-2.5 text-xs font-body tracking-widest uppercase border border-[#C9B99A] text-[#C9B99A] hover:bg-[#C9B99A] hover:text-black transition-colors duration-300"
             >
               {t("navValueHome")}
             </Link>
@@ -132,7 +132,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-[#0a0a0a] flex flex-col justify-center px-10 transition-all duration-500",
+          "fixed inset-0 z-40 bg-[#0a0a0a] flex flex-col justify-center px-10 transition-opacity duration-500",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
       >

@@ -127,7 +127,7 @@ function PropertyCard({ property, priority = false }: Props) {
         onClose={() => setShowShareModal(false)}
       />
     )}
-    <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/40 transition-all duration-500 overflow-hidden">
+    <article className="group bg-[#111] border border-[#1e1e1e] hover:border-[#C9B99A]/40 transition-colors duration-500 overflow-hidden">
       {/* Image area — outer div is the positioning root so media buttons
           can sit outside the <Link> (no nested anchors) but still overlay the image */}
       <div className="relative aspect-[4/3]">
@@ -159,7 +159,7 @@ function PropertyCard({ property, priority = false }: Props) {
 
           {/* Tipo badge */}
           <div className="absolute top-3 left-3">
-            <span className="bg-[#0a0a0a]/80 backdrop-blur-sm text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
+            <span className="bg-[#0a0a0a]/90 text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
               {getTipoLabel(property.tipo, lang, property.subtipo)}
             </span>
           </div>
@@ -170,7 +170,7 @@ function PropertyCard({ property, priority = false }: Props) {
           {property.imagenes.length > 0 && (
             <button
               onClick={handleGalleryClick}
-              className="pointer-events-auto group/chip flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white text-[11px] font-body tabular-nums hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              className="pointer-events-auto group/chip flex items-center gap-1.5 h-8 px-3 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-white text-[11px] font-body tabular-nums hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title={`Ver ${property.imagenes.length} fotos`}
             >
               <Camera size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
@@ -180,13 +180,13 @@ function PropertyCard({ property, priority = false }: Props) {
           {hasPlano && (
             <button
               onClick={handlePlanoClick}
-              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title={t("galleryPlan")}
             >
               <span className="w-8 h-8 flex items-center justify-center shrink-0">
                 <FloorPlanIcon size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
               </span>
-              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-all duration-300">
+              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-[max-width,padding] duration-300">
                 {t("galleryPlan")}
               </span>
             </button>
@@ -194,13 +194,13 @@ function PropertyCard({ property, priority = false }: Props) {
           {hasVideo && (
             <button
               onClick={handleVideoClick}
-              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title={t("galleryVideo")}
             >
               <span className="w-8 h-8 flex items-center justify-center shrink-0">
                 <Play size={13} fill="currentColor" className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
               </span>
-              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-all duration-300">
+              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-[max-width,padding] duration-300">
                 {t("galleryVideo")}
               </span>
             </button>
@@ -208,7 +208,7 @@ function PropertyCard({ property, priority = false }: Props) {
           {has360 && (
             <button
               onClick={handle360Click}
-              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title="Ver 360°"
             >
               360°
@@ -217,7 +217,7 @@ function PropertyCard({ property, priority = false }: Props) {
           {hasTour && (
             <button
               onClick={handleTourClick}
-              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/55 backdrop-blur-md ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-all duration-300"
+              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title={t("galleryVirtualTour")}
             >
               3D
