@@ -91,7 +91,7 @@ export default function Footer() {
 
           {/* Zonas */}
           <div>
-            <h3 className="text-white text-xs font-body tracking-widest uppercase mb-5">Zonas</h3>
+            <h3 className="text-white text-xs font-body tracking-widest uppercase mb-5">{t("footerZonasTitle")}</h3>
             <ul className="space-y-3">
               {[
                 { href: "/zona/vilanova",          label: "Vilanova i la Geltrú" },
