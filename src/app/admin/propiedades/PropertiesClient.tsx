@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, ExternalLink, Home, RefreshCw, Map } from "lucide-react";
+import { Search, ExternalLink, Home, RefreshCw, Map, Eye, EyeOff } from "lucide-react";
 
 interface PropRow {
   ref:            string;
@@ -24,7 +24,7 @@ interface PropRow {
   plano_pins:     string;
   fecha:          string;
   fechaact:       string | null;
-  estado_op:      string;
+  oculta:         number;
 }
 
 function formatPrice(n: number) {
@@ -63,9 +63,10 @@ function tipoLabel(tipo: string, subtipo: string | null) {
 }
 
 const TABS = [
-  { key: "all",      label: "Todos"     },
+  { key: "all",      label: "Todas"     },
   { key: "venta",    label: "Venta"     },
   { key: "alquiler", label: "Alquiler"  },
+  { key: "ocultas",  label: "Ocultas"   },
 ];
 
 export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
@@ -74,6 +75,12 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
   const [search,  setSearch]  = useState("");
   const [syncing, setSyncing] = useState(false);
   const [syncErr, setSyncErr] = useState("");
+
+  // Optimistic local state for the hidden set
+  const [hidden, setHidden] = useState<Set<string>>(
+    () => new Set(rows.filter(r => r.oculta).map(r => r.ref))
+  );
+  const [toggling, setToggling] = useState<string | null>(null);
 
   async function handleSync() {
     setSyncing(true);
@@ -93,14 +100,50 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
     }
   }
 
+  async function toggleHidden(ref: string) {
+    const willHide = !hidden.has(ref);
+    setToggling(ref);
+    // Optimistic update
+    setHidden(prev => {
+      const next = new Set(prev);
+      if (willHide) next.add(ref); else next.delete(ref);
+      return next;
+    });
+    try {
+      const res = await fetch(`/api/admin/properties/${ref}/ocultar`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ oculta: willHide }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      // Revert on error
+      setHidden(prev => {
+        const next = new Set(prev);
+        if (willHide) next.delete(ref); else next.add(ref);
+        return next;
+      });
+    } finally {
+      setToggling(null);
+    }
+  }
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter(r => {
-      if (tab !== "all" && r.operacion !== tab) return false;
-      if (q && !r.ref.toLowerCase().includes(q) && !r.titulo.toLowerCase().includes(q) && !(r.ciudad ?? "").toLowerCase().includes(q)) return false;
+      const isHidden = hidden.has(r.ref);
+      if (tab === "ocultas") {
+        if (!isHidden) return false;
+      } else {
+        if (isHidden) return false;
+        if (tab !== "all" && r.operacion !== tab) return false;
+      }
+      if (q && !r.ref.toLowerCase().includes(q) && !r.titulo.toLowerCase().includes(q) && !(r.ciudad ?? "").toLowerCase().includes(q) && !(r.direccion ?? "").toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [rows, tab, search]);
+  }, [rows, tab, search, hidden]);
+
+  const ocultasCount = hidden.size;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -135,6 +178,11 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
               }`}
             >
               {t.label}
+              {t.key === "ocultas" && ocultasCount > 0 && (
+                <span className={`ml-1.5 px-1 py-0.5 text-[10px] leading-none ${tab === t.key ? "bg-black/15" : "bg-[#1a1a1a] text-[#666]"}`}>
+                  {ocultasCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -176,7 +224,9 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
       ) : filtered.length === 0 ? (
         <div className="border border-[#1a1a1a] bg-[#0d0d0d] py-20 text-center">
           <Home size={20} className="text-[#222] mx-auto mb-3" />
-          <p className="text-[#444] text-sm">Sin resultados para este filtro</p>
+          <p className="text-[#444] text-sm">
+            {tab === "ocultas" ? "No hay propiedades ocultas" : "Sin resultados para este filtro"}
+          </p>
         </div>
       ) : (
         <div className="border border-[#1a1a1a] overflow-x-auto">
@@ -195,17 +245,16 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                 const img = firstImage(row.imagenes);
                 const isActive   = row.estado_ficha === 1;
                 const isReserved = row.estado_ficha === 7;
-                // Operación cerrada en el CRM (vendida o archivada) → fila atenuada y tachada
-                const isClosed   = row.estado_op === "vendido" || row.estado_op === "archivado";
+                const isHidden   = hidden.has(row.ref);
                 return (
-                  <tr key={row.ref} className={`border-b border-[#111] hover:bg-[#0d0d0d] transition-colors ${isClosed ? "opacity-50" : ""}`}>
+                  <tr key={row.ref} className={`border-b border-[#111] hover:bg-[#0d0d0d] transition-colors ${isHidden ? "opacity-50" : ""}`}>
                     {/* Thumbnail */}
                     <td className="pl-4 pr-2 py-3 w-12">
                       {img ? (
                         <img
                           src={img}
                           alt=""
-                          className={`w-10 h-8 object-cover bg-[#111] ${isClosed ? "grayscale" : ""}`}
+                          className={`w-10 h-8 object-cover bg-[#111] ${isHidden ? "grayscale" : ""}`}
                           loading="lazy"
                         />
                       ) : (
@@ -220,9 +269,9 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                       <span className="text-[#888] font-mono">{row.ref}</span>
                     </td>
 
-                    {/* Title */}
+                    {/* Title — dirección completa */}
                     <td className="px-4 py-3 max-w-xs">
-                      <p className={`leading-snug line-clamp-1 ${isClosed ? "text-[#666] line-through" : "text-white"}`}>
+                      <p className={`leading-snug line-clamp-1 ${isHidden ? "text-[#666]" : "text-white"}`}>
                         {row.direccion || [row.zona, row.ciudad].filter(Boolean).join(", ") || row.titulo}
                       </p>
                     </td>
@@ -244,33 +293,39 @@ export default function PropertiesClient({ rows }: { rows: PropRow[] }) {
                     </td>
 
                     {/* Price */}
-                    <td className={`px-4 py-3 whitespace-nowrap font-mono ${isClosed ? "text-[#666] line-through" : "text-white"}`}>
+                    <td className="px-4 py-3 text-white whitespace-nowrap font-mono">
                       {formatPrice(row.precio)}
                     </td>
 
                     {/* City */}
                     <td className="px-4 py-3 text-[#666]">{row.ciudad ?? "—"}</td>
 
-                    {/* Status — CRM estado takes precedence over feed estado */}
+                    {/* Status */}
                     <td className="px-4 py-3">
-                      {row.estado_op === "vendido" ? (
-                        <span className="text-purple-400 text-xs">● Vendida</span>
-                      ) : row.estado_op === "archivado" ? (
-                        <span className="text-[#555] text-xs">● Archivada</span>
+                      {isHidden ? (
+                        <span className="text-[#888] text-xs">● Oculta</span>
+                      ) : isActive ? (
+                        <span className="text-emerald-400 text-xs">● Activa</span>
+                      ) : isReserved ? (
+                        <span className="text-amber-400 text-xs">● Reservada</span>
                       ) : (
-                        <>
-                          {isActive   && <span className="text-emerald-400 text-xs">● Activo</span>}
-                          {isReserved && <span className="text-amber-400  text-xs">● Reservado</span>}
-                          {!isActive && !isReserved && (
-                            <span className="text-[#444] text-xs">● Inactivo</span>
-                          )}
-                        </>
+                        <span className="text-[#444] text-xs">● Inactiva</span>
                       )}
                     </td>
 
                     {/* Links */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
+                        {/* Ocultar / mostrar */}
+                        <button
+                          onClick={() => toggleHidden(row.ref)}
+                          disabled={toggling === row.ref}
+                          className={`transition-colors disabled:opacity-40 ${isHidden ? "text-[#888] hover:text-[#C9B99A]" : "text-[#333] hover:text-amber-400"}`}
+                          title={isHidden ? "Mostrar en la web" : "Ocultar de la web"}
+                        >
+                          {isHidden ? <EyeOff size={13} /> : <Eye size={13} />}
+                        </button>
+
                         {hasPlanoImage(row.imagenes) && (() => {
                           const pinCount = getPinCount(row.plano_pins);
                           const hasPins = pinCount > 0;

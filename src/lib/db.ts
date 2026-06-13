@@ -45,7 +45,7 @@ export function getDb(): Database.Database {
 
 /**
  * getDb() preceded by a Blob restore — REQUIRED in every API route / server
- * component that reads or writes CRM data (operaciones, pendientes, blog…).
+ * component that reads or writes persisted data (hidden properties, blog…).
  * Without the restore, a cold Vercel container opens an EMPTY /tmp database:
  * reads return nothing and writes land in a DB that is later persisted to
  * Blob, wiping the real data.
@@ -194,80 +194,21 @@ function initSchema(db: Database.Database): void {
     slug  TEXT PRIMARY KEY,
     count INTEGER NOT NULL DEFAULT 0
   )`); } catch {}
-  // Pendientes — properties that left or reappeared in the Inmovilla feed
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones_pendientes (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    ref         TEXT NOT NULL,
-    titulo      TEXT NOT NULL DEFAULT '',
-    descripcion TEXT,
-    tipo        TEXT NOT NULL DEFAULT 'salida_feed',
-    created_at  TEXT DEFAULT (datetime('now')),
-    resuelta    INTEGER DEFAULT 0,
-    resuelta_at TEXT,
-    accion      TEXT
-  )`); } catch {}
-  try { db.exec(`ALTER TABLE operaciones_pendientes ADD COLUMN tipo TEXT NOT NULL DEFAULT 'salida_feed'`); } catch {}
-  // Operaciones CRM tables — migrate old schema (from reverted commit) if present
-  try {
-    const cols = (db.prepare(`PRAGMA table_info(operaciones)`).all() as { name: string }[]).map(c => c.name);
-    if (cols.length > 0 && !cols.includes("ref")) {
-      db.exec(`DROP TABLE IF EXISTS operaciones`);
-    }
-  } catch {}
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones (
-    ref                  TEXT PRIMARY KEY,
-    estado               TEXT NOT NULL DEFAULT 'en_venta',
-    precio_inicial       REAL,
-    honorarios_tipo      TEXT DEFAULT 'porcentaje',
-    honorarios_valor     REAL DEFAULT 3.0,
-    honorarios_iva       INTEGER DEFAULT 0,
-    propietario_nombre   TEXT,
-    propietario_telefono TEXT,
-    propietario_email    TEXT,
-    propietario_nif      TEXT,
-    propietario_notas    TEXT,
-    observaciones        TEXT,
-    fecha_inicio         TEXT,
-    fecha_cierre         TEXT,
-    created_at           TEXT DEFAULT (datetime('now')),
-    updated_at           TEXT DEFAULT (datetime('now'))
-  )`); } catch {}
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones_seguimiento (
-    id      INTEGER PRIMARY KEY AUTOINCREMENT,
-    ref     TEXT NOT NULL,
-    fecha   TEXT NOT NULL,
-    tipo    TEXT NOT NULL DEFAULT 'llamada',
-    notas   TEXT,
-    agente  TEXT,
+  // ── Ocultar propiedades manualmente ──────────────────────────────────────
+  // El CRM completo (operaciones, visitas, propietarios…) vive en Ora CRM.
+  // Aquí solo guardamos qué propiedades se ocultan del sitio público aunque
+  // sigan presentes en el feed de Inmovilla.
+  try { db.exec(`CREATE TABLE IF NOT EXISTS propiedades_ocultas (
+    ref        TEXT PRIMARY KEY,
     created_at TEXT DEFAULT (datetime('now'))
   )`); } catch {}
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones_visitas (
-    id                INTEGER PRIMARY KEY AUTOINCREMENT,
-    ref               TEXT NOT NULL,
-    fecha             TEXT NOT NULL,
-    nombre_contacto   TEXT,
-    telefono_contacto TEXT,
-    valoracion        TEXT DEFAULT 'neutral',
-    notas             TEXT,
-    agente            TEXT,
-    created_at        TEXT DEFAULT (datetime('now'))
-  )`); } catch {}
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones_documentos (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    ref        TEXT NOT NULL,
-    nombre     TEXT NOT NULL,
-    tipo       TEXT DEFAULT 'otro',
-    url        TEXT,
-    created_at TEXT DEFAULT (datetime('now'))
-  )`); } catch {}
-  try { db.exec(`CREATE TABLE IF NOT EXISTS operaciones_historial (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    ref         TEXT NOT NULL,
-    evento      TEXT NOT NULL,
-    descripcion TEXT,
-    agente      TEXT,
-    created_at  TEXT DEFAULT (datetime('now'))
-  )`); } catch {}
+  // Limpieza: el mini-CRM que vivía aquí se ha trasladado a Ora CRM.
+  for (const t of [
+    "operaciones_pendientes", "operaciones_seguimiento", "operaciones_visitas",
+    "operaciones_documentos", "operaciones_historial", "operaciones",
+  ]) {
+    try { db.exec(`DROP TABLE IF EXISTS ${t}`); } catch {}
+  }
   // plano_pins: JSON array of FloorPlanPin for interactive floor plan
   try { db.exec(`ALTER TABLE properties ADD COLUMN plano_pins TEXT DEFAULT '[]'`); } catch {}
   // fechaact: Inmovilla REST API last-modified timestamp (for differential sync)

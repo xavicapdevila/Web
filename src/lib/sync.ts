@@ -60,13 +60,35 @@ export async function getCachedPropertyBySlug(slug: string): Promise<Property | 
   }
 }
 
+/**
+ * Refs of properties manually hidden from the public site (admin "ocultar").
+ * These must NOT appear in any public listing, featured grid, sitemap or
+ * dropdown even if they are still present in the Inmovilla feed.
+ * Best-effort: returns an empty set if the DB is unavailable.
+ */
+async function getHiddenRefs(): Promise<Set<string>> {
+  try {
+    await initDbFromBlob();
+    const db = getDb();
+    const rows = db
+      .prepare(`SELECT ref FROM propiedades_ocultas`)
+      .all() as { ref: string }[];
+    return new Set(rows.map((r) => r.ref));
+  } catch {
+    return new Set();
+  }
+}
+
 /** Returns all slugs+dates using the Vercel Data Cache (for generateStaticParams and sitemap).
  *  Falls back to SQLite/Blob when the XML cache is unavailable (e.g. build time, XML outage).
  */
 export async function getCachedSlugs(): Promise<{ slug: string; fecha: string }[]> {
+  const hidden = await getHiddenRefs();
   try {
     const properties = await _getCachedXmlProperties();
-    return properties.map((p) => ({ slug: p.slug, fecha: p.fecha }));
+    return properties
+      .filter((p) => !hidden.has(p.ref))
+      .map((p) => ({ slug: p.slug, fecha: p.fecha }));
   } catch { /* fall through to DB */ }
 
   await initDbFromBlob();
@@ -110,7 +132,9 @@ export async function getCachedPropertiesList(
     return { properties: [], total: 0 };
   }
 
-  let filtered = all;
+  // Hide properties manually hidden from the public site (admin "ocultar")
+  const hidden = await getHiddenRefs();
+  let filtered = hidden.size > 0 ? all.filter((p) => !hidden.has(p.ref)) : all;
 
   if (filters.tipo) {
     filtered = filtered.filter((p) => p.tipo === filters.tipo);
@@ -347,7 +371,7 @@ function propertyToRow(p: Property, fechaact?: string | null) {
 async function syncFromXml(): Promise<SyncResult> {
   // Restore the latest DB from Blob BEFORE syncing. Without this, a sync on a
   // cold container would upsert the XML into an empty DB and then persist it,
-  // wiping all CRM data (operaciones, pendientes, blog, pins) from the Blob.
+  // wiping the persisted data (hidden properties, blog, pins) from the Blob.
   await initDbFromBlob();
   const db = getDb();
   let added = 0, updated = 0, removed = 0;
@@ -359,30 +383,15 @@ async function syncFromXml(): Promise<SyncResult> {
     (db.prepare("SELECT ref FROM properties").all() as { ref: string }[]).map((r) => r.ref)
   );
 
-  // Properties no longer in the Inmovilla XML feed.
-  // Instead of deleting silently, create a pending notification so the admin
-  // can decide the final action (sold by us, sold by others, withdrawn, delete).
-  // If a pending notification already exists for this ref (from a previous sync
-  // cycle), skip creating another one to avoid duplicates.
+  // Inmovilla is the source of truth: properties no longer in the feed are
+  // removed (sold/withdrawn). The full sale tracking lives in Ora CRM.
+  const deleteStmt   = db.prepare("DELETE FROM properties WHERE ref = ?");
+  const unhideStmt   = db.prepare("DELETE FROM propiedades_ocultas WHERE ref = ?");
   for (const ref of existingRefs) {
     if (!incomingRefs.has(ref)) {
-      const alreadyPending = db.prepare(
-        `SELECT 1 FROM operaciones_pendientes WHERE ref = ? AND resuelta = 0`
-      ).get(ref);
-      if (!alreadyPending) {
-        const prop = db.prepare(`SELECT titulo FROM properties WHERE ref = ?`).get(ref) as
-          | { titulo: string }
-          | undefined;
-        db.prepare(`
-          INSERT INTO operaciones_pendientes (ref, titulo, descripcion)
-          VALUES (?, ?, ?)
-        `).run(
-          ref,
-          prop?.titulo ?? ref,
-          "Esta propiedad ha desaparecido del feed de Inmovilla. Decide qué hacer con ella."
-        );
-      }
-      // Keep the property in the DB until the admin resolves the pending action.
+      deleteStmt.run(ref);
+      unhideStmt.run(ref); // clean up any stale hide flag
+      removed++;
     }
   }
 
@@ -390,29 +399,6 @@ async function syncFromXml(): Promise<SyncResult> {
 
   const insertMany = db.transaction((props: Property[]) => {
     for (const p of props) {
-      // Detect if a closed/archived property is reappearing in the feed.
-      // This can happen when an owner withdraws a property, then re-lists it.
-      const closedOp = db.prepare(
-        `SELECT estado FROM operaciones WHERE ref = ? AND estado IN ('archivado', 'vendido')`
-      ).get(p.ref) as { estado: string } | undefined;
-
-      if (closedOp) {
-        const alreadyPending = db.prepare(
-          `SELECT 1 FROM operaciones_pendientes WHERE ref = ? AND tipo = 'reaparicion' AND resuelta = 0`
-        ).get(p.ref);
-        if (!alreadyPending) {
-          const estadoLabel = closedOp.estado === "vendido" ? "vendida" : "archivada";
-          db.prepare(`
-            INSERT INTO operaciones_pendientes (ref, titulo, tipo, descripcion)
-            VALUES (?, ?, 'reaparicion', ?)
-          `).run(
-            p.ref,
-            p.titulo,
-            `Esta propiedad estaba ${estadoLabel} en el CRM pero ha vuelto a aparecer en el feed de Inmovilla. ¿Quieres reactivarla?`
-          );
-        }
-      }
-
       upsert.run(propertyToRow(p, null));
       if (existingRefs.has(p.ref)) { updated++; } else { added++; }
     }
@@ -557,6 +543,9 @@ export function getPropertiesFromDb(filters?: {
     params.push(`%${filters.ciudad.toLowerCase()}%`);
   }
 
+  // Always exclude manually hidden properties from listings
+  conditions.push("ref NOT IN (SELECT ref FROM propiedades_ocultas)");
+
   const where  = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
   const page   = filters?.page  ?? 1;
   const limit  = filters?.limit ?? 12;
@@ -593,7 +582,12 @@ export function getPropertyByRef(ref: string): Property | null {
 export function getFeaturedProperties(limit = 6): Property[] {
   const db = getDb();
   const rows = db
-    .prepare("SELECT * FROM properties WHERE estado_ficha = 1 ORDER BY fecha DESC LIMIT ?")
+    .prepare(`
+      SELECT * FROM properties
+      WHERE estado_ficha = 1
+        AND ref NOT IN (SELECT ref FROM propiedades_ocultas)
+      ORDER BY fecha DESC LIMIT ?
+    `)
     .all(limit) as Record<string, unknown>[];
   return rows.map(rowToProperty);
 }
@@ -601,7 +595,11 @@ export function getFeaturedProperties(limit = 6): Property[] {
 export function getAllPropertySlugs(): { slug: string; fecha: string }[] {
   const db = getDb();
   return db
-    .prepare("SELECT slug, fecha FROM properties ORDER BY fecha DESC")
+    .prepare(`
+      SELECT slug, fecha FROM properties
+      WHERE ref NOT IN (SELECT ref FROM propiedades_ocultas)
+      ORDER BY fecha DESC
+    `)
     .all() as { slug: string; fecha: string }[];
 }
 

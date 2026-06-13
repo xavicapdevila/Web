@@ -21,11 +21,16 @@ async function getStats() {
     const q  = (sql: string) =>
       (db.prepare(sql).get() as { c: number }).c;
 
+    // Manually hidden properties are discounted from the active/sale counters
+    // and reported in their own counter.
+    const notHidden = "ref NOT IN (SELECT ref FROM propiedades_ocultas)";
+
     return {
-      total:    q("SELECT COUNT(*) as c FROM properties WHERE estado_ficha = 1"),
-      venta:    q("SELECT COUNT(*) as c FROM properties WHERE operacion='venta'    AND estado_ficha=1"),
-      alquiler: q("SELECT COUNT(*) as c FROM properties WHERE operacion='alquiler' AND estado_ficha=1"),
-      outlet:   q("SELECT COUNT(*) as c FROM properties WHERE outlet=1            AND estado_ficha=1"),
+      total:    q(`SELECT COUNT(*) as c FROM properties WHERE estado_ficha = 1 AND ${notHidden}`),
+      venta:    q(`SELECT COUNT(*) as c FROM properties WHERE operacion='venta'    AND estado_ficha=1 AND ${notHidden}`),
+      alquiler: q(`SELECT COUNT(*) as c FROM properties WHERE operacion='alquiler' AND estado_ficha=1 AND ${notHidden}`),
+      outlet:   q(`SELECT COUNT(*) as c FROM properties WHERE outlet=1            AND estado_ficha=1 AND ${notHidden}`),
+      ocultas:  q("SELECT COUNT(*) as c FROM propiedades_ocultas"),
       lastSync: db
         .prepare("SELECT synced_at,properties_added,properties_updated,properties_removed,status,source FROM sync_log ORDER BY id DESC LIMIT 1")
         .get() as SyncRow | undefined,
@@ -34,7 +39,7 @@ async function getStats() {
         .all() as SyncRow[],
     };
   } catch {
-    return { total: 0, venta: 0, alquiler: 0, outlet: 0, lastSync: undefined, recentSyncs: [] };
+    return { total: 0, venta: 0, alquiler: 0, outlet: 0, ocultas: 0, lastSync: undefined, recentSyncs: [] };
   }
 }
 
@@ -58,11 +63,12 @@ export default async function AdminPage() {
       <p className="text-[#444] text-xs mb-10">The Vila Home · Panel de administración</p>
 
       {/* ── Stat cards ─────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
         {[
           { label: "Propiedades activas", value: s.total      },
           { label: "En venta",            value: s.venta      },
           { label: "En alquiler",         value: s.alquiler   },
+          { label: "Ocultas",             value: s.ocultas    },
           { label: "Artículos blog",      value: blogCount    },
         ].map(({ label, value }) => (
           <div key={label} className="border border-[#1a1a1a] bg-[#0d0d0d] px-5 py-5">

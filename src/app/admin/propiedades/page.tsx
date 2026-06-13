@@ -23,7 +23,7 @@ interface PropRow {
   plano_pins:     string;
   fecha:          string;
   fechaact:       string | null;
-  estado_op:      string;
+  oculta:         number;
 }
 
 async function getProperties(): Promise<PropRow[]> {
@@ -36,9 +36,9 @@ async function getProperties(): Promise<PropRow[]> {
         `SELECT p.ref, p.slug, p.titulo, p.tipo, p.subtipo, p.operacion, p.precio,
                 p.ciudad, p.zona, p.direccion, p.habitaciones, p.banos, p.m2_construidos,
                 p.estado_ficha, p.imagenes, p.plano_pins, p.fecha, p.fechaact,
-                COALESCE(o.estado, '') AS estado_op
+                CASE WHEN o.ref IS NULL THEN 0 ELSE 1 END AS oculta
          FROM properties p
-         LEFT JOIN operaciones o ON o.ref = p.ref
+         LEFT JOIN propiedades_ocultas o ON o.ref = p.ref
          ORDER BY p.fecha DESC`
       )
       .all() as PropRow[];
