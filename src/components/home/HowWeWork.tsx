@@ -30,12 +30,6 @@ export default function HowWeWork() {
             transform: inView ? "translateY(0)" : "translateY(30px)",
           }}
         >
-          <div className="flex items-center gap-4 mb-6">
-            <span className="h-px w-10 bg-[#C9B99A]" />
-            <span className="text-[#C9B99A] text-xs font-body tracking-[0.3em] uppercase">
-              {t("howLabel")}
-            </span>
-          </div>
           <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight">
             {t("howTitle1")}
             <br />
