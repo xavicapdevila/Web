@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Inter, Cormorant_Garamond, DM_Serif_Display, DM_Sans } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
@@ -22,6 +22,22 @@ const cormorant = Cormorant_Garamond({
   style: ["normal", "italic"],
   display: "swap",
   preload: true,
+});
+
+// Tipografías de la landing /vender — DM Serif Display (titulares) + DM Sans (cuerpo/UI)
+const dmSerif = DM_Serif_Display({
+  subsets: ["latin"],
+  variable: "--font-dm-serif",
+  weight: ["400"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
 const BASE_URL = "https://www.thevilahome.com";
@@ -124,10 +140,16 @@ export default async function RootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") ?? "";
   const isAdmin = pathname.startsWith("/admin");
-  const isStandalone = pathname.startsWith("/links") || pathname.startsWith("/trabaja");
+  const isStandalone =
+    pathname.startsWith("/links") ||
+    pathname.startsWith("/trabaja") ||
+    pathname.startsWith("/vender");
 
   return (
-    <html lang="es" className={`${inter.variable} ${cormorant.variable}`}>
+    <html
+      lang="es"
+      className={`${inter.variable} ${cormorant.variable} ${dmSerif.variable} ${dmSans.variable}`}
+    >
       <head>
         {/* Preconnect to external origins used on every page */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

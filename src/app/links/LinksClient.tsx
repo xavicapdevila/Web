@@ -5,108 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Script from 'next/script'
 import JobsModal from './JobsModal'
-
-type Lang = 'ca' | 'es' | 'en' | 'fr'
-
-type LinkItem = {
-  label: string
-  desc: string
-  href: string
-  external: boolean
-  icon: string
-  comingSoon?: boolean
-}
-
-const i18n: Record<Lang, { sections: { section: string; items: LinkItem[] }[] }> = {
-  ca: {
-    sections: [
-      {
-        section: "Troba'ns",
-        items: [
-          { label: 'Instagram',  desc: 'El dia a dia, sense filtres',               href: 'https://www.instagram.com/thevilahome',                    external: true,  icon: 'ig' },
-          { label: 'Facebook',   desc: 'Per als que encara esteu per aquí',          href: 'https://www.facebook.com/profile.php?id=100093001283637',  external: true,  icon: 'fb' },
-          { label: 'TikTok',     desc: 'Cases, persones i alguna sorpresa',          href: 'https://www.tiktok.com/@thevilahome',                      external: true,  icon: 'tk' },
-        ],
-      },
-      {
-        section: 'El que fem',
-        items: [
-          { label: 'Propietats',            desc: 'Cases de veritat, per a persones de veritat', href: '/propiedades',    external: false, icon: 'props'   },
-          { label: 'Vull vendre casa meva', desc: "Et diem el que val. Sense embuts.",            href: '/valoracion',    external: false, icon: 'sell'    },
-          { label: 'Com som',               desc: 'Per què fem les coses diferent',               href: '/quienes-somos', external: false, icon: 'work'    },
-          { label: 'Parlem',                desc: 'Sense compromís. De veritat.',                 href: '/contacto',      external: false, icon: 'contact' },
-          { label: 'Treballa amb nosaltres',desc: 'Potser ets tu qui busquem',                    href: '',               external: false, icon: 'jobs', comingSoon: true },
-        ],
-      },
-    ],
-  },
-  es: {
-    sections: [
-      {
-        section: 'Encuéntranos',
-        items: [
-          { label: 'Instagram',          desc: 'El día a día, sin filtros',                   href: 'https://www.instagram.com/thevilahome',                    external: true,  icon: 'ig' },
-          { label: 'Facebook',           desc: 'Para los que aún están por aquí',             href: 'https://www.facebook.com/profile.php?id=100093001283637',  external: true,  icon: 'fb' },
-          { label: 'TikTok',             desc: 'Casas, personas y alguna sorpresa',           href: 'https://www.tiktok.com/@thevilahome',                      external: true,  icon: 'tk' },
-        ],
-      },
-      {
-        section: 'Lo que hacemos',
-        items: [
-          { label: 'Propiedades',           desc: 'Casas de verdad, para personas de verdad',   href: '/propiedades',    external: false, icon: 'props'   },
-          { label: 'Quiero vender mi casa', desc: 'Te decimos lo que vale. Sin rodeos.',         href: '/valoracion',    external: false, icon: 'sell'    },
-          { label: 'Cómo somos',            desc: 'Por qué hacemos esto diferente',             href: '/quienes-somos', external: false, icon: 'work'    },
-          { label: 'Hablamos',              desc: 'Sin compromiso. En serio.',                  href: '/contacto',      external: false, icon: 'contact' },
-          { label: 'Trabaja con nosotros',  desc: 'Quizás eres tú quien buscamos',              href: '',               external: false, icon: 'jobs', comingSoon: true },
-        ],
-      },
-    ],
-  },
-  en: {
-    sections: [
-      {
-        section: 'Find us',
-        items: [
-          { label: 'Instagram',          desc: 'Day to day, no filters',                     href: 'https://www.instagram.com/thevilahome',                    external: true,  icon: 'ig' },
-          { label: 'Facebook',           desc: 'For those still around',                     href: 'https://www.facebook.com/profile.php?id=100093001283637',  external: true,  icon: 'fb' },
-          { label: 'TikTok',             desc: 'Homes, people and some surprises',           href: 'https://www.tiktok.com/@thevilahome',                      external: true,  icon: 'tk' },
-        ],
-      },
-      {
-        section: 'What we do',
-        items: [
-          { label: 'Properties',         desc: 'Real homes, for real people',                href: '/propiedades',    external: false, icon: 'props'   },
-          { label: 'I want to sell',     desc: "We tell you what it's worth. No nonsense.",  href: '/valoracion',    external: false, icon: 'sell'    },
-          { label: 'Who we are',         desc: 'Why we do things differently',               href: '/quienes-somos', external: false, icon: 'work'    },
-          { label: "Let's talk",         desc: 'No commitment. Seriously.',                  href: '/contacto',      external: false, icon: 'contact' },
-          { label: 'Work with us',       desc: 'Maybe you\'re who we\'re looking for',       href: '',               external: false, icon: 'jobs', comingSoon: true },
-        ],
-      },
-    ],
-  },
-  fr: {
-    sections: [
-      {
-        section: 'Retrouvez-nous',
-        items: [
-          { label: 'Instagram',          desc: 'Le quotidien, sans filtres',                 href: 'https://www.instagram.com/thevilahome',                    external: true,  icon: 'ig' },
-          { label: 'Facebook',           desc: 'Pour ceux qui sont encore là',              href: 'https://www.facebook.com/profile.php?id=100093001283637',  external: true,  icon: 'fb' },
-          { label: 'TikTok',             desc: 'Maisons, personnes et surprises',           href: 'https://www.tiktok.com/@thevilahome',                      external: true,  icon: 'tk' },
-        ],
-      },
-      {
-        section: 'Ce que nous faisons',
-        items: [
-          { label: 'Propriétés',         desc: 'Vraies maisons, pour de vraies personnes',  href: '/propiedades',    external: false, icon: 'props'   },
-          { label: 'Je veux vendre',     desc: 'On vous dit ce que ça vaut. Sans détour.',  href: '/valoracion',    external: false, icon: 'sell'    },
-          { label: 'Qui sommes-nous',    desc: 'Pourquoi nous faisons les choses autrement',href: '/quienes-somos', external: false, icon: 'work'    },
-          { label: 'Parlons',            desc: 'Sans engagement. Vraiment.',                href: '/contacto',      external: false, icon: 'contact' },
-          { label: 'Travailler avec nous',desc: 'Peut-être êtes-vous qui nous cherchons',   href: '',               external: false, icon: 'jobs', comingSoon: true },
-        ],
-      },
-    ],
-  },
-}
+import type { Lang, LinksDoc } from '@/lib/links-content'
 
 const iconStyles: Record<string, { bg: string; color: string }> = {
   ig:      { bg: '#fce4ec', color: '#c2185b' },
@@ -118,6 +17,10 @@ const iconStyles: Record<string, { bg: string; color: string }> = {
   contact: { bg: '#fbe9e7', color: '#bf360c' },
   jobs:    { bg: '#f0fdf4', color: '#166534' },
 }
+
+// Used when an item references an icon key the web doesn't know yet
+// (e.g. a brand-new link created in Ora).
+const FALLBACK_STYLE = { bg: '#eceae6', color: '#555' }
 
 const iconSvgs: Record<string, React.ReactNode> = {
   ig: (
@@ -173,6 +76,13 @@ const iconSvgs: Record<string, React.ReactNode> = {
   ),
 }
 
+const FallbackIcon = (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </svg>
+)
+
 const ArrowRight = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
     <line x1="5" y1="12" x2="19" y2="12"/>
@@ -193,11 +103,10 @@ declare global {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
-export default function LinksClient({ defaultJobsOpen = false }: { defaultJobsOpen?: boolean }) {
+export default function LinksClient({ data, defaultJobsOpen = false }: { data: LinksDoc; defaultJobsOpen?: boolean }) {
   const [lang, setLang] = useState<Lang>('ca')
   const params = useSearchParams()
   const [jobsOpen, setJobsOpen] = useState(() => defaultJobsOpen || params.get('jobs') === '1')
-  const { sections } = i18n[lang]
 
   useEffect(() => {
     if (GA_ID && window.gtag) {
@@ -210,17 +119,17 @@ export default function LinksClient({ defaultJobsOpen = false }: { defaultJobsOp
     }).catch(() => {})
   }, [])
 
-  const trackClick = useCallback((label: string, href: string, iconKey: string) => {
+  const trackClick = useCallback((label: string, href: string, id: string) => {
     window.gtag?.('event', 'links_click', { link_label: label, link_url: href })
     fetch('/api/links-track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'click', key: iconKey }),
+      body: JSON.stringify({ type: 'click', key: id }),
     }).catch(() => {})
   }, [])
 
-  const handleJobsClick = useCallback((label: string, iconKey: string) => {
-    trackClick(label, '', iconKey)
+  const handleJobsClick = useCallback((label: string, id: string) => {
+    trackClick(label, '', id)
     setJobsOpen(true)
   }, [trackClick])
 
@@ -262,64 +171,73 @@ export default function LinksClient({ defaultJobsOpen = false }: { defaultJobsOp
           </div>
         </div>
 
-        {sections.map((group) => (
-          <div key={group.section} className="mb-2">
-            <p className="text-[10px] tracking-[0.12em] uppercase text-[#C9B99A] mb-2 px-1">
-              {group.section}
-            </p>
-            {group.items.map((item) => {
-              const style = iconStyles[item.icon]
+        {data.sections.map((group) => {
+          const items = group.items.filter((i) => i.active)
+          if (items.length === 0) return null
 
-              if (item.comingSoon) {
+          return (
+            <div key={group.id} className="mb-2">
+              <p className="text-[10px] tracking-[0.12em] uppercase text-[#C9B99A] mb-2 px-1">
+                {group.title[lang]}
+              </p>
+              {items.map((item) => {
+                const style = iconStyles[item.icon] ?? FALLBACK_STYLE
+                const glyph = iconSvgs[item.icon] ?? FallbackIcon
+                const label = item.label[lang]
+                const desc = item.desc[lang]
+
+                if (item.comingSoon) {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleJobsClick(label, item.id)}
+                      className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors text-left group"
+                    >
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: style.bg, color: style.color }}
+                      >
+                        {glyph}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-neutral-100 leading-tight">{label}</p>
+                        <p className="text-xs text-neutral-500 mt-0.5 leading-tight">{desc}</p>
+                      </div>
+                      <span className="text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0">
+                        <ArrowRight />
+                      </span>
+                    </button>
+                  )
+                }
+
                 return (
-                  <button
-                    key={item.icon}
-                    onClick={() => handleJobsClick(item.label, item.icon)}
-                    className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors text-left group"
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    onClick={() => trackClick(label, item.href, item.id)}
+                    className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors no-underline text-inherit group"
                   >
                     <div
                       className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: style.bg, color: style.color }}
                     >
-                      {iconSvgs[item.icon]}
+                      {glyph}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-neutral-100 leading-tight">{item.label}</p>
-                      <p className="text-xs text-neutral-500 mt-0.5 leading-tight">{item.desc}</p>
+                      <p className="text-sm font-medium text-neutral-100 leading-tight">{label}</p>
+                      <p className="text-xs text-neutral-500 mt-0.5 leading-tight">{desc}</p>
                     </div>
                     <span className="text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0">
                       <ArrowRight />
                     </span>
-                  </button>
+                  </a>
                 )
-              }
-
-              return (
-                <a
-                  key={item.icon}
-                  href={item.href}
-                  target="_blank" rel="noopener noreferrer"
-                  onClick={() => trackClick(item.label, item.href, item.icon)}
-                  className="flex items-center gap-4 w-full px-4 py-3.5 mb-2.5 rounded-xl border border-[#2a2a2a] bg-[#111111] hover:bg-[#1a1a1a] transition-colors no-underline text-inherit group"
-                >
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: style.bg, color: style.color }}
-                  >
-                    {iconSvgs[item.icon]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-neutral-100 leading-tight">{item.label}</p>
-                    <p className="text-xs text-neutral-500 mt-0.5 leading-tight">{item.desc}</p>
-                  </div>
-                  <span className="text-neutral-600 group-hover:text-neutral-400 transition-colors flex-shrink-0">
-                    <ArrowRight />
-                  </span>
-                </a>
-              )
-            })}
-          </div>
-        ))}
+              })}
+            </div>
+          )
+        })}
 
         <div className="mt-6 pt-4 border-t border-[#2a2a2a] text-center">
           <a href="https://www.thevilahome.com" className="text-[10px] text-neutral-600 hover:text-neutral-400 transition-colors no-underline">

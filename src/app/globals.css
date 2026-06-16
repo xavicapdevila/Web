@@ -94,6 +94,19 @@
     font-family: "Inter", system-ui, sans-serif;
   }
 
+  /* Tipografías landing /vender (referencian las variables de next/font) */
+  .font-dm-serif {
+    font-family: var(--font-dm-serif), "Georgia", serif;
+  }
+
+  .font-dm-sans {
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+
+  .font-cormorant {
+    font-family: var(--font-cormorant), "Cormorant Garamond", "Georgia", serif;
+  }
+
   .gradient-gold {
     background: linear-gradient(135deg, #C9B99A, #DDD0BB);
   }

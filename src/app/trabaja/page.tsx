@@ -1,5 +1,8 @@
 import type { Metadata } from 'next'
 import LinksClient from '../links/LinksClient'
+import { getLinksContent } from '@/lib/links-content'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Treballa amb nosaltres — The Vila Home',
@@ -7,6 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-export default function TrabajaPage() {
-  return <LinksClient defaultJobsOpen />
+export default async function TrabajaPage() {
+  const data = await getLinksContent()
+  return <LinksClient data={data} defaultJobsOpen />
 }
