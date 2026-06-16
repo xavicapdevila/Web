@@ -3,6 +3,7 @@
 import Link from "next/link";
 import PropertyCard from "@/components/properties/PropertyCard";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
+import { fillTemplate } from "@/lib/i18n";
 import type { Property } from "@/types/property";
 
 export interface ZonaFaq {
@@ -37,11 +38,15 @@ interface Props {
   properties: Property[];
   total: number;
   cercanas: { slug: string; nombre: string; descripcionCorta: string }[];
-  waUrl: string;
 }
 
-export default function ZonaPageContent({ zona, properties, total, cercanas, waUrl }: Props) {
+export default function ZonaPageContent({ zona, properties, total, cercanas }: Props) {
   const { t } = useLanguage();
+
+  // WA "notify me" button → message prefilled in the current site language
+  const waUrl = `https://wa.me/34638359612?text=${encodeURIComponent(
+    fillTemplate(t("zonaNotifyMsg"), { zona: zona.nombre })
+  )}`;
 
   // Auto-translated prose (ES → current language) — same mechanism as property descriptions.
   // Long description is split into sentences so each chunk stays within the translation API limit.

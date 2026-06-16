@@ -5,18 +5,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Phone, Mail, BedDouble, Bath, Maximize2, Share2, ArrowLeft } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
-import { getTipoLabel } from "@/lib/i18n";
+import { getTipoLabel, fillTemplate } from "@/lib/i18n";
 import { useLanguage, useAutoTranslate, useAutoTranslateMulti } from "@/context/LanguageContext";
 import PropertyDetails from "./PropertyDetails";
 import AgentPhoto from "./AgentPhoto";
 import ShareModal from "./ShareModal";
 import type { Property } from "@/types/property";
+import { buildAgentWhatsApp } from "@/lib/agents";
 
 interface Props {
   property: Property;
   agentInfo: { name: string; photo: string };
   contactEmail: string;
-  waUrl: string;
   isReserved: boolean;
 }
 
@@ -141,7 +141,7 @@ function EnergyCertificate({
   );
 }
 
-export default function PropertyPageContent({ property, agentInfo, contactEmail, waUrl, isReserved }: Props) {
+export default function PropertyPageContent({ property, agentInfo, contactEmail, isReserved }: Props) {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
@@ -174,7 +174,14 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
     : `https://www.thevilahome.com/propiedades/${property.slug}`;
 
   // WA share modal → no preset recipient, user chooses who to forward to
-  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${titulo}\n${shareUrl}`)}`;
+  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(fillTemplate(t("propShareWaMsg"), { titulo, url: shareUrl }))}`;
+
+  // WA contact button → message to the agent, prefilled in the current site language
+  const waUrl = buildAgentWhatsApp(property.agenteEmail, t("propWhatsappMsg"), {
+    titulo,
+    ref: property.ref ?? "",
+    url: shareUrl,
+  });
 
   return (
     <>

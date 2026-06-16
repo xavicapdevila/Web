@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X } from "lucide-react";
 import { FloorPlanIcon } from "./icons";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
-import { getTipoLabel } from "@/lib/i18n";
+import { getTipoLabel, fillTemplate } from "@/lib/i18n";
 import type { Property } from "@/types/property";
 import { useLanguage, useAutoTranslate } from "@/context/LanguageContext";
 import ShareModal from "./ShareModal";
@@ -73,10 +73,15 @@ function PropertyCard({ property, priority = false }: Props) {
   };
 
   const propertyUrl = `https://www.thevilahome.com/propiedades/${property.slug}`;
-  // WA button in card → contact the agent (resolved from centralised agents config)
-  const cardWaUrl = buildAgentWhatsApp(property.agenteEmail, property.titulo, property.ref ?? "", propertyUrl);
+  // WA button in card → contact the agent (resolved from centralised agents config),
+  // message prefilled in the current site language
+  const cardWaUrl = buildAgentWhatsApp(property.agenteEmail, t("propWhatsappMsg"), {
+    titulo,
+    ref: property.ref ?? "",
+    url: propertyUrl,
+  });
   // WA button in share modal → open WhatsApp without recipient so user chooses who to forward to
-  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(`Mira esta propiedad de The Vila Home:\n\n${property.titulo}\n${propertyUrl}`)}`;
+  const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(fillTemplate(t("propShareWaMsg"), { titulo, url: propertyUrl }))}`;
   const isReserved = property.estadoFicha === 7;
   const hasDiscount = property.outlet && property.precioAnterior;
 

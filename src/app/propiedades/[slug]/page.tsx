@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getCachedPropertyBySlug, getCachedSlugs } from "@/lib/sync";
-import { getAgentInfo, buildAgentWhatsApp } from "@/lib/agents";
+import { getAgentInfo } from "@/lib/agents";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import PropertyPageContent from "@/components/properties/PropertyPageContent";
 import { formatPrice } from "@/lib/utils";
@@ -94,9 +94,6 @@ export default async function PropertyPage({ params }: Props) {
   const { name: agentName, photo: agentPhoto, contactEmail } = getAgentInfo(property.agenteEmail);
   const agentInfo = { name: agentName, photo: agentPhoto };
 
-  const propertyUrl = `${BASE_URL}/propiedades/${slug}`;
-  const waUrl = buildAgentWhatsApp(property.agenteEmail, property.titulo, property.ref ?? "", propertyUrl);
-
   const canonicalUrl = `${BASE_URL}/propiedades/${slug}`;
 
   // JSON-LD RealEstateListing
@@ -184,7 +181,6 @@ export default async function PropertyPage({ params }: Props) {
         property={property}
         agentInfo={agentInfo}
         contactEmail={contactEmail}
-        waUrl={waUrl}
         isReserved={isReserved}
       />
     </div>

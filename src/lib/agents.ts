@@ -3,6 +3,7 @@
  * Used by PropertyCard, the property detail page, and any other component
  * that needs to display or contact a specific agent.
  */
+import { fillTemplate } from "@/lib/i18n";
 
 export interface AgentInfo {
   name: string;
@@ -52,16 +53,17 @@ export function getAgentInfo(email?: string): AgentInfo & { contactEmail: string
 /**
  * Builds the WhatsApp deep-link URL for a property enquiry directed to the
  * responsible agent (or the generic office number if agent is unknown).
+ *
+ * `messageTemplate` is the localised text (from i18n key `propWhatsappMsg`) and
+ * must contain the `{titulo}`, `{ref}` and `{url}` placeholders, which are
+ * substituted here so the prefilled WhatsApp message matches the site language.
  */
 export function buildAgentWhatsApp(
   agentEmail: string | undefined,
-  propertyTitulo: string,
-  propertyRef: string,
-  propertyUrl: string,
+  messageTemplate: string,
+  values: { titulo: string; ref: string; url: string },
 ): string {
   const { mobile } = getAgentInfo(agentEmail);
-  const text = encodeURIComponent(
-    `Hola, he visto la propiedad ${propertyTitulo} (Ref. ${propertyRef}) en vuestra web y me gustaría recibir más información.\n\n${propertyUrl}`,
-  );
+  const text = encodeURIComponent(fillTemplate(messageTemplate, values));
   return `https://wa.me/${mobile}?text=${text}`;
 }

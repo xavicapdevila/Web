@@ -94,8 +94,19 @@ const dict = {
     propCall: "Llamar · 936 061 800",
     propEmail: "Enviar email",
     propWhatsapp: "Contactar por WhatsApp",
+    propWhatsappMsg: "Hola, he visto la propiedad {titulo} (Ref. {ref}) en vuestra web y me gustaría recibir más información.\n\n{url}",
     propReservedAlert: "Este inmueble está reservado. Para más información, contacta con nosotros.",
     propShare: "Compartir propiedad",
+    propShareWaMsg: "Mira esta propiedad de The Vila Home:\n\n{titulo}\n{url}",
+    propShareEmailMsg: "Te comparto esta propiedad de The Vila Home:\n\n{titulo}\n{price}\n\n{url}",
+    shareModalClose: "Cerrar",
+    shareModalMessaging: "Compartir por mensajería",
+    shareModalSendWhatsapp: "Enviar por WhatsApp",
+    shareModalCopyLink: "Copiar enlace",
+    shareModalCopy: "Copiar",
+    shareModalCopied: "Copiado",
+    shareModalEmailLabel: "Compartir por email",
+    shareModalSendEmail: "Enviar por email",
     backToListing: "Volver al listado",
 
     // Property details section
@@ -302,6 +313,7 @@ const dict = {
     zonaNoPropsPrefix: "Ahora mismo no tenemos propiedades en",
     zonaNoPropsDesc: "Pero trabajamos activamente en esta zona. Tenemos compradores y vendedores buscando aquí. Si te interesa, escríbenos y te avisamos en cuanto entre algo que encaje.",
     zonaNotifyWhatsapp: "Avisadme por WhatsApp",
+    zonaNotifyMsg: "Hola, me gustaría que me avisaseis cuando haya propiedades disponibles en {zona}.",
     zonaMarketLabel: "Mercado local",
     zonaAvgPrice: "Precio medio",
     zonaPropertyType: "Tipo de vivienda",
@@ -392,8 +404,19 @@ const dict = {
     propCall: "Trucar · 936 061 800",
     propEmail: "Enviar correu",
     propWhatsapp: "Contactar per WhatsApp",
+    propWhatsappMsg: "Hola, he vist la propietat {titulo} (Ref. {ref}) al vostre web i m'agradaria rebre'n més informació.\n\n{url}",
     propReservedAlert: "Aquest immoble està reservat. Per a més informació, contacta amb nosaltres.",
     propShare: "Compartir propietat",
+    propShareWaMsg: "Mira aquesta propietat de The Vila Home:\n\n{titulo}\n{url}",
+    propShareEmailMsg: "Et comparteixo aquesta propietat de The Vila Home:\n\n{titulo}\n{price}\n\n{url}",
+    shareModalClose: "Tancar",
+    shareModalMessaging: "Compartir per missatgeria",
+    shareModalSendWhatsapp: "Enviar per WhatsApp",
+    shareModalCopyLink: "Copiar enllaç",
+    shareModalCopy: "Copiar",
+    shareModalCopied: "Copiat",
+    shareModalEmailLabel: "Compartir per email",
+    shareModalSendEmail: "Enviar per email",
     backToListing: "Tornar al llistat",
 
     detailsTitle: "Característiques",
@@ -591,6 +614,7 @@ const dict = {
     zonaNoPropsPrefix: "Ara mateix no tenim propietats a",
     zonaNoPropsDesc: "Però treballem activament en aquesta zona. Tenim compradors i venedors buscant aquí. Si t'interessa, escriu-nos i t'avisem tan aviat com entri alguna cosa que encaixi.",
     zonaNotifyWhatsapp: "Aviseu-me per WhatsApp",
+    zonaNotifyMsg: "Hola, m'agradaria que m'aviséssiu quan hi hagi propietats disponibles a {zona}.",
     zonaMarketLabel: "Mercat local",
     zonaAvgPrice: "Preu mitjà",
     zonaPropertyType: "Tipus d'habitatge",
@@ -681,8 +705,19 @@ const dict = {
     propCall: "Call · 936 061 800",
     propEmail: "Send email",
     propWhatsapp: "Contact via WhatsApp",
+    propWhatsappMsg: "Hi, I saw the property {titulo} (Ref. {ref}) on your website and I'd like to receive more information.\n\n{url}",
     propReservedAlert: "This property is reserved. For more information, please contact us.",
     propShare: "Share property",
+    propShareWaMsg: "Check out this property from The Vila Home:\n\n{titulo}\n{url}",
+    propShareEmailMsg: "I'm sharing this property from The Vila Home with you:\n\n{titulo}\n{price}\n\n{url}",
+    shareModalClose: "Close",
+    shareModalMessaging: "Share via messaging",
+    shareModalSendWhatsapp: "Send via WhatsApp",
+    shareModalCopyLink: "Copy link",
+    shareModalCopy: "Copy",
+    shareModalCopied: "Copied",
+    shareModalEmailLabel: "Share via email",
+    shareModalSendEmail: "Send via email",
     backToListing: "Back to listings",
 
     detailsTitle: "Features",
@@ -880,6 +915,7 @@ const dict = {
     zonaNoPropsPrefix: "Right now we have no properties in",
     zonaNoPropsDesc: "But we're actively working in this area. We have buyers and sellers looking here. If you're interested, write to us and we'll let you know as soon as something suitable comes up.",
     zonaNotifyWhatsapp: "Notify me on WhatsApp",
+    zonaNotifyMsg: "Hi, I'd like to be notified when there are properties available in {zona}.",
     zonaMarketLabel: "Local market",
     zonaAvgPrice: "Average price",
     zonaPropertyType: "Property type",
@@ -970,8 +1006,19 @@ const dict = {
     propCall: "Appeler · 936 061 800",
     propEmail: "Envoyer un email",
     propWhatsapp: "Contacter par WhatsApp",
+    propWhatsappMsg: "Bonjour, j'ai vu la propriété {titulo} (Réf. {ref}) sur votre site web et je souhaiterais recevoir plus d'informations.\n\n{url}",
     propReservedAlert: "Ce bien est réservé. Pour plus d'informations, contactez-nous.",
     propShare: "Partager le bien",
+    propShareWaMsg: "Découvre ce bien de The Vila Home :\n\n{titulo}\n{url}",
+    propShareEmailMsg: "Je te partage ce bien de The Vila Home :\n\n{titulo}\n{price}\n\n{url}",
+    shareModalClose: "Fermer",
+    shareModalMessaging: "Partager par messagerie",
+    shareModalSendWhatsapp: "Envoyer par WhatsApp",
+    shareModalCopyLink: "Copier le lien",
+    shareModalCopy: "Copier",
+    shareModalCopied: "Copié",
+    shareModalEmailLabel: "Partager par email",
+    shareModalSendEmail: "Envoyer par email",
     backToListing: "Retour à la liste",
 
     detailsTitle: "Caractéristiques",
@@ -1169,6 +1216,7 @@ const dict = {
     zonaNoPropsPrefix: "Pour le moment, nous n'avons pas de biens à",
     zonaNoPropsDesc: "Mais nous travaillons activement dans cette zone. Nous avons des acheteurs et des vendeurs qui cherchent ici. Si cela vous intéresse, écrivez-nous et nous vous préviendrons dès que quelque chose de pertinent se présente.",
     zonaNotifyWhatsapp: "Prévenez-moi sur WhatsApp",
+    zonaNotifyMsg: "Bonjour, je souhaiterais être prévenu(e) lorsqu'il y aura des biens disponibles à {zona}.",
     zonaMarketLabel: "Marché local",
     zonaAvgPrice: "Prix moyen",
     zonaPropertyType: "Type de bien",
@@ -1190,6 +1238,15 @@ export type Translations = typeof dict.es;
 
 export function getTranslations(lang: Lang): Translations {
   return dict[lang] as unknown as Translations;
+}
+
+/**
+ * Substitutes `{key}` placeholders in a (usually translated) template string.
+ * Used to build localised WhatsApp / email messages, e.g.
+ * fillTemplate(t("propWhatsappMsg"), { titulo, ref, url }).
+ */
+export function fillTemplate(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => values[key] ?? `{${key}}`);
 }
 
 // Property type labels per language

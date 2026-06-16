@@ -347,10 +347,6 @@ export default async function ZonaPage({ params }: Props) {
   });
 
   const canonicalUrl = `${BASE_URL}/zona/${ciudad}`;
-  const waText = encodeURIComponent(
-    `Hola, me gustaría que me avisaseis cuando haya propiedades disponibles en ${zona.nombre}.`
-  );
-  const waUrl = `https://wa.me/34638359612?text=${waText}`;
 
   const schemaOrganization = {
     "@context": "https://schema.org",
@@ -427,7 +423,6 @@ export default async function ZonaPage({ params }: Props) {
         properties={properties}
         total={total}
         cercanas={cercanas}
-        waUrl={waUrl}
       />
     </div>
   );
