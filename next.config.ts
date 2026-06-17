@@ -47,21 +47,25 @@ const nextConfig: NextConfig = {
      { source: "/inmuebles{/}?", destination: "/propiedades/", permanent: true },
      { source: "/valora-tu-vivienda{/}?", destination: "/valoracion/", permanent: true },
 
-     // Blog posts antiguos (root level → /blog/)
+     // Blog posts antiguos (root level) → artículo / zona equivalente cuando existe
      { source: "/inmobiliaria-en-vilanova-i-la-geltru{/}?", destination: "/blog/elegir-inmobiliaria-vender-piso", permanent: true },
-     { source: "/mejor-zona-para-vivir-en-vilanova-i-la-geltru{/}?", destination: "/blog/", permanent: true },
-     { source: "/por-que-mi-inmueble-no-recibe-visitas{/}?", destination: "/blog/", permanent: true },
-     { source: "/hoja-de-firmas-en-visitas-inmobiliarias{/}?", destination: "/blog/", permanent: true },
+     { source: "/mejor-zona-para-vivir-en-vilanova-i-la-geltru{/}?", destination: "/zona/vilanova", permanent: true },
+     { source: "/por-que-mi-inmueble-no-recibe-visitas{/}?", destination: "/blog/anuncios-inmobiliarios-reciben-mas-visitas", permanent: true },
+     { source: "/hoja-de-firmas-en-visitas-inmobiliarias{/}?", destination: "/blog/hoja-visitas-inmobiliaria-que-es-como-protege", permanent: true },
      { source: "/vivir-en-vilanova-i-la-geltru{/}?", destination: "/zona/vilanova", permanent: true },
-     { source: "/beneficios-broker-hipotecario{/}?", destination: "/blog/", permanent: true },
-     { source: "/descripciones-inmobiliarias{/}?", destination: "/blog/", permanent: true },
-     { source: "/como-preparar-tu-casa-para-la-venta{/}?", destination: "/blog/", permanent: true },
-     { source: "/vender-casa-con-hipoteca-en-catalunya{/}?", destination: "/blog/", permanent: true },
-     { source: "/cuanto-cuesta-vender{/}?", destination: "/blog/", permanent: true },
-     { source: "/como-elegir-mejor-zona-para-vivir-en-vilanova-geltru{/}?", destination: "/blog/", permanent: true },
-     { source: "/elegir-mejor-zona-vilanova-geltru{/}?", destination: "/blog/", permanent: true },
-     { source: "/mejor-zona-vivir-vilanova{/}?", destination: "/blog/", permanent: true },
+     { source: "/beneficios-broker-hipotecario{/}?", destination: "/blog/categoria/hipotecas", permanent: true },
+     { source: "/descripciones-inmobiliarias{/}?", destination: "/blog/anuncios-inmobiliarios-reciben-mas-visitas", permanent: true },
+     { source: "/como-preparar-tu-casa-para-la-venta{/}?", destination: "/blog/home-staging-vender-vivienda-mas-rapido", permanent: true },
+     { source: "/vender-casa-con-hipoteca-en-catalunya{/}?", destination: "/blog/vender-casa-hipoteca-pendiente-catalunya", permanent: true },
+     { source: "/cuanto-cuesta-vender{/}?", destination: "/blog/gastos-vender-vivienda-catalunya", permanent: true },
+     { source: "/paso-previo-a-las-arras{/}?", destination: "/blog/contrato-de-arras", permanent: true },
+     { source: "/como-elegir-mejor-zona-para-vivir-en-vilanova-geltru{/}?", destination: "/zona/vilanova", permanent: true },
+     { source: "/elegir-mejor-zona-vilanova-geltru{/}?", destination: "/zona/vilanova", permanent: true },
+     { source: "/mejor-zona-vivir-vilanova{/}?", destination: "/zona/vilanova", permanent: true },
      { source: "/noticias{/}?", destination: "/blog/", permanent: true },
+
+     // Demo sobrante del theme WordPress (Houzez) — sin equivalente
+     { source: "/about-this-demo{/}?", destination: "/", permanent: true },
 
      // Corrección de slug con typo (faltaba la "d" inicial de "documentacion")
      {
@@ -79,14 +83,15 @@ const nextConfig: NextConfig = {
      { source: "/valoracion-inmueble{/}?", destination: "/valoracion/", permanent: true },
 
      // Servicios y empresa
+     { source: "/servicios/home-staging{/}?", destination: "/blog/home-staging-vender-vivienda-mas-rapido", permanent: true },
      { source: "/servicios/:slug{/}?", destination: "/quienes-somos/", permanent: true },
      { source: "/servicios{/}?", destination: "/quienes-somos/", permanent: true },
      { source: "/empresa{/}?", destination: "/quienes-somos/", permanent: true },
 
      // Paginación y taxonomías WordPress
      { source: "/page/:num{/}?", destination: "/propiedades/", permanent: true },
-     { source: "/category/:slug{/}?", destination: "/blog/", permanent: true },
-     { source: "/tag/:slug{/}?", destination: "/blog/", permanent: true },
+     { source: "/category/:path*", destination: "/blog/", permanent: true },
+     { source: "/tag/:path*", destination: "/blog/", permanent: true },
      { source: "/author/:slug{/}?", destination: "/", permanent: true },
 
      // Permalinks WordPress con fecha (/AAAA/MM/slug). El guard \d evita
