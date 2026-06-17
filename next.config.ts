@@ -48,10 +48,11 @@ const nextConfig: NextConfig = {
      { source: "/valora-tu-vivienda{/}?", destination: "/valoracion/", permanent: true },
 
      // Blog posts antiguos (root level → /blog/)
+     { source: "/inmobiliaria-en-vilanova-i-la-geltru{/}?", destination: "/blog/elegir-inmobiliaria-vender-piso", permanent: true },
      { source: "/mejor-zona-para-vivir-en-vilanova-i-la-geltru{/}?", destination: "/blog/", permanent: true },
      { source: "/por-que-mi-inmueble-no-recibe-visitas{/}?", destination: "/blog/", permanent: true },
      { source: "/hoja-de-firmas-en-visitas-inmobiliarias{/}?", destination: "/blog/", permanent: true },
-     { source: "/vivir-en-vilanova-i-la-geltru{/}?", destination: "/zona/vilanova-i-la-geltru/", permanent: true },
+     { source: "/vivir-en-vilanova-i-la-geltru{/}?", destination: "/zona/vilanova", permanent: true },
      { source: "/beneficios-broker-hipotecario{/}?", destination: "/blog/", permanent: true },
      { source: "/descripciones-inmobiliarias{/}?", destination: "/blog/", permanent: true },
      { source: "/como-preparar-tu-casa-para-la-venta{/}?", destination: "/blog/", permanent: true },
@@ -61,6 +62,13 @@ const nextConfig: NextConfig = {
      { source: "/elegir-mejor-zona-vilanova-geltru{/}?", destination: "/blog/", permanent: true },
      { source: "/mejor-zona-vivir-vilanova{/}?", destination: "/blog/", permanent: true },
      { source: "/noticias{/}?", destination: "/blog/", permanent: true },
+
+     // Corrección de slug con typo (faltaba la "d" inicial de "documentacion")
+     {
+       source: "/blog/ocumentacion-necesaria-vender-vivienda-catalunya{/}?",
+       destination: "/blog/documentacion-necesaria-vender-vivienda-catalunya",
+       permanent: true,
+     },
 
      // Páginas de propiedades (URL antigua /propiedad/ → nueva /propiedades/)
      { source: "/propiedad/:slug{/}?", destination: "/propiedades/", permanent: true },
@@ -80,6 +88,11 @@ const nextConfig: NextConfig = {
      { source: "/category/:slug{/}?", destination: "/blog/", permanent: true },
      { source: "/tag/:slug{/}?", destination: "/blog/", permanent: true },
      { source: "/author/:slug{/}?", destination: "/", permanent: true },
+
+     // Permalinks WordPress con fecha (/AAAA/MM/slug). El guard \d evita
+     // colisionar con rutas reales como /blog/categoria/* o /zona/*.
+     { source: "/:year(\\d{4})/:month(\\d{2})/:slug{/}?", destination: "/blog/", permanent: true },
+     { source: "/:year(\\d{4})/:month(\\d{2}){/}?", destination: "/blog/", permanent: true },
    ];
  },
 

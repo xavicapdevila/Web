@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from "@/lib/blog";
+import { normalizeBlogContent } from "@/lib/blog-content";
 import BlogPostClient from "@/components/blog/BlogPostClient";
 import BlogCategoryNav from "@/components/blog/BlogCategoryNav";
 
@@ -80,6 +81,10 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
   if (!post) notFound();
+
+  // Normalise internal links in the body (absolute → relative) so they resolve
+  // to 200 on www with no redirect hop, and Google crawls clean links.
+  if (post.contenido) post = { ...post, contenido: normalizeBlogContent(post.contenido) };
 
   const related = await getRelatedPosts(slug, post.etiquetas, post.categoria, 3);
   const canonicalUrl = `${BASE_URL}/blog/${slug}`;

@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   try {
-    const { posts } = await getBlogPosts(100, 0);
+    const { posts } = await getBlogPosts(1000, 0);
     for (const post of posts) {
       routes.push({
         url: `${BASE_URL}/blog/${post.slug}`,
