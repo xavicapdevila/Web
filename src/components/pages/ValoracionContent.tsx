@@ -26,10 +26,10 @@ export default function ValoracionContent() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight mb-6">
+            <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-[1.05] mb-6">
               {t("valorTitle1")}
               <br />
-              <span className="text-[#C9B99A] italic">{t("valorTitle2")}</span>
+              <span className="text-[#C9B99A]">{t("valorTitle2")}</span>
             </h1>
 
             <div className="space-y-4 text-[#aaa] text-base leading-relaxed mb-10">

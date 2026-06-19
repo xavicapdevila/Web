@@ -30,10 +30,10 @@ export default function HowWeWork() {
             transform: inView ? "translateY(0)" : "translateY(30px)",
           }}
         >
-          <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight">
+          <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-[1.05]">
             {t("howTitle1")}
             <br />
-            <span className="text-[#C9B99A] italic">{t("howTitle2")}</span>
+            <span className="text-[#C9B99A]">{t("howTitle2")}</span>
           </h2>
           <p className="mt-6 text-[#888] text-base leading-relaxed">
             {t("howIntro")}

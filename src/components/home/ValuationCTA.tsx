@@ -23,10 +23,10 @@ export default function ValuationCTA() {
             <span className="h-px w-10 bg-[#C9B99A]" />
           </div>
 
-          <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight mb-6">
+          <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-[1.05] mb-6">
             {t("ctaTitle1")}
             <br />
-            <span className="text-[#C9B99A] italic">{t("ctaTitle2")}</span>
+            <span className="text-[#C9B99A]">{t("ctaTitle2")}</span>
           </h2>
 
           <p className="text-[#888] text-lg font-body font-light max-w-sm mx-auto mb-10 leading-relaxed text-center text-balance">
