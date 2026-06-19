@@ -26,7 +26,7 @@ export default function ValoracionContent() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl lg:text-6xl text-white font-light leading-[1.05] mb-6">
+            <h1 className="font-display text-3xl lg:text-4xl text-white font-light leading-[1.05] mb-6">
               {t("valorTitle1")}
               <br />
               <span className="text-[#C9B99A]">{t("valorTitle2")}</span>
@@ -54,7 +54,7 @@ export default function ValoracionContent() {
               </p>
               <a
                 href="tel:936061800"
-                className="text-[#C9B99A] font-display text-2xl hover:text-[#DDD0BB] transition-colors"
+                className="text-[#C9B99A] font-display text-lg hover:text-[#DDD0BB] transition-colors"
               >
                 936 061 800
               </a>
