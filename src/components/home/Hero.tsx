@@ -40,7 +40,7 @@ export default function Hero() {
           >
             <span className="text-white">Human</span>
             <br />
-            <span className="text-[#C9B99A] italic">Real Estate</span>
+            <span className="text-[#C9B99A]">Real Estate</span>
             <span className="sr-only"> — Inmobiliaria en Vilanova i la Geltrú</span>
           </h1>
 
