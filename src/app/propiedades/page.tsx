@@ -113,7 +113,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       <PropiedadesHeader total={total} />
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 pt-8 pb-12">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Filters sidebar */}
           <Suspense fallback={<div className="w-72 h-96 bg-[#111] animate-pulse" />}>
