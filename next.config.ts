@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
  serverExternalPackages: ["better-sqlite3", "sharp"],
 
  experimental: {
-   optimizePackageImports: ["lucide-react", "framer-motion"],
+   optimizePackageImports: ["lucide-react"],
  },
 
  images: {

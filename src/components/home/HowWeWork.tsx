@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { useInView } from "framer-motion";
+import { useInView } from "@/hooks/useInView";
 import { Ear, Camera, PhoneCall } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 

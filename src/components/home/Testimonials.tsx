@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { useInView } from "framer-motion";
+import { useInView } from "@/hooks/useInView";
 import { useLanguage } from "@/context/LanguageContext";
 import type { GoogleReview } from "@/lib/googlePlaces";
 

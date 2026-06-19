@@ -21,7 +21,7 @@ export default function Hero() {
           fetchPriority="high"
           sizes="100vw"
           className="object-cover object-center"
-          quality={85}
+          quality={75}
         />
         {/* Dark overlay — 42% so faces are clearly visible */}
         <div className="absolute inset-0 bg-black/[0.42]" />
