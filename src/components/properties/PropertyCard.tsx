@@ -248,7 +248,7 @@ function PropertyCard({ property, priority = false }: Props) {
 
         {/* Price */}
         <div className="mb-3">
-          <span className="text-[#C9B99A] font-body text-2xl font-semibold tracking-tight">
+          <span className="text-[#C9B99A] font-body text-xl font-semibold tracking-tight">
             {formatPrice(property.precio)}
           </span>
           {isReserved && (
