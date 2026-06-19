@@ -169,9 +169,10 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
     }
   };
 
-  const shareUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/propiedades/${property.slug}`
-    : `https://www.thevilahome.com/propiedades/${property.slug}`;
+  // Canonical public URL — fija para que coincida en servidor y navegador
+  // (evita el hydration mismatch) y para que los enlaces compartidos / de
+  // WhatsApp nunca apunten a un localhost o a una URL de preview.
+  const shareUrl = `https://www.thevilahome.com/propiedades/${property.slug}`;
 
   // WA share modal → no preset recipient, user chooses who to forward to
   const shareWaUrl = `https://wa.me/?text=${encodeURIComponent(fillTemplate(t("propShareWaMsg"), { titulo, url: shareUrl }))}`;
@@ -229,7 +230,7 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
 
             {/* Price */}
             <div className="flex items-end gap-4">
-              <span className="font-display text-4xl text-[#C9B99A]">
+              <span className="font-body text-4xl font-semibold tracking-tight text-[#C9B99A]">
                 {formatPrice(property.precio)}
               </span>
             </div>
