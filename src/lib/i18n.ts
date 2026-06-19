@@ -337,7 +337,7 @@ const dict = {
     howStep1Desc: "Abans que propietaris o compradors, veiem persones. Per això ens interessa entendre què necessites, què et preocupa i què esperes aconseguir. A partir d'aquí comença la nostra feina.",
     howStep2Title: "Menys anuncis, més estratègia",
     howStep2Desc: "Un habitatge no es ven per estar publicat. Es ven quan es presenta bé, arriba a les persones adequades i compta amb una estratègia al darrere. Per això cuidem cada detall i donem a cada propietat l'atenció que mereix.",
-    howStep3Title: "Al teu costat de principi a fi",
+    howStep3Title: "Amb tu de principi a fi",
     howStep3Desc: "Estem presents en els moments importants i també en els complicats. Resolent dubtes, gestionant documentació, negociant quan cal i acompanyant-te fins a la firma. Sense desaparèixer a mig camí.",
 
     featuredLabel: "Propietats destacades",
@@ -627,7 +627,7 @@ const dict = {
     howStep1Desc: "Before owners or buyers, we see people. That's why we're interested in understanding what you need, what worries you, and what you hope to achieve. From there, our work begins.",
     howStep2Title: "Less listings, more strategy",
     howStep2Desc: "A home doesn't sell just by being listed. It sells when it's presented well, reaches the right people, and has a strategy behind it. That's why we take care of every detail and give each property the attention it deserves.",
-    howStep3Title: "By your side from start to finish",
+    howStep3Title: "With you from start to finish",
     howStep3Desc: "We're present in the important moments and the difficult ones too. Resolving doubts, handling paperwork, negotiating when needed, and accompanying you all the way to signing. Without disappearing halfway through.",
 
     featuredLabel: "Featured properties",
@@ -917,7 +917,7 @@ const dict = {
     howStep1Desc: "Avant d'être propriétaires ou acheteurs, nous voyons des personnes. C'est pourquoi nous cherchons à comprendre ce dont vous avez besoin, ce qui vous préoccupe et ce que vous espérez obtenir. C'est là que commence notre travail.",
     howStep2Title: "Moins d'annonces, plus de stratégie",
     howStep2Desc: "Un logement ne se vend pas simplement parce qu'il est publié. Il se vend quand il est bien présenté, qu'il atteint les bonnes personnes et qu'il y a une stratégie derrière. C'est pourquoi nous soignons chaque détail et accordons à chaque bien l'attention qu'il mérite.",
-    howStep3Title: "À vos côtés du début à la fin",
+    howStep3Title: "Avec vous du début à la fin",
     howStep3Desc: "Nous sommes présents dans les moments importants et aussi dans les moments difficiles. Répondant à vos questions, gérant les documents, négociant quand il le faut et vous accompagnant jusqu'à la signature. Sans disparaître en cours de route.",
 
     featuredLabel: "Propriétés en vedette",
