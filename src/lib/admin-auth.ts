@@ -52,8 +52,9 @@ export function verifySession(value: string | undefined | null): boolean {
 export function checkPassword(input: unknown): boolean {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected || typeof input !== "string") return false;
-  const a = createHash("sha256").update(input).digest();
-  const b = createHash("sha256").update(expected).digest();
+  // Trim to tolerate stray whitespace/newlines pasted into the env var or form.
+  const a = createHash("sha256").update(input.trim()).digest();
+  const b = createHash("sha256").update(expected.trim()).digest();
   return timingSafeEqual(a, b);
 }
 
