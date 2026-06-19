@@ -155,18 +155,6 @@ const dict = {
     detailsConsumption: "Consumo energético",
     detailsCO2: "Emisiones CO₂",
 
-    // Mortgage
-    mortgageTitle: "Calculadora de hipoteca",
-    mortgageDeposit: "Entrada",
-    mortgageYears: "Plazo",
-    mortgageYearsUnit: "años",
-    mortgageInterest: "Interés anual",
-    mortgageMonthly: "Cuota mensual estimada",
-    mortgageFinancing: "Capital a financiar",
-    mortgageTotalInterest: "Total intereses",
-    mortgageTotalCost: "Coste total",
-    mortgageDisclaimer: "* Cálculo orientativo. Consulta con tu entidad bancaria.",
-
     // Properties page
     propPageTitle: "Propiedades en venta",
     propPageFoundOne: "propiedad encontrada",
@@ -464,17 +452,6 @@ const dict = {
     detailsConsumption: "Consum energètic",
     detailsCO2: "Emissions CO₂",
 
-    mortgageTitle: "Calculadora d'hipoteca",
-    mortgageDeposit: "Entrada",
-    mortgageYears: "Termini",
-    mortgageYearsUnit: "anys",
-    mortgageInterest: "Interès anual",
-    mortgageMonthly: "Quota mensual estimada",
-    mortgageFinancing: "Capital a finançar",
-    mortgageTotalInterest: "Total interessos",
-    mortgageTotalCost: "Cost total",
-    mortgageDisclaimer: "* Càlcul orientatiu. Consulta amb la teva entitat bancària.",
-
     propPageTitle: "Propietats en venda",
     propPageFoundOne: "propietat trobada",
     propPageFoundMany: "propietats trobades",
@@ -765,17 +742,6 @@ const dict = {
     detailsConsumption: "Energy consumption",
     detailsCO2: "CO₂ emissions",
 
-    mortgageTitle: "Mortgage calculator",
-    mortgageDeposit: "Down payment",
-    mortgageYears: "Term",
-    mortgageYearsUnit: "years",
-    mortgageInterest: "Annual interest",
-    mortgageMonthly: "Estimated monthly payment",
-    mortgageFinancing: "Amount to finance",
-    mortgageTotalInterest: "Total interest",
-    mortgageTotalCost: "Total cost",
-    mortgageDisclaimer: "* Indicative calculation. Consult your bank.",
-
     propPageTitle: "Properties for sale",
     propPageFoundOne: "property found",
     propPageFoundMany: "properties found",
@@ -1065,17 +1031,6 @@ const dict = {
     detailsEnergy: "Certificat de Performance Énergétique",
     detailsConsumption: "Consommation énergétique",
     detailsCO2: "Émissions CO₂",
-
-    mortgageTitle: "Calculateur de prêt",
-    mortgageDeposit: "Apport",
-    mortgageYears: "Durée",
-    mortgageYearsUnit: "ans",
-    mortgageInterest: "Taux annuel",
-    mortgageMonthly: "Mensualité estimée",
-    mortgageFinancing: "Capital à financer",
-    mortgageTotalInterest: "Total intérêts",
-    mortgageTotalCost: "Coût total",
-    mortgageDisclaimer: "* Calcul indicatif. Consultez votre établissement bancaire.",
 
     propPageTitle: "Propriétés à vendre",
     propPageFoundOne: "propriété trouvée",
