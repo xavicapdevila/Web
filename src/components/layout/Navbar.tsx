@@ -44,20 +44,20 @@ export default function Navbar() {
         )}
       >
         <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
-          {/* Logo */}
-          {isHome ? (
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="flex items-center leading-none group cursor-pointer"
-              aria-label="Volver arriba"
-            >
-              <img src="/logo.svg" alt="The Vila Home" className="h-9 w-auto" />
-            </button>
-          ) : (
-            <Link href="/" className="flex items-center leading-none group">
-              <img src="/logo.svg" alt="The Vila Home" className="h-9 w-auto" />
-            </Link>
-          )}
+          {/* Logo — siempre un enlace a Home; estando en Home solo sube arriba */}
+          <Link
+            href="/"
+            onClick={(e) => {
+              if (isHome) {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
+            className="flex items-center leading-none group cursor-pointer"
+            aria-label={isHome ? "Volver arriba" : "Inicio"}
+          >
+            <img src="/logo.svg" alt="The Vila Home" className="h-9 w-auto" />
+          </Link>
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-8">
