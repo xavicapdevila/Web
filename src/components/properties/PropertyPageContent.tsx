@@ -230,7 +230,7 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
 
             {/* Price */}
             <div className="flex items-end gap-4">
-              <span className="font-body text-3xl font-semibold tracking-tight text-[#C9B99A]">
+              <span className="font-body text-3xl tracking-tight text-[#C9B99A]">
                 {formatPrice(property.precio)}
               </span>
             </div>

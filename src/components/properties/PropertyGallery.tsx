@@ -9,6 +9,11 @@ import type { PropertyImage, FloorPlanPin } from "@/types/property";
 import { getYouTubeId } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
+// The main gallery image never renders wider than max-w-7xl (1280px), so cap the
+// requested size there instead of 100vw. Avoids fetching oversized variants on
+// wide screens and makes loading / paging noticeably faster.
+const GALLERY_SIZES = "(min-width: 1280px) 1280px, 100vw";
+
 interface Props {
   images: PropertyImage[];
   video?: string;
@@ -174,18 +179,24 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             onTouchEnd={onTouchEnd}
           >
             {/* ── Cross-fade image layers ── */}
-            {/* Layer 0: preload next image (invisible, warms browser cache) */}
-            {images.length > 1 && (
-              <div className="absolute inset-0 pointer-events-none opacity-0" style={{ zIndex: 0 }} aria-hidden="true">
-                <Image
-                  src={images[(currentIndex + 1) % images.length].url}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  priority
-                />
-              </div>
-            )}
+            {/* Layer 0: preload the adjacent images (next two + previous), invisible,
+                so paging in either direction feels instant. Uses loading="eager"
+                (not priority) so they never compete with the visible image. */}
+            {images.length > 1 && (() => {
+              const n = images.length;
+              const preloadIdx = [...new Set([
+                (currentIndex + 1) % n,
+                (currentIndex + 2) % n,
+                (currentIndex - 1 + n) % n,
+              ])].filter((i) => i !== currentIndex);
+              return (
+                <div className="absolute inset-0 pointer-events-none opacity-0" style={{ zIndex: 0 }} aria-hidden="true">
+                  {preloadIdx.map((i) => (
+                    <Image key={images[i].url} src={images[i].url} alt="" fill sizes={GALLERY_SIZES} loading="eager" />
+                  ))}
+                </div>
+              );
+            })()}
 
             {/* Layer 1: previous image (bg, fades out) */}
             {prevSrc && (
@@ -194,7 +205,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
                 style={{ zIndex: 1 }}
                 aria-hidden="true"
               >
-                <Image src={prevSrc} alt="" fill className="object-cover" sizes="100vw" priority />
+                <Image src={prevSrc} alt="" fill className="object-cover" sizes={GALLERY_SIZES} priority />
               </div>
             )}
 
@@ -210,7 +221,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
                   fill
                   className="object-cover cursor-pointer"
                   priority
-                  sizes="100vw"
+                  sizes={GALLERY_SIZES}
                   onClick={() => openLightbox(currentIndex)}
                 />
               </div>
