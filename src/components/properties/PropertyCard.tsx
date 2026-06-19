@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { memo, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X, RotateCcw, Rotate3d } from "lucide-react";
 import { FloorPlanIcon } from "./icons";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel, fillTemplate } from "@/lib/i18n";
@@ -213,19 +213,29 @@ function PropertyCard({ property, priority = false }: Props) {
           {has360 && (
             <button
               onClick={handle360Click}
-              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
-              title="Ver 360°"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
+              title={t("gallery360")}
             >
-              360°
+              <span className="w-8 h-8 flex items-center justify-center shrink-0">
+                <RotateCcw size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
+              </span>
+              <span className="max-w-0 group-hover/chip:max-w-[90px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-[max-width,padding] duration-300">
+                {t("gallery360")}
+              </span>
             </button>
           )}
           {hasTour && (
             <button
               onClick={handleTourClick}
-              className="pointer-events-auto flex items-center h-8 px-2.5 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-[#C9B99A] text-[10px] font-semibold tracking-wider hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
+              className="pointer-events-auto group/chip flex items-center h-8 rounded-full bg-black/70 ring-1 ring-white/15 shadow-lg shadow-black/20 text-white overflow-hidden hover:bg-[#C9B99A] hover:ring-[#C9B99A] hover:text-black transition-colors duration-300"
               title={t("galleryVirtualTour")}
             >
-              3D
+              <span className="w-8 h-8 flex items-center justify-center shrink-0">
+                <Rotate3d size={13} className="text-[#C9B99A] group-hover/chip:text-black transition-colors duration-300" />
+              </span>
+              <span className="max-w-0 group-hover/chip:max-w-[120px] group-hover/chip:pr-3 overflow-hidden whitespace-nowrap text-[11px] font-body transition-[max-width,padding] duration-300">
+                {t("galleryVirtualTour")}
+              </span>
             </button>
           )}
         </div>
