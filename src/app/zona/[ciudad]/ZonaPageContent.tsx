@@ -64,7 +64,7 @@ export default function ZonaPageContent({ zona, properties, total, cercanas }: P
   return (
     <>
       {/* Header */}
-      <div className="bg-[#0a0a0a] border-b border-[#1a1a1a] py-16">
+      <div className="bg-[#0a0a0a] border-b border-[#1a1a1a] py-8 lg:py-10">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">
           <nav className="text-[#555] text-xs font-body tracking-wide mb-4 flex items-center gap-2">
             <Link href="/" className="hover:text-[#C9B99A] transition-colors">{t("zonaHome")}</Link>
@@ -73,7 +73,7 @@ export default function ZonaPageContent({ zona, properties, total, cercanas }: P
             <span>/</span>
             <span className="text-[#888]">{zona.nombre}</span>
           </nav>
-          <h1 className="font-display text-4xl lg:text-5xl text-white font-light mb-3">
+          <h1 className="font-display text-3xl lg:text-4xl text-white font-light mb-3">
             {titulo}
           </h1>
           <p className="text-[#666] text-sm font-body max-w-xl">
