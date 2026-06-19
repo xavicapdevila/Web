@@ -259,7 +259,7 @@ export default function BlogPostClient({ post, related }: Props) {
       </div>
 
       {/* Title */}
-      <h1 className="font-display text-2xl lg:text-3xl text-white font-normal leading-tight mb-6">
+      <h1 className="font-display text-2xl lg:text-3xl text-[#f5f0e8] font-normal leading-tight mb-6">
         {translatedTitle}
       </h1>
 
