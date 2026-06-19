@@ -55,7 +55,7 @@ export default function ContactoContent() {
                   <p className="text-[#888] text-xs font-body tracking-wide uppercase mb-1">
                     {t("contactPhoneLabel")}
                   </p>
-                  <p className="text-white font-body text-2xl group-hover:text-[#C9B99A] transition-colors">
+                  <p className="text-white font-body text-lg group-hover:text-[#C9B99A] transition-colors">
                     {siteConfig.phoneDisplay}
                   </p>
                   <p className="text-[#666] text-xs mt-1">{t("contactPhoneNote")}</p>
@@ -76,7 +76,7 @@ export default function ContactoContent() {
                 </div>
                 <div>
                   <p className="text-[#888] text-xs font-body tracking-wide uppercase mb-1">WhatsApp</p>
-                  <p className="text-white font-body text-2xl group-hover:text-[#25D366] transition-colors">
+                  <p className="text-white font-body text-lg group-hover:text-[#25D366] transition-colors">
                     {t("contactWATitle")}
                   </p>
                   <p className="text-[#666] text-xs mt-1">{t("contactWANote")}</p>
@@ -95,7 +95,7 @@ export default function ContactoContent() {
                   <p className="text-[#888] text-xs font-body tracking-wide uppercase mb-1">
                     {t("contactEmailLabel")}
                   </p>
-                  <p className="text-white font-body text-xl group-hover:text-[#C9B99A] transition-colors">
+                  <p className="text-white font-body text-lg group-hover:text-[#C9B99A] transition-colors">
                     {siteConfig.email}
                   </p>
                   <p className="text-[#666] text-xs mt-1">{t("contactEmailNote")}</p>
@@ -116,7 +116,7 @@ export default function ContactoContent() {
                   <p className="text-[#888] text-xs font-body tracking-wide uppercase mb-1">
                     {t("contactOfficeLabel")}
                   </p>
-                  <p className="text-white font-body text-xl group-hover:text-[#C9B99A] transition-colors">
+                  <p className="text-white font-body text-lg group-hover:text-[#C9B99A] transition-colors">
                     Av. Francesc Macià 48
                   </p>
                   <p className="text-[#aaa] text-sm mt-0.5">08800 Vilanova i la Geltrú</p>
@@ -204,7 +204,7 @@ export default function ContactoContent() {
               </div>
 
               <div className="bg-[#111] border border-[#1e1e1e] p-6 text-center">
-                <h3 className="font-display text-2xl text-white mb-3">{t("contactValuateTitle")}</h3>
+                <h3 className="font-body text-xl text-white mb-3">{t("contactValuateTitle")}</h3>
                 <p className="text-[#888] text-sm mb-5 text-center">{t("contactValuateDesc")}</p>
                 <a
                   href="/valoracion"
