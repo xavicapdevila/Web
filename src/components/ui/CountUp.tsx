@@ -18,7 +18,10 @@ export default function CountUp({
   className = "",
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [value, setValue] = useState(0);
+  // Inicia en `target` para que el HTML del servidor (y los buscadores / sin JS)
+  // muestren ya el numero real. La animacion en cliente reinicia desde 0 al
+  // entrar en viewport. Si el JS o el observer no corren, queda el valor real.
+  const [value, setValue] = useState(target);
   const started = useRef(false);
 
   useEffect(() => {
