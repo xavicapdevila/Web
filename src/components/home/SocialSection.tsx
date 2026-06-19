@@ -17,7 +17,7 @@ export default function SocialSection() {
           <span className="h-px w-10 bg-[#C9B99A]" />
         </div>
 
-        <h2 className="font-display text-4xl text-white font-light mb-14">{t("socialFollow")}</h2>
+        <h2 className="font-display text-3xl lg:text-4xl text-white font-light mb-14">{t("socialFollow")}</h2>
 
         <div className="flex items-center justify-center gap-10 md:gap-20">
           {/* Instagram */}

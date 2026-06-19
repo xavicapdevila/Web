@@ -27,7 +27,7 @@ export default function FeaturedProperties({ properties }: Props) {
                   {t("featuredLabel")}
                 </span>
               </div>
-              <h2 className="font-display text-5xl lg:text-6xl text-white font-light leading-tight">
+              <h2 className="font-display text-3xl lg:text-4xl text-white font-light leading-tight">
                 {t("featuredTitle")}
               </h2>
             </div>

@@ -31,7 +31,7 @@ const dict = {
     howStep1Desc: "Antes que propietarios o compradores, vemos personas. Por eso nos interesa entender qué necesitas, qué te preocupa y qué esperas conseguir. A partir de ahí empieza nuestro trabajo.",
     howStep2Title: "Menos anuncios, más estrategia",
     howStep2Desc: "Una vivienda no se vende por estar publicada. Se vende cuando se presenta bien, llega a las personas adecuadas y cuenta con una estrategia detrás. Por eso cuidamos cada detalle y damos a cada propiedad la atención que merece.",
-    howStep3Title: "A tu lado de principio a fin",
+    howStep3Title: "Contigo de principio a fin",
     howStep3Desc: "Estamos presentes en los momentos importantes y también en los complicados. Resolviendo dudas, gestionando documentación, negociando cuando hace falta y acompañándote hasta la firma. Sin desaparecer a mitad del camino.",
 
     // Featured
