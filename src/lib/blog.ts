@@ -1,4 +1,5 @@
 import { getDb } from "./db";
+import { sanitizeBlogHtml } from "./sanitize";
 
 export interface BlogPost {
   id: string;
@@ -197,6 +198,8 @@ export async function getBlogPostByIdAdmin(id: string): Promise<BlogPost | null>
 }
 
 export async function createBlogPost(input: BlogPostInput): Promise<BlogPost> {
+  // Sanitize rich-text HTML before storing (prevents stored XSS).
+  if (input.contenido) input = { ...input, contenido: sanitizeBlogHtml(input.contenido) };
   const id = `post_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 
   const newPost: BlogPost = {
@@ -249,6 +252,8 @@ export async function updateBlogPost(
   id: string,
   input: Partial<BlogPostInput>
 ): Promise<BlogPost | null> {
+  // Sanitize rich-text HTML before storing (prevents stored XSS).
+  if (input.contenido) input = { ...input, contenido: sanitizeBlogHtml(input.contenido) };
   if (USE_BLOB) {
     const all = await readBlobPosts();
     const idx = all.findIndex((p) => p.id === id);

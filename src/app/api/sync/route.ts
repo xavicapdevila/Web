@@ -6,7 +6,7 @@ export const maxDuration = 300;
 
 function isAuthorized(request: Request): boolean {
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true; // no secret configured → open (dev/staging)
+  if (!cronSecret) return false; // fail closed: no secret configured → deny
   return request.headers.get("authorization") === `Bearer ${cronSecret}`;
 }
 

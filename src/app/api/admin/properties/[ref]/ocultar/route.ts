@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { getDbRestored, persistDbToBlob } from "@/lib/db";
+import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 type Ctx = { params: Promise<{ ref: string }> };
 
 function isAuth(req: NextRequest) {
-  return req.cookies.get("tvh_admin")?.value === "authenticated";
+  return verifySession(req.cookies.get(ADMIN_COOKIE)?.value);
 }
 
 /**

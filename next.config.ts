@@ -13,9 +13,11 @@ const nextConfig: NextConfig = {
  images: {
    formats: ["image/avif", "image/webp"],
    minimumCacheTTL: 604800, // 7 days — property images rarely change
+   // Restricted to the hosts we actually load images from. A wildcard ("**")
+   // turns /_next/image into an open proxy → SSRF + bandwidth/quota abuse.
    remotePatterns: [
-     { protocol: "https", hostname: "**" },
-     { protocol: "http",  hostname: "**" },
+     { protocol: "https", hostname: "**.apinmo.com" },                    // property photos (XML feed)
+     { protocol: "https", hostname: "**.public.blob.vercel-storage.com" }, // blog images (admin uploads)
    ],
  },
 
@@ -102,7 +104,18 @@ const nextConfig: NextConfig = {
  },
 
  async headers() {
+   // Applied to every response. frame-ancestors / X-Frame-Options stop the site
+   // being embedded in a third-party iframe (clickjacking / "secuestro").
+   const securityHeaders = [
+     { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+     { key: "X-Frame-Options", value: "SAMEORIGIN" },
+     { key: "X-Content-Type-Options", value: "nosniff" },
+     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+     { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+     { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+   ];
    return [
+     { source: "/(.*)", headers: securityHeaders },
      {
        source: "/api/:path*",
        headers: [{ key: "Access-Control-Allow-Origin", value: "https://www.thevilahome.com" }],

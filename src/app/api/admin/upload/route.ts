@@ -1,12 +1,12 @@
 import { put } from "@vercel/blob";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 export async function POST(req: NextRequest) {
   // Auth check
   const cookieStore = await cookies();
-  const session = cookieStore.get("tvh_admin");
-  if (session?.value !== "authenticated") {
+  if (!verifySession(cookieStore.get(ADMIN_COOKIE)?.value)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

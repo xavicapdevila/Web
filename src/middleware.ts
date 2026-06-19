@@ -18,8 +18,6 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   response.headers.set("x-pathname", request.nextUrl.pathname);
-  // temporary: remove once redirect is confirmed working
-  response.headers.set("x-debug-hostname", hostname);
   return response;
 }
 

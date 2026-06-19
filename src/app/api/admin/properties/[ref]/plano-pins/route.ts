@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { getDb, persistDbToBlob } from "@/lib/db";
 import type { FloorPlanPin } from "@/types/property";
+import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 type Ctx = { params: Promise<{ ref: string }> };
 
@@ -22,6 +23,9 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
 }
 
 export async function PUT(req: NextRequest, { params }: Ctx) {
+  if (!verifySession(req.cookies.get(ADMIN_COOKIE)?.value)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   const { ref } = await params;
   try {
     const { pins }: { pins: FloorPlanPin[] } = await req.json();

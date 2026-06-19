@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogPostByIdAdmin, updateBlogPost, deleteBlogPost } from "@/lib/blog";
+import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 function isAuthenticated(req: NextRequest): boolean {
-  const cookie = req.cookies.get("tvh_admin");
-  return cookie?.value === "authenticated";
+  return verifySession(req.cookies.get(ADMIN_COOKIE)?.value);
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

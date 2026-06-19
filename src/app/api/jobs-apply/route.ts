@@ -1,11 +1,31 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import Anthropic from '@anthropic-ai/sdk'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
 const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]) // %PDF
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export async function POST(request: Request) {
+  // Rate limit: 5 applications / hour per IP. This endpoint calls Claude and
+  // sends email, so it's a cost/abuse target if left open.
+  const limit = rateLimit(`jobs:${clientIp(request)}`, 5, 60 * 60 * 1000)
+  if (!limit.ok) {
+    return NextResponse.json(
+      { error: 'rate_limited' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } },
+    )
+  }
+
   try {
     const formData = await request.formData()
     const name    = (formData.get('name')    as string)?.trim()
@@ -76,9 +96,9 @@ export async function POST(request: Request) {
         <div style="font-family:sans-serif;max-width:480px;color:#222">
           <h2 style="margin-bottom:4px">Nova candidatura rebuda</h2>
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0"/>
-          <p><strong>Nom:</strong> ${name}</p>
-          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-          ${message ? `<p><strong>Missatge:</strong><br/>${message.replace(/\n/g, '<br/>')}</p>` : ''}
+          <p><strong>Nom:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
+          ${message ? `<p><strong>Missatge:</strong><br/>${escapeHtml(message).replace(/\n/g, '<br/>')}</p>` : ''}
           <hr style="border:none;border-top:1px solid #eee;margin:12px 0"/>
           <p style="color:#666;font-size:13px">El CV s'adjunta a aquest correu.</p>
         </div>

@@ -13,8 +13,9 @@ export async function GET(request: NextRequest) {
     habitaciones: searchParams.get("habitaciones") ? Number(searchParams.get("habitaciones")) : undefined,
     m2Min: searchParams.get("m2Min") ? Number(searchParams.get("m2Min")) : undefined,
     ciudad: searchParams.get("ciudad") ?? undefined,
-    page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
-    limit: searchParams.get("limit") ? Number(searchParams.get("limit")) : 12,
+    page: Math.max(1, Math.floor(Number(searchParams.get("page"))) || 1),
+    // Clamp limit so a huge ?limit= can't be used to dump/scrape the whole DB.
+    limit: Math.min(50, Math.max(1, Math.floor(Number(searchParams.get("limit"))) || 12)),
   };
 
   try {
