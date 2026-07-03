@@ -2,10 +2,8 @@
 
 import { useRef } from "react";
 import { useInView } from "@/hooks/useInView";
-import { Ear, Camera, PhoneCall } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
-const icons = [Ear, Camera, PhoneCall];
 const numbers = ["01", "02", "03"];
 
 export default function HowWeWork() {
@@ -14,17 +12,17 @@ export default function HowWeWork() {
   const { t } = useLanguage();
 
   const steps = [
-    { icon: icons[0], number: numbers[0], title: t("howStep1Title"), description: t("howStep1Desc") },
-    { icon: icons[1], number: numbers[1], title: t("howStep2Title"), description: t("howStep2Desc") },
-    { icon: icons[2], number: numbers[2], title: t("howStep3Title"), description: t("howStep3Desc") },
+    { number: numbers[0], title: t("howStep1Title"), description: t("howStep1Desc") },
+    { number: numbers[1], title: t("howStep2Title"), description: t("howStep2Desc") },
+    { number: numbers[2], title: t("howStep3Title"), description: t("howStep3Desc") },
   ];
 
   return (
-    <section ref={ref} className="pt-32 pb-16 bg-[#0a0a0a]">
+    <section ref={ref} className="pt-32 pb-24 bg-[#0a0a0a]">
       <div className="max-w-7xl mx-auto px-6 lg:px-10">
         {/* Header */}
         <div
-          className="max-w-xl mb-20 transition-all duration-700"
+          className="max-w-xl mb-16 lg:mb-20 transition-all duration-700"
           style={{
             opacity: inView ? 1 : 0,
             transform: inView ? "translateY(0)" : "translateY(30px)",
@@ -35,41 +33,38 @@ export default function HowWeWork() {
             <br />
             <span className="text-[#C9B99A]">{t("howTitle2")}</span>
           </h2>
-          <p className="mt-6 text-[#888] text-base leading-relaxed">
+          <p className="mt-6 text-[#888] text-base leading-relaxed text-left">
             {t("howIntro")}
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+        {/* Steps — tres columnas editoriales: filete, numeración dorada, serif y aire */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-14 md:gap-10 lg:gap-16">
           {steps.map((step, i) => (
             <div
               key={step.number}
-              className="relative group transition-all duration-700"
+              className="group transition-all duration-700"
               style={{
                 opacity: inView ? 1 : 0,
                 transform: inView ? "translateY(0)" : "translateY(40px)",
                 transitionDelay: `${i * 150}ms`,
               }}
             >
-              {/* Number */}
-              <div className="font-display text-7xl text-[#1a1a1a] font-light mb-6 leading-none group-hover:text-[#C9B99A]/10 transition-colors duration-500">
+              {/* Filete superior — se enciende en dorado al pasar */}
+              <div className="relative h-px bg-[#2a2a2a] mb-8 overflow-hidden">
+                <div className="absolute inset-y-0 left-0 w-0 bg-[#C9B99A] transition-[width] duration-700 ease-out group-hover:w-full" />
+              </div>
+
+              <div className="font-body text-xs tracking-[0.35em] text-[#C9B99A] mb-6">
                 {step.number}
               </div>
 
-              {/* Icon */}
-              <div className="w-12 h-12 border border-[#C9B99A]/30 flex items-center justify-center mb-6 group-hover:border-[#C9B99A] group-hover:bg-[#C9B99A]/5 transition-all duration-300">
-                <step.icon size={20} className="text-[#C9B99A]" />
-              </div>
-
-              {/* Content */}
-              <h3 className="font-display text-2xl text-white mb-4">{step.title}</h3>
-              <p className="text-[#888] text-sm leading-relaxed">{step.description}</p>
-
-              {/* Separator line (not last) */}
-              {i < steps.length - 1 && (
-                <div className="hidden md:block absolute top-16 -right-6 h-px w-12 bg-[#2a2a2a]" />
-              )}
+              <h3 className="font-display text-2xl lg:text-[1.7rem] text-white font-light leading-snug mb-5 md:min-h-[4.75rem]">
+                {step.title}
+              </h3>
+              <p className="text-[#999] text-[15px] leading-[1.85] text-left">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
