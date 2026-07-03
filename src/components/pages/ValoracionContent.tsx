@@ -74,7 +74,10 @@ export default function ValoracionContent() {
                 {t("valorWidgetLabel")}
               </p>
 
-              <div className="min-h-[480px]">
+              {/* min-h ≈ alto real del primer paso del widget (~333px): evita el
+                  salto durante la carga sin dejar un hueco negro debajo. Si el
+                  widget crece en pasos posteriores, el contenedor crece con él. */}
+              <div className="min-h-[340px]">
                 <Script
                   type="module"
                   src="https://st1.idealista.com/data/static/embeds/valuation-agency/assets/index.js"
