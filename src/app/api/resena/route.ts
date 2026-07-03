@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     const html = `
       <div style="font-family:Inter,system-ui,sans-serif;max-width:560px;margin:0 auto;padding:8px;color:#1a1a18">
-        <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a8a294;margin:0 0 6px">Opinión privada · no publicada en Google</p>
+        <p style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#a8a294;margin:0 0 6px">Opinión de cliente · feedback interno</p>
         <h2 style="margin:0 0 14px;font-size:22px">Valoración: <span style="color:#C9B99A">${stars}</span> (${rating}/5)</h2>
         <div style="background:#faf9f6;border:1px solid #ececec;border-radius:12px;padding:16px 18px;font-size:15px;line-height:1.6;white-space:pre-wrap">${esc(comment)}</div>
         <p style="margin:16px 0 0;font-size:14px;color:#5a564e">
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
       from: FROM,
       to: TEAM_INBOX,
       replyTo: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(contact) ? contact : undefined,
-      subject: `Opinión privada (${rating}★) — a mejorar`,
+      subject: `Opinión de cliente (${rating}★) — a mejorar`,
       html,
     });
     if (res.error) {

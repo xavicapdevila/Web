@@ -72,7 +72,7 @@ export default function ReviewGate() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-md text-center">
-        <img src="/logo.svg" alt="The Vila Home" className="mx-auto mb-12 h-6 w-auto opacity-90" />
+        <img src="/logo.svg" alt="The Vila Home" className="mx-auto mb-12 h-10 w-auto opacity-95 sm:h-11" />
 
         {step === "rating" && (
           <div className="animate-[fadeIn_.5s_ease]">
@@ -137,7 +137,7 @@ export default function ReviewGate() {
               Gracias por tu sinceridad
             </h1>
             <p className="mx-auto mt-3 max-w-sm text-center text-[15px] leading-relaxed text-[#9a968c]">
-              Cuéntanos qué no fue como esperabas. Esto llega <strong className="text-[#c8c4ba]">directo a dirección</strong> y no se publica.
+              Cuéntanos qué no fue como esperabas. Lo <strong className="text-[#c8c4ba]">leemos personalmente</strong> y nos ayuda a mejorar.
             </p>
 
             <form onSubmit={submitFeedback} className="mt-8 space-y-3">
