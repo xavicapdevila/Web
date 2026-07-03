@@ -21,7 +21,7 @@ const dict = {
     heroSeeProperties: "Ver propiedades",
     heroValueHome: "Valorar mi casa",
     heroFamilies: "Familias acompañadas",
-    heroYears: "Años de experiencia acumulada",
+    heroYears: "Años de experiencia",
     heroReviews: "reseñas en Google",
 
     // HowWeWork
@@ -329,7 +329,7 @@ const dict = {
     heroSeeProperties: "Veure propietats",
     heroValueHome: "Valorar la meva casa",
     heroFamilies: "Famílies acompanyades",
-    heroYears: "Anys d'experiència acumulada",
+    heroYears: "Anys d'experiència",
     heroReviews: "ressenyes a Google",
 
     howTitle1: "Com",
@@ -620,7 +620,7 @@ const dict = {
     heroSeeProperties: "See properties",
     heroValueHome: "Value my home",
     heroFamilies: "Families helped",
-    heroYears: "Years of accumulated experience",
+    heroYears: "Years of experience",
     heroReviews: "Google reviews",
 
     howTitle1: "How",
@@ -911,7 +911,7 @@ const dict = {
     heroSeeProperties: "Voir les propriétés",
     heroValueHome: "Estimer mon bien",
     heroFamilies: "Familles accompagnées",
-    heroYears: "Années d'expérience cumulées",
+    heroYears: "Années d'expérience",
     heroReviews: "avis Google",
 
     howTitle1: "Comment",
