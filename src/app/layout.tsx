@@ -38,8 +38,10 @@ const BASE_URL = "https://www.thevilahome.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
+  // Keyword primero (como la competencia que rankea nº1): esto SOLO se ve en
+  // Google y en la pestaña del navegador — no cambia nada del diseño de la web.
   title: {
-    default: "The Vila Home | Inmobiliaria en Vilanova i la Geltrú",
+    default: "Inmobiliaria en Vilanova i la Geltrú — The Vila Home",
     template: "%s | The Vila Home",
   },
   description:
@@ -105,7 +107,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: BASE_URL,
     siteName: "The Vila Home",
-    title: "The Vila Home | Inmobiliaria en Vilanova i la Geltrú",
+    title: "Inmobiliaria en Vilanova i la Geltrú — The Vila Home",
     description:
       "Inmobiliaria en Vilanova i la Geltrú. Pisos, casas y chalets en el Garraf y Penedès. Cercanos, honestos y sin corporativismo.",
     images: [
