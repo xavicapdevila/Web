@@ -96,8 +96,9 @@ export default function ValoracionContent() {
             </div>
           </div>
 
-          {/* Right — Idealista embed */}
-          <div>
+          {/* Right — Idealista embed. self-center: centrado vertical respecto a
+              la columna izquierda (antes quedaba «colgado» arriba del todo). */}
+          <div className="lg:self-center">
             {/* Sin marco: con la máscara de marca sobre el widget, el recuadro
                 dorado era un doble marco innecesario. */}
             <div>
