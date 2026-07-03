@@ -154,9 +154,7 @@ export default function RootLayout({
       className={`${inter.variable} ${cormorant.variable} ${dmSerif.variable} ${dmSans.variable}`}
     >
       <head>
-        {/* Preconnect to external origins used on every page */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* next/font self-aloja las fuentes: no hace falta preconnect a Google Fonts */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       </head>

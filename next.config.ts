@@ -112,25 +112,27 @@ const nextConfig: NextConfig = {
      { key: "X-Content-Type-Options", value: "nosniff" },
      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-     { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
-     // Report-Only: no bloquea nada, solo registra violaciones en la consola del
-     // navegador. Es el paso previo a promocionarla a CSP estricta: si tras un
-     // tiempo no aparecen violaciones legítimas, se cambia la clave a
-     // "Content-Security-Policy" (manteniendo frame-ancestors de arriba).
+     // CSP en modo bloqueo. Validada primero en Report-Only (jul 2026) contra
+     // home+GA+Meta, fichas, /vender, blog y traductor sin ninguna violación.
+     // Si se añade un servicio externo nuevo (script/fetch/iframe), hay que
+     // añadir su dominio aquí o el navegador lo bloqueará en silencio.
      {
-       key: "Content-Security-Policy-Report-Only",
+       key: "Content-Security-Policy",
        value: [
          "default-src 'self'",
-         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com",
+         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com",
          "style-src 'self' 'unsafe-inline'",
          "img-src 'self' data: blob: https:",
          "font-src 'self' data:",
-         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://api.mymemory.translated.net",
+         // Incluye los endpoints de conversión de Google Ads (googleadservices,
+         // doubleclick, google.com) — sin ellos las campañas no medirían.
+         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://*.googleadservices.com https://www.google.com https://www.facebook.com https://api.mymemory.translated.net https://challenges.cloudflare.com",
          "frame-src https:",
          "media-src 'self' https:",
          "object-src 'none'",
          "base-uri 'self'",
          "form-action 'self'",
+         "frame-ancestors 'self'",
        ].join("; "),
      },
    ];
