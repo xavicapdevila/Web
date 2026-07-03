@@ -104,7 +104,8 @@ export default function ValoracionContent() {
             <div>
               {/* Centrado y discreto: el widget centra su contenido (m-auto), así
                   la etiqueta alinea con él en vez de colgar del borde izquierdo */}
-              <p className="text-center text-[#777] text-[10px] font-body tracking-[0.3em] uppercase mb-5">
+              {/* Dorado tenue: mismo tono que el eyebrow de la izquierda pero apagado */}
+              <p className="text-center text-[#C9B99A]/55 text-[10px] font-body tracking-[0.3em] uppercase mb-5">
                 {t("valorWidgetLabel")}
               </p>
 
