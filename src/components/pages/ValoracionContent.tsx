@@ -1,13 +1,44 @@
 "use client";
 
+import { useEffect } from "react";
 import Script from "next/script";
 import { CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const bulletKeys = ["valorBullet1", "valorBullet2", "valorBullet3", "valorBullet4"] as const;
 
+/**
+ * Tipografía de la web dentro del widget de Idealista: inyecta una regla en su
+ * shadow root (abierto) para sustituir su fuente (Bernino) por la nuestra.
+ * Solo cosmético — si Idealista cambia su interior, lo peor que ocurre es que
+ * vuelva su fuente; el funcionamiento no depende de esto.
+ */
+function useWidgetBrandFont() {
+  useEffect(() => {
+    let tries = 0;
+    const interval = setInterval(() => {
+      const el = document.querySelector("idealista-data-valuation-common-embed-app");
+      const root = el?.shadowRoot;
+      if (root) {
+        if (!root.querySelector("#tvh-font-override")) {
+          const style = document.createElement("style");
+          style.id = "tvh-font-override";
+          style.textContent =
+            "* { font-family: var(--font-inter), Inter, system-ui, sans-serif !important; }";
+          root.appendChild(style);
+        }
+        clearInterval(interval);
+      } else if (++tries > 100) {
+        clearInterval(interval); // el widget no cargó (p. ej. bloqueado) — no insistir
+      }
+    }, 300);
+    return () => clearInterval(interval);
+  }, []);
+}
+
 export default function ValoracionContent() {
   const { t } = useLanguage();
+  useWidgetBrandFont();
 
   return (
     <section className="py-24 relative overflow-hidden">
