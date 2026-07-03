@@ -143,7 +143,8 @@ export default async function RootLayout({
   const isStandalone =
     pathname.startsWith("/links") ||
     pathname.startsWith("/trabaja") ||
-    pathname.startsWith("/vender");
+    pathname.startsWith("/vender") ||
+    pathname.startsWith("/resena");
 
   return (
     <html
