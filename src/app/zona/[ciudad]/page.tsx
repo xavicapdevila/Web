@@ -294,6 +294,123 @@ const ZONAS: Record<string, ZonaConfig> = {
     ],
     cercanas: ["sant-pere-de-ribes", "vilanova"],
   },
+
+  "calafell": {
+    ciudad: "calafell",
+    nombre: "Calafell",
+    titulo: "Inmobiliaria en Calafell",
+    descripcionCorta: "Playa larga y vida todo el año en el Baix Penedès. El pueblo, la playa y Segur.",
+    descripcionLarga:
+      "Calafell son en realidad tres lugares en uno: el núcleo histórico con su castillo en lo alto, la Platja de Calafell con uno de los paseos marítimos más agradables de la costa dorada, y Segur de Calafell, con estación de tren propia y un parque enorme de casas y chalets. Durante años fue destino de segunda residencia; hoy cada vez más compradores la eligen como primera vivienda: el tren de Rodalies conecta con Barcelona en poco más de una hora y el municipio mantiene comercio y servicios abiertos todo el año. La oferta va de apartamentos junto al mar a chalets con jardín en las urbanizaciones de Segur.",
+    metaTitle: "Inmobiliaria en Calafell — Pisos y casas en venta",
+    metaDescription:
+      "Pisos junto al mar, casas y chalets en venta en Calafell y Segur de Calafell. The Vila Home, tu inmobiliaria en la costa del Baix Penedès.",
+    cp: "43820",
+    lat: 41.1999,
+    lng: 1.5686,
+    mercado: {
+      precio: "2.000–2.600 €/m²",
+      tipos: "Apartamentos junto al mar, casas y chalets en Segur",
+      perfil: "Primera y segunda residencia, teletrabajo",
+    },
+    faq: [
+      {
+        q: "¿Cuánto cuesta una vivienda en Calafell?",
+        a: "Depende mucho de la franja: la primera línea de la Platja de Calafell es lo más cotizado, mientras que Segur de Calafell y el interior ofrecen casas y chalets con jardín a precios sensiblemente más accesibles que el Garraf. Como referencia general, el precio se mueve entre 2.000 y 2.600 €/m² según zona y estado.",
+      },
+      {
+        q: "¿Calafell pueblo, la playa o Segur?",
+        a: "El pueblo conserva la vida local y las vistas; la playa concentra paseo, restaurantes y los apartamentos más buscados; y Segur de Calafell es la opción con más oferta de casas, con su propia estación de tren y servicios. Son tres mercados distintos con precios distintos: te los enseñamos comparados para que decidas con datos.",
+      },
+      {
+        q: "¿Se puede vivir en Calafell todo el año?",
+        a: "Sí, y es una tendencia clara. El municipio mantiene colegios, comercio y servicios abiertos fuera de temporada, y el tren de Rodalies conecta con Barcelona en poco más de una hora. Cada vez más familias y teletrabajadores convierten la que iba a ser segunda residencia en su vivienda principal.",
+      },
+      {
+        q: "¿Trabajáis Calafell desde Vilanova?",
+        a: "Sí. Estamos a unos 15 minutos por la C-31 y trabajamos toda la franja costera del Garraf y el Baix Penedès. Mismo método que en Vilanova: valoración realista, reportaje profesional y un único asesor de principio a fin.",
+      },
+    ],
+    cercanas: ["cunit", "el-vendrell", "cubelles"],
+  },
+
+  "el-vendrell": {
+    ciudad: "el vendrell",
+    nombre: "El Vendrell",
+    titulo: "Inmobiliaria en El Vendrell",
+    descripcionCorta: "Capital del Baix Penedès. Precios accesibles, servicios de capital y playa en Comarruga.",
+    descripcionLarga:
+      "El Vendrell es la capital del Baix Penedès y uno de los mercados con mejor relación calidad-precio de toda la franja entre Barcelona y Tarragona. El municipio combina un centro con comercio y servicios de capital comarcal, urbanizaciones residenciales y una fachada marítima propia con Comarruga y Sant Salvador, a diez minutos del centro. Con estación de tren, acceso directo a la AP-7 y la C-32, y precios claramente por debajo del Garraf, atrae tanto a compradores de primera vivienda que no llegan a los precios de la costa norte como a inversores que buscan recorrido.",
+    metaTitle: "Inmobiliaria en El Vendrell — Pisos y casas en venta",
+    metaDescription:
+      "Pisos en el centro, casas en urbanizaciones y apartamentos en Comarruga. The Vila Home, tu inmobiliaria en El Vendrell y el Baix Penedès.",
+    cp: "43700",
+    lat: 41.2201,
+    lng: 1.5348,
+    mercado: {
+      precio: "1.600–2.200 €/m²",
+      tipos: "Pisos en el centro, casas en urbanizaciones, apartamentos en Comarruga",
+      perfil: "Primera vivienda, compradores que buscan precio",
+    },
+    faq: [
+      {
+        q: "¿Por qué está creciendo la demanda en El Vendrell?",
+        a: "Porque ofrece lo que muchos compradores ya no encuentran en el Garraf: precios de entrada claramente más bajos, vivienda amplia y servicios de capital de comarca. Quien se queda fuera del mercado de Vilanova o Sitges encuentra en El Vendrell una alternativa real sin renunciar a tren, autopista y playa a diez minutos.",
+      },
+      {
+        q: "¿Cuánto cuesta un piso en El Vendrell?",
+        a: "Como referencia general, el precio se mueve entre 1.600 y 2.200 €/m² según zona y estado, con el centro y la zona de playa (Comarruga, Sant Salvador) en la parte alta de la horquilla. Es de los pocos mercados de la zona donde todavía se encuentra vivienda familiar por debajo de los 200.000 €.",
+      },
+      {
+        q: "¿Comarruga es El Vendrell?",
+        a: "Sí — Comarruga y Sant Salvador son los núcleos de playa del municipio de El Vendrell, a unos diez minutos del centro. Funcionan como un mercado propio, con apartamentos y casas junto al mar que interesan tanto para vivir todo el año como para segunda residencia.",
+      },
+      {
+        q: "¿Trabajáis El Vendrell desde Vilanova?",
+        a: "Sí. Cubrimos el Baix Penedès junto con el Garraf, a unos 20 minutos por la C-31 o la C-32. Mismo método que en el resto de zonas: valoración realista, reportaje profesional y un único asesor que lleva la operación de principio a fin.",
+      },
+    ],
+    cercanas: ["calafell", "cunit", "vilafranca"],
+  },
+
+  "sant-sadurni-d-anoia": {
+    ciudad: "sant sadurni",
+    nombre: "Sant Sadurní d'Anoia",
+    titulo: "Inmobiliaria en Sant Sadurní d'Anoia",
+    descripcionCorta: "La capital del cava. Vida de pueblo entre viñedos con tren directo a Barcelona.",
+    descripcionLarga:
+      "Sant Sadurní d'Anoia es la capital del cava y uno de los pueblos con más identidad del Penedès: un núcleo compacto rodeado de viñedos, con las grandes cavas como motor económico y una vida local activa todo el año. El mercado inmobiliario combina casas de pueblo, pisos en el centro y fincas o masías en el entorno rural. Con estación de Rodalies (línea R4) y Barcelona a unos 45 minutos en tren, atrae a compradores que quieren vida de pueblo de verdad — no urbanización dormitorio — sin desconectarse de la ciudad.",
+    metaTitle: "Inmobiliaria en Sant Sadurní d'Anoia — Casas y pisos en venta",
+    metaDescription:
+      "Casas de pueblo, pisos y fincas en venta en Sant Sadurní d'Anoia, la capital del cava. The Vila Home, tu inmobiliaria en el Penedès.",
+    cp: "08770",
+    lat: 41.4266,
+    lng: 1.7862,
+    mercado: {
+      precio: "1.700–2.300 €/m²",
+      tipos: "Casas de pueblo, pisos céntricos, fincas y masías",
+      perfil: "Vida de pueblo con conexión a Barcelona",
+    },
+    faq: [
+      {
+        q: "¿Cómo es vivir en Sant Sadurní d'Anoia?",
+        a: "Es vida de pueblo auténtica: comercio local, fiestas con siglos de historia, viñedos a cinco minutos andando y una economía propia gracias a la industria del cava. A diferencia de las urbanizaciones dormitorio, aquí hay vida todo el año — y el tren te deja en Barcelona en unos 45 minutos.",
+      },
+      {
+        q: "¿Qué tipo de vivienda se encuentra en Sant Sadurní?",
+        a: "Sobre todo casas de pueblo — muchas con patio o garaje — y pisos en el centro. En el entorno rural aparecen fincas y masías entre viñedos, un producto escaso y muy buscado. Como referencia general, los precios se mueven entre 1.700 y 2.300 €/m² según tipología y estado.",
+      },
+      {
+        q: "¿Está bien comunicado con Barcelona?",
+        a: "Sí: la estación de Rodalies (línea R4) conecta con Barcelona en unos 45 minutos, y por carretera la AP-7 queda a diez minutos. Es de los pocos pueblos del Penedès donde puedes vivir sin coche si trabajas en Barcelona.",
+      },
+      {
+        q: "¿Trabajáis el Alt Penedès?",
+        a: "Sí. Junto con Vilafranca, Sant Sadurní completa nuestra cobertura del Penedès. Mismo método que en la costa: valoración realista basada en el mercado local, reportaje profesional y un único asesor de principio a fin.",
+      },
+    ],
+    cercanas: ["vilafranca", "olivella", "canyelles"],
+  },
 };
 
 interface Props {

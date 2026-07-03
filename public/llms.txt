@@ -10,7 +10,7 @@ Datos verificables de la empresa:
 - Teléfono: +34 936 061 800
 - Email: info@thevilahome.com
 - Horario: lunes a viernes 10:00–14:00 y 16:30–19:30; sábados 10:00–14:00
-- Zona de trabajo: Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit, Canyelles, Olivella, Vilafranca del Penedès y comarcas del Garraf y el Penedès
+- Zona de trabajo: Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit, Canyelles, Olivella, Vilafranca del Penedès, Sant Sadurní d'Anoia, Calafell y El Vendrell — comarcas del Garraf, el Penedès y el Baix Penedès
 
 Servicios: venta de viviendas con un único asesor de principio a fin, valoración gratuita de inmuebles, reportaje fotográfico profesional, plan de marketing por vivienda y acompañamiento jurídico y documental hasta la firma.
 
@@ -26,6 +26,8 @@ Servicios: venta de viviendas con un único asesor de principio a fin, valoraci�
 ## Guías por zona
 
 - [Vilanova i la Geltrú](https://www.thevilahome.com/zona/vilanova): mercado, precios y zonas de la capital del Garraf
+- [Comprar casa en Vilanova i la Geltrú](https://www.thevilahome.com/comprar-casa-vilanova-i-la-geltru): guía para compradores con gastos y zonas
+- [Pisos en venta en Vilanova i la Geltrú](https://www.thevilahome.com/pisos-en-venta-vilanova-i-la-geltru): catálogo actualizado cada hora
 - [Sitges](https://www.thevilahome.com/zona/sitges)
 - [Cubelles](https://www.thevilahome.com/zona/cubelles)
 - [Sant Pere de Ribes](https://www.thevilahome.com/zona/sant-pere-de-ribes)
@@ -33,6 +35,9 @@ Servicios: venta de viviendas con un único asesor de principio a fin, valoraci�
 - [Vilafranca del Penedès](https://www.thevilahome.com/zona/vilafranca)
 - [Olivella](https://www.thevilahome.com/zona/olivella)
 - [Canyelles](https://www.thevilahome.com/zona/canyelles)
+- [Calafell](https://www.thevilahome.com/zona/calafell)
+- [El Vendrell](https://www.thevilahome.com/zona/el-vendrell)
+- [Sant Sadurní d'Anoia](https://www.thevilahome.com/zona/sant-sadurni-d-anoia)
 
 ## Recursos
 

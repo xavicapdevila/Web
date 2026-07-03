@@ -86,9 +86,15 @@ const schemaRealEstateAgent = {
     { "@type": "City", name: "Vilanova i la Geltrú" },
     { "@type": "AdministrativeArea", name: "Garraf" },
     { "@type": "AdministrativeArea", name: "Penedès" },
+    { "@type": "AdministrativeArea", name: "Baix Penedès" },
     { "@type": "City", name: "Sitges" },
     { "@type": "City", name: "Sant Pere de Ribes" },
     { "@type": "City", name: "Cubelles" },
+    { "@type": "City", name: "Cunit" },
+    { "@type": "City", name: "Vilafranca del Penedès" },
+    { "@type": "City", name: "Sant Sadurní d'Anoia" },
+    { "@type": "City", name: "Calafell" },
+    { "@type": "City", name: "El Vendrell" },
   ],
   sameAs: [
     "https://www.instagram.com/thevilahome",
@@ -123,7 +129,7 @@ const schemaFaq = {
       name: "¿Qué zonas cubre The Vila Home?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "The Vila Home opera principalmente en Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit y toda la comarca del Garraf. También trabajamos en el Penedès, especialmente en Vilafranca del Penedès.",
+        text: "The Vila Home opera principalmente en Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit y toda la comarca del Garraf. También trabajamos en el Penedès — Vilafranca del Penedès y Sant Sadurní d'Anoia — y en el Baix Penedès, con Calafell y El Vendrell.",
       },
     },
     {
