@@ -27,7 +27,16 @@ function useWidgetBrandFont() {
             "* { font-family: var(--font-inter), Inter, system-ui, sans-serif !important; } " +
             // Título del widget con la misma voz que el titular de la página
             // (font-light ~30px, como el h1 de al lado).
-            "h1, .kiwi-headline__l { font-weight: 300 !important; font-size: 1.875rem !important; line-height: 1.15 !important; }";
+            "h1, .kiwi-headline__l { font-weight: 300 !important; font-size: 1.875rem !important; line-height: 1.15 !important; } " +
+            // OJO: estos colores están calculados para verse BIEN TRAS EL FILTRO
+            // del contenedor (invert 0.94 + hue-rotate 180 + sepia 0.18):
+            //   #534324 → dorado de marca #C9B99A · #352a1b → hover #DDD0BB
+            //   #00000b → blanco · #f3f4f6 → texto oscuro · #757a83 → placeholder gris
+            // Si se cambia el filtro, hay que recalcularlos (script en el commit).
+            ".kiwi-button__primary { background-color: #534324 !important; border-color: #534324 !important; color: #fff !important; } " +
+            ".kiwi-button__primary:hover { background-color: #352a1b !important; border-color: #352a1b !important; } " +
+            ".kiwi-input-field, input.kiwi-input-field { background-color: #00000b !important; color: #f3f4f6 !important; } " +
+            ".kiwi-input-field::placeholder { color: #757a83 !important; }";
           root.appendChild(style);
         }
         clearInterval(interval);
