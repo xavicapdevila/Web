@@ -26,8 +26,8 @@ const dict = {
 
     // HowWeWork
     howTitle1: "Cómo",
-    howTitle2: "trabajamos",
-    howIntro: "Vender o comprar una casa es de las decisiones más importantes que tomarás. Merece que alguien se lo tome igual de en serio que tú.",
+    howTitle2: "te acompañamos",
+    howIntro: "Comprar o vender una casa pasa una o dos veces en la vida, y nadie nace sabiendo. Tener dudas es normal; pasarlas solo, no.",
     howStep1Title: "Las personas primero",
     howStep1Desc: "Empezamos sentándonos contigo, sin prisa. Antes de hablar de precio queremos saber qué vendes de verdad: la casa donde crecieron tus hijos, la de tu madre, la que se te quedó pequeña. De ahí sale todo lo demás.",
     howStep2Title: "Menos anuncios, más estrategia",
@@ -333,8 +333,8 @@ const dict = {
     heroReviews: "ressenyes a Google",
 
     howTitle1: "Com",
-    howTitle2: "treballem",
-    howIntro: "Vendre o comprar una casa és una de les decisions més importants que prendràs. Mereix que algú se la prengui tan seriosament com tu.",
+    howTitle2: "t'acompanyem",
+    howIntro: "Comprar o vendre una casa passa una o dues vegades a la vida, i ningú no neix ensenyat. Tenir dubtes és normal; passar-los sol, no.",
     howStep1Title: "Les persones primer",
     howStep1Desc: "Comencem seient amb tu, sense presses. Abans de parlar de preu volem saber què vens de veritat: la casa on han crescut els teus fills, la de la teva mare, la que se t'ha quedat petita. D'aquí en surt tota la resta.",
     howStep2Title: "Menys anuncis, més estratègia",
@@ -624,8 +624,8 @@ const dict = {
     heroReviews: "Google reviews",
 
     howTitle1: "How",
-    howTitle2: "we work",
-    howIntro: "Buying or selling a home is one of the most important decisions you'll make. It deserves someone who takes it as seriously as you do.",
+    howTitle2: "we walk with you",
+    howIntro: "Buying or selling a home happens once or twice in a lifetime, and nobody is born knowing how. Having doubts is normal; facing them alone isn't.",
     howStep1Title: "People first",
     howStep1Desc: "We start by sitting down with you, no rush. Before talking price, we want to know what you're really selling: the house where your kids grew up, your mother's place, the one you outgrew. Everything else follows from there.",
     howStep2Title: "Fewer listings, more strategy",
@@ -915,8 +915,8 @@ const dict = {
     heroReviews: "avis Google",
 
     howTitle1: "Comment",
-    howTitle2: "nous travaillons",
-    howIntro: "Acheter ou vendre une maison est l'une des décisions les plus importantes que vous prendrez. Elle mérite quelqu'un qui la prenne aussi au sérieux que vous.",
+    howTitle2: "nous vous accompagnons",
+    howIntro: "Acheter ou vendre une maison, cela arrive une ou deux fois dans une vie, et personne ne naît en sachant faire. Avoir des doutes, c'est normal ; les traverser seul, non.",
     howStep1Title: "Les personnes d'abord",
     howStep1Desc: "On commence par s'asseoir avec vous, sans se presser. Avant de parler prix, on veut savoir ce que vous vendez vraiment : la maison où vos enfants ont grandi, celle de votre mère, celle devenue trop petite. Tout le reste part de là.",
     howStep2Title: "Moins d'annonces, plus de stratégie",
