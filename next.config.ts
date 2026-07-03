@@ -124,13 +124,15 @@ const nextConfig: NextConfig = {
          // El widget usa por dentro Google Maps (dirección) y reCAPTCHA (envío final):
          // www.google.com + www.gstatic.com + maps.googleapis.com son IMPRESCINDIBLES
          // o el botón «valorar» se queda colgado.
-         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com https://*.idealista.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com",
+         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com https://idealista.com https://*.idealista.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com",
          "style-src 'self' 'unsafe-inline' https://*.idealista.com https://fonts.googleapis.com",
          "img-src 'self' data: blob: https:",
          "font-src 'self' data: https://*.idealista.com https://fonts.gstatic.com",
          // Incluye los endpoints de conversión de Google Ads (googleadservices,
          // doubleclick, google.com) — sin ellos las campañas no medirían.
-         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://*.googleadservices.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com https://www.facebook.com https://api.mymemory.translated.net https://challenges.cloudflare.com https://*.idealista.com",
+         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://*.googleadservices.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com https://www.facebook.com https://api.mymemory.translated.net https://challenges.cloudflare.com https://idealista.com https://*.idealista.com",
+         // blob: para posibles web workers de librerías embebidas (mapas, captcha)
+         "worker-src 'self' blob:",
          "frame-src https:",
          "media-src 'self' https:",
          "object-src 'none'",
