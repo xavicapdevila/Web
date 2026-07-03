@@ -118,14 +118,23 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            className="lg:hidden text-white p-2"
-            onClick={() => setOpen(!open)}
-            aria-label="Menú"
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {/* Mobile: click-to-call siempre visible (en móvil es donde se llama) */}
+          <div className="lg:hidden flex items-center gap-1">
+            <a
+              href="tel:936061800"
+              className="text-[#C9B99A] hover:text-[#DDD0BB] transition-colors p-2"
+              aria-label="Llamar a The Vila Home — 936 061 800"
+            >
+              <Phone size={19} />
+            </a>
+            <button
+              className="text-white p-2"
+              onClick={() => setOpen(!open)}
+              aria-label="Menú"
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </nav>
       </header>
 

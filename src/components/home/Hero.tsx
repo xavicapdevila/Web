@@ -6,7 +6,13 @@ import { ArrowDown } from "lucide-react";
 import CountUp from "@/components/ui/CountUp";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function Hero() {
+interface HeroProps {
+  /** Valoración real de la ficha de Google (viene de la API de Places). */
+  rating?: number;
+  totalReviews?: number;
+}
+
+export default function Hero({ rating, totalReviews }: HeroProps) {
   const { t } = useLanguage();
 
   return (
@@ -64,7 +70,7 @@ export default function Hero() {
 
           {/* Stats */}
           <div
-            className="flex items-center gap-12 mt-14 pt-8 border-t border-white/15 animate-fade-up"
+            className="flex flex-wrap items-center gap-x-10 gap-y-6 sm:gap-x-12 mt-14 pt-8 border-t border-white/15 animate-fade-up"
             style={{ animationDelay: "520ms", animationFillMode: "both" }}
           >
             <div>
@@ -79,6 +85,16 @@ export default function Hero() {
               </div>
               <div className="text-white/60 text-xs font-body tracking-wide mt-1">{t("heroYears")}</div>
             </div>
+            {typeof rating === "number" && rating > 0 && (
+              <div>
+                <div className="font-display text-3xl text-[#C9B99A]">
+                  {rating.toFixed(1).replace(".", ",")}<span className="text-2xl align-top">★</span>
+                </div>
+                <div className="text-white/60 text-xs font-body tracking-wide mt-1">
+                  {totalReviews ? `${totalReviews} ${t("heroReviews")}` : t("heroReviews")}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

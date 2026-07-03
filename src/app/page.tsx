@@ -184,7 +184,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFaq) }}
       />
-      <Hero />
+      <Hero rating={placeData.rating} totalReviews={placeData.totalReviews} />
       <HowWeWork />
       <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
         <FeaturedProperties properties={featured} />
