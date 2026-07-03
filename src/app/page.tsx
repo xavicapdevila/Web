@@ -56,6 +56,7 @@ const schemaRealEstateAgent = {
     latitude: 41.2183,
     longitude: 1.7266,
   },
+  hasMap: "https://www.google.com/maps/search/?api=1&query=The%20Vila%20Home&query_place_id=ChIJhciFmN6HoxIRfBIcpyI-w6Q",
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",

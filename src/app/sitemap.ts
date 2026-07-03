@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL,                                        lastModified: new Date(), priority: 1,   changeFrequency: "weekly"  },
     { url: `${BASE_URL}/propiedades`,                       lastModified: new Date(), priority: 0.9, changeFrequency: "daily"   },
     { url: `${BASE_URL}/valoracion`,                        lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/vender`,                            lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/blog`,                              lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
     { url: `${BASE_URL}/quienes-somos`,                     lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/contacto`,                          lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },
@@ -48,8 +49,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
       });
     }
-  } catch {
-    // XML cache not ready
+  } catch (err) {
+    // XML cache not ready — log it: a silent failure here hides property URLs from Google
+    console.error("[sitemap] property slugs unavailable:", err);
   }
 
   try {
@@ -62,8 +64,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "weekly",
       });
     }
-  } catch {
-    // DB not ready
+  } catch (err) {
+    // DB not ready — log it: a silent failure here hides blog URLs from Google
+    console.error("[sitemap] blog posts unavailable:", err);
   }
 
   return routes;

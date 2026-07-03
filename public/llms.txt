@@ -1,0 +1,40 @@
+# The Vila Home
+
+> Inmobiliaria en Vilanova i la Geltrú (Garraf, Barcelona) especializada en la venta de pisos, casas, chalets y áticos en Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit y el resto del Garraf y el Penedès. Atención en español, catalán, inglés y francés.
+
+Datos verificables de la empresa:
+
+- Nombre comercial: The Vila Home
+- Razón social: Projectes Immobiliaris Costa Daurada SL (NIF B13683529)
+- Dirección: Av. Francesc Macià 48, 08800 Vilanova i la Geltrú (Barcelona), España
+- Teléfono: +34 936 061 800
+- Email: info@thevilahome.com
+- Horario: lunes a viernes 10:00–14:00 y 16:30–19:30; sábados 10:00–14:00
+- Zona de trabajo: Vilanova i la Geltrú, Sitges, Cubelles, Sant Pere de Ribes, Cunit, Canyelles, Olivella, Vilafranca del Penedès y comarcas del Garraf y el Penedès
+
+Servicios: venta de viviendas con un único asesor de principio a fin, valoración gratuita de inmuebles, reportaje fotográfico profesional, plan de marketing por vivienda y acompañamiento jurídico y documental hasta la firma.
+
+## Páginas principales
+
+- [Inicio](https://www.thevilahome.com/): quiénes somos y propiedades destacadas
+- [Propiedades en venta](https://www.thevilahome.com/propiedades): catálogo actualizado de pisos y casas en venta
+- [Vender tu casa](https://www.thevilahome.com/vender): cómo trabajamos la venta y solicitud de valoración
+- [Valoración gratuita](https://www.thevilahome.com/valoracion): estimación real de mercado en menos de 24 h
+- [Quiénes somos](https://www.thevilahome.com/quienes-somos): el equipo
+- [Contacto](https://www.thevilahome.com/contacto): dirección, teléfono y formulario
+
+## Guías por zona
+
+- [Vilanova i la Geltrú](https://www.thevilahome.com/zona/vilanova): mercado, precios y zonas de la capital del Garraf
+- [Sitges](https://www.thevilahome.com/zona/sitges)
+- [Cubelles](https://www.thevilahome.com/zona/cubelles)
+- [Sant Pere de Ribes](https://www.thevilahome.com/zona/sant-pere-de-ribes)
+- [Cunit](https://www.thevilahome.com/zona/cunit)
+- [Vilafranca del Penedès](https://www.thevilahome.com/zona/vilafranca)
+- [Olivella](https://www.thevilahome.com/zona/olivella)
+- [Canyelles](https://www.thevilahome.com/zona/canyelles)
+
+## Recursos
+
+- [Blog inmobiliario](https://www.thevilahome.com/blog): guías sobre comprar y vender vivienda en Catalunya (gastos, impuestos, arras, hipotecas, herencias, documentación)
+- [Sitemap](https://www.thevilahome.com/sitemap.xml)

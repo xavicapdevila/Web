@@ -313,6 +313,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: zona.metaTitle,
     description: zona.metaDescription,
+    keywords: [
+      `inmobiliaria en ${zona.nombre}`,
+      `inmobiliaria ${zona.nombre}`,
+      `inmobiliarias en ${zona.nombre}`,
+      `agencia inmobiliaria en ${zona.nombre}`,
+      `agencias inmobiliarias en ${zona.nombre}`,
+      `mejor inmobiliaria ${zona.nombre}`,
+      `pisos en venta en ${zona.nombre}`,
+      `casas en venta en ${zona.nombre}`,
+      `vender piso en ${zona.nombre}`,
+      `vender casa en ${zona.nombre}`,
+    ],
     alternates: { canonical: canonicalUrl },
     openGraph: {
       type: "website",

@@ -45,9 +45,9 @@ const nextConfig: NextConfig = {
 
      // Páginas principales
      { source: "/home{/}?", destination: "/", permanent: true },
-     { source: "/venta{/}?", destination: "/propiedades/", permanent: true },
-     { source: "/inmuebles{/}?", destination: "/propiedades/", permanent: true },
-     { source: "/valora-tu-vivienda{/}?", destination: "/valoracion/", permanent: true },
+     { source: "/venta{/}?", destination: "/propiedades", permanent: true },
+     { source: "/inmuebles{/}?", destination: "/propiedades", permanent: true },
+     { source: "/valora-tu-vivienda{/}?", destination: "/valoracion", permanent: true },
 
      // Blog posts antiguos (root level) → artículo / zona equivalente cuando existe
      { source: "/inmobiliaria-en-vilanova-i-la-geltru{/}?", destination: "/blog/elegir-inmobiliaria-vender-piso", permanent: true },
@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
      { source: "/como-elegir-mejor-zona-para-vivir-en-vilanova-geltru{/}?", destination: "/zona/vilanova", permanent: true },
      { source: "/elegir-mejor-zona-vilanova-geltru{/}?", destination: "/zona/vilanova", permanent: true },
      { source: "/mejor-zona-vivir-vilanova{/}?", destination: "/zona/vilanova", permanent: true },
-     { source: "/noticias{/}?", destination: "/blog/", permanent: true },
+     { source: "/noticias{/}?", destination: "/blog", permanent: true },
 
      // Demo sobrante del theme WordPress (Houzez) — sin equivalente
      { source: "/about-this-demo{/}?", destination: "/", permanent: true },
@@ -77,29 +77,29 @@ const nextConfig: NextConfig = {
      },
 
      // Páginas de propiedades (URL antigua /propiedad/ → nueva /propiedades/)
-     { source: "/propiedad/:slug{/}?", destination: "/propiedades/", permanent: true },
-     { source: "/propiedad{/}?", destination: "/propiedades/", permanent: true },
+     { source: "/propiedad/:slug{/}?", destination: "/propiedades", permanent: true },
+     { source: "/propiedad{/}?", destination: "/propiedades", permanent: true },
 
      // Valoración (URLs alternativas antiguas)
-     { source: "/valoracion-inmuebles{/}?", destination: "/valoracion/", permanent: true },
-     { source: "/valoracion-inmueble{/}?", destination: "/valoracion/", permanent: true },
+     { source: "/valoracion-inmuebles{/}?", destination: "/valoracion", permanent: true },
+     { source: "/valoracion-inmueble{/}?", destination: "/valoracion", permanent: true },
 
      // Servicios y empresa
      { source: "/servicios/home-staging{/}?", destination: "/blog/home-staging-vender-vivienda-mas-rapido", permanent: true },
-     { source: "/servicios/:slug{/}?", destination: "/quienes-somos/", permanent: true },
-     { source: "/servicios{/}?", destination: "/quienes-somos/", permanent: true },
-     { source: "/empresa{/}?", destination: "/quienes-somos/", permanent: true },
+     { source: "/servicios/:slug{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/servicios{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/empresa{/}?", destination: "/quienes-somos", permanent: true },
 
      // Paginación y taxonomías WordPress
-     { source: "/page/:num{/}?", destination: "/propiedades/", permanent: true },
-     { source: "/category/:path*", destination: "/blog/", permanent: true },
-     { source: "/tag/:path*", destination: "/blog/", permanent: true },
+     { source: "/page/:num{/}?", destination: "/propiedades", permanent: true },
+     { source: "/category/:path*", destination: "/blog", permanent: true },
+     { source: "/tag/:path*", destination: "/blog", permanent: true },
      { source: "/author/:slug{/}?", destination: "/", permanent: true },
 
      // Permalinks WordPress con fecha (/AAAA/MM/slug). El guard \d evita
      // colisionar con rutas reales como /blog/categoria/* o /zona/*.
-     { source: "/:year(\\d{4})/:month(\\d{2})/:slug{/}?", destination: "/blog/", permanent: true },
-     { source: "/:year(\\d{4})/:month(\\d{2}){/}?", destination: "/blog/", permanent: true },
+     { source: "/:year(\\d{4})/:month(\\d{2})/:slug{/}?", destination: "/blog", permanent: true },
+     { source: "/:year(\\d{4})/:month(\\d{2}){/}?", destination: "/blog", permanent: true },
    ];
  },
 
@@ -113,6 +113,26 @@ const nextConfig: NextConfig = {
      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
      { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
      { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
+     // Report-Only: no bloquea nada, solo registra violaciones en la consola del
+     // navegador. Es el paso previo a promocionarla a CSP estricta: si tras un
+     // tiempo no aparecen violaciones legítimas, se cambia la clave a
+     // "Content-Security-Policy" (manteniendo frame-ancestors de arriba).
+     {
+       key: "Content-Security-Policy-Report-Only",
+       value: [
+         "default-src 'self'",
+         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net https://challenges.cloudflare.com",
+         "style-src 'self' 'unsafe-inline'",
+         "img-src 'self' data: blob: https:",
+         "font-src 'self' data:",
+         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.facebook.com https://api.mymemory.translated.net",
+         "frame-src https:",
+         "media-src 'self' https:",
+         "object-src 'none'",
+         "base-uri 'self'",
+         "form-action 'self'",
+       ].join("; "),
+     },
    ];
    return [
      { source: "/(.*)", headers: securityHeaders },

@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'The Vila Home · Links',
   description: 'Inmobiliaria humana en la costa catalana. Garraf · Baix Penedès.',
+  alternates: { canonical: 'https://www.thevilahome.com/links' },
   openGraph: {
     title: 'The Vila Home',
     description: 'Inmobiliaria humana en la costa catalana.',
