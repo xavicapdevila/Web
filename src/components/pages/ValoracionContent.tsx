@@ -98,7 +98,9 @@ export default function ValoracionContent() {
             {/* Sin marco: con la máscara de marca sobre el widget, el recuadro
                 dorado era un doble marco innecesario. */}
             <div>
-              <p className="text-[#888] text-xs font-body tracking-[0.3em] uppercase mb-5">
+              {/* Centrado y discreto: el widget centra su contenido (m-auto), así
+                  la etiqueta alinea con él en vez de colgar del borde izquierdo */}
+              <p className="text-center text-[#777] text-[10px] font-body tracking-[0.3em] uppercase mb-5">
                 {t("valorWidgetLabel")}
               </p>
 
