@@ -12,7 +12,10 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === "/";
+  // En la regeneración ISR de Vercel la raíz se renderiza como "/index", no "/"
+  // (quirk conocido de Next en Vercel): sin este caso el HTML cacheado sale
+  // con la barra negra en vez de transparente sobre el hero.
+  const isHome = pathname === "/" || pathname === "/index";
   const { lang, setLang, t } = useLanguage();
 
   const navLinks = [
