@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useTurnstile } from '@/hooks/useTurnstile'
 
 type Lang = 'ca' | 'es' | 'en' | 'fr'
 
@@ -20,6 +21,7 @@ const i18n: Record<Lang, {
   success: string; successSub: string
   errorGeneral: string; errorPdfOnly: string; errorTooLarge: string
   errorInvalidPdf: string; errorNotACv: string
+  privacy: string; privacyLink: string
 }> = {
   ca: {
     title:           "Treballa amb nosaltres",
@@ -42,6 +44,8 @@ const i18n: Record<Lang, {
     errorTooLarge:   "El fitxer supera els 2 MB.",
     errorInvalidPdf: "El fitxer no és un PDF vàlid.",
     errorNotACv:     "El document no sembla un CV. Comprova que has adjuntat el fitxer correcte.",
+    privacy:         "En enviar, acceptes que tractem les teves dades i el teu CV per a aquest procés de selecció (conservació màx. 12 mesos).",
+    privacyLink:     "Política de privadesa",
   },
   es: {
     title:           "Trabaja con nosotros",
@@ -64,6 +68,8 @@ const i18n: Record<Lang, {
     errorTooLarge:   "El archivo supera los 2 MB.",
     errorInvalidPdf: "El archivo no es un PDF válido.",
     errorNotACv:     "El documento no parece un CV. Comprueba que has adjuntado el archivo correcto.",
+    privacy:         "Al enviar, aceptas que tratemos tus datos y tu CV para este proceso de selección (conservación máx. 12 meses).",
+    privacyLink:     "Política de privacidad",
   },
   en: {
     title:           "Work with us",
@@ -86,6 +92,8 @@ const i18n: Record<Lang, {
     errorTooLarge:   "File exceeds 2 MB.",
     errorInvalidPdf: "The file is not a valid PDF.",
     errorNotACv:     "The document doesn't look like a CV. Please check you've attached the right file.",
+    privacy:         "By submitting, you agree to the processing of your details and CV for this recruitment process (kept for up to 12 months).",
+    privacyLink:     "Privacy policy",
   },
   fr: {
     title:           "Travailler avec nous",
@@ -108,6 +116,8 @@ const i18n: Record<Lang, {
     errorTooLarge:   "Le fichier dépasse 2 Mo.",
     errorInvalidPdf: "Le fichier n'est pas un PDF valide.",
     errorNotACv:     "Le document ne ressemble pas à un CV. Vérifiez que vous avez joint le bon fichier.",
+    privacy:         "En envoyant, vous acceptez le traitement de vos données et de votre CV pour ce processus de recrutement (conservation max. 12 mois).",
+    privacyLink:     "Politique de confidentialité",
   },
 }
 
@@ -125,6 +135,7 @@ export default function JobsModal({ open, onClose, lang }: Props) {
   const [errorMsg, setErrorMsg] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
+  const turnstile = useTurnstile()
 
   // Close on Escape
   useEffect(() => {
@@ -159,11 +170,15 @@ export default function JobsModal({ open, onClose, lang }: Props) {
     setStatus('sending')
     setErrorMsg('')
 
+    // Captcha invisible (no-op hasta que Turnstile esté configurado).
+    const turnstileToken = await turnstile.getToken()
+
     const fd = new FormData()
     fd.append('name',    name)
     fd.append('email',   email)
     fd.append('message', message)
     fd.append('cv',      file)
+    if (turnstileToken) fd.append('turnstileToken', turnstileToken)
 
     try {
       const res  = await fetch('/api/jobs-apply', { method: 'POST', body: fd })
@@ -234,6 +249,9 @@ export default function JobsModal({ open, onClose, lang }: Props) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+
+              {/* Turnstile invisible (no renderiza UI) */}
+              <div ref={turnstile.containerRef} />
 
               {/* Name */}
               <div>
@@ -340,6 +358,12 @@ export default function JobsModal({ open, onClose, lang }: Props) {
               >
                 {status === 'sending' ? t.sending : t.submit}
               </button>
+
+              {/* Capa informativa RGPD (candidatos) */}
+              <p className="text-[10px] text-neutral-600 leading-relaxed text-center">
+                {t.privacy}{' '}
+                <a href="/privacidad" className="underline hover:text-neutral-400 transition-colors">{t.privacyLink}</a>
+              </p>
 
             </form>
           )}

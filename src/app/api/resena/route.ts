@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 // Opinión privada: cuando el cliente valora con MENOS de 5★, en lugar de
 // publicarse en Google, el comentario llega a dirección para poder mejorar y
@@ -28,6 +29,11 @@ export async function POST(request: Request) {
 
     // Honeypot anti-bots.
     if (String(body.company ?? "").trim()) return NextResponse.json({ ok: true });
+
+    // Captcha invisible (activo solo con TURNSTILE_SECRET_KEY configurada).
+    if (!(await verifyTurnstile(body.turnstileToken, ip))) {
+      return NextResponse.json({ error: "captcha_failed" }, { status: 400 });
+    }
 
     const rating = Number(body.rating);
     const comment = String(body.comment ?? "").trim().slice(0, MAX);

@@ -6,7 +6,10 @@ import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 type Ctx = { params: Promise<{ ref: string }> };
 
-export async function GET(_req: NextRequest, { params }: Ctx) {
+export async function GET(req: NextRequest, { params }: Ctx) {
+  if (!verifySession(req.cookies.get(ADMIN_COOKIE)?.value)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
   const { ref } = await params;
   try {
     const db  = getDb();
@@ -18,7 +21,8 @@ export async function GET(_req: NextRequest, { params }: Ctx) {
     const imagenes             = JSON.parse(row.imagenes   ?? "[]");
     return NextResponse.json({ pins, imagenes });
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    console.error("[plano-pins GET]", e);
+    return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }
 
@@ -45,6 +49,7 @@ export async function PUT(req: NextRequest, { params }: Ctx) {
 
     return NextResponse.json({ ok: true });
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    console.error("[plano-pins PUT]", e);
+    return NextResponse.json({ error: "internal_error" }, { status: 500 });
   }
 }

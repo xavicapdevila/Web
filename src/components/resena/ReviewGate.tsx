@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { useTurnstile } from "@/hooks/useTurnstile";
 
 const GOOGLE_REVIEW_URL = "https://g.page/r/CXwSHKciPsOkEBM/review";
 
@@ -28,6 +29,7 @@ export default function ReviewGate() {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
+  const turnstile = useTurnstile();
 
   // Al puntuar 5★, se abre Google (y se autolleva tras un instante).
   useEffect(() => {
@@ -49,6 +51,8 @@ export default function ReviewGate() {
     const data = new FormData(form);
     setStatus("sending");
     try {
+      // Captcha invisible (no-op hasta que Turnstile esté configurado).
+      const turnstileToken = await turnstile.getToken();
       const res = await fetch("/api/resena", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,6 +62,7 @@ export default function ReviewGate() {
           name: data.get("name"),
           contact: data.get("contact"),
           company: data.get("company"),
+          turnstileToken,
         }),
       });
       if (!res.ok) throw new Error();
@@ -160,6 +165,8 @@ export default function ReviewGate() {
               />
               {/* Honeypot */}
               <input name="company" tabIndex={-1} autoComplete="off" className="absolute -left-[9999px] h-px w-px opacity-0" aria-hidden />
+              {/* Turnstile invisible (no renderiza UI) */}
+              <div ref={turnstile.containerRef} />
 
               {status === "error" && (
                 <p className="text-sm text-[#d98a86]">No se pudo enviar. Inténtalo de nuevo.</p>
@@ -171,6 +178,10 @@ export default function ReviewGate() {
               >
                 {status === "sending" ? "Enviando…" : "Enviar a dirección"}
               </button>
+              <p className="text-center text-[11px] leading-relaxed text-[#6b6a63]">
+                Tu comentario llega solo a dirección y se trata según nuestra{" "}
+                <a href="/privacidad" className="underline transition-colors hover:text-[#9a968c]">política de privacidad</a>.
+              </p>
             </form>
           </div>
         )}

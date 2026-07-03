@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import Anthropic from '@anthropic-ai/sdk'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
 const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]) // %PDF
@@ -18,7 +19,8 @@ function escapeHtml(s: string): string {
 export async function POST(request: Request) {
   // Rate limit: 5 applications / hour per IP. This endpoint calls Claude and
   // sends email, so it's a cost/abuse target if left open.
-  const limit = rateLimit(`jobs:${clientIp(request)}`, 5, 60 * 60 * 1000)
+  const ip = clientIp(request)
+  const limit = rateLimit(`jobs:${ip}`, 5, 60 * 60 * 1000)
   if (!limit.ok) {
     return NextResponse.json(
       { error: 'rate_limited' },
@@ -35,6 +37,11 @@ export async function POST(request: Request) {
 
     if (!name || !email || !cv) {
       return NextResponse.json({ error: 'missing_fields' }, { status: 400 })
+    }
+
+    // Captcha invisible (activo solo con TURNSTILE_SECRET_KEY configurada).
+    if (!(await verifyTurnstile(formData.get('turnstileToken'), ip))) {
+      return NextResponse.json({ error: 'captcha_failed' }, { status: 400 })
     }
     if (cv.type !== 'application/pdf') {
       return NextResponse.json({ error: 'pdf_only' }, { status: 400 })

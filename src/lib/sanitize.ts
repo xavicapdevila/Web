@@ -31,8 +31,10 @@ const OPTIONS: sanitizeHtml.IOptions = {
   allowedStyles: {
     "*": {
       "text-align": [/^(left|right|center|justify)$/],
-      color: [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/i],
-      "background-color": [/^#(0x)?[0-9a-f]+$/i, /^rgb\(/i],
+      // Full-match regexes: an open-ended /^rgb\(/ would accept anything after
+      // the paren (e.g. extra declarations smuggled into the value).
+      color: [/^#[0-9a-f]{3,8}$/i, /^rgba?\(\s*\d{1,3}(\s*,\s*\d{1,3}){2}(\s*,\s*(0|1|0?\.\d+))?\s*\)$/i],
+      "background-color": [/^#[0-9a-f]{3,8}$/i, /^rgba?\(\s*\d{1,3}(\s*,\s*\d{1,3}){2}(\s*,\s*(0|1|0?\.\d+))?\s*\)$/i],
     },
   },
 };

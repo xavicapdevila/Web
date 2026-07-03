@@ -18,7 +18,9 @@ async function handleSync(request: Request) {
     const result = await syncProperties();
     return NextResponse.json({ success: true, ...result, timestamp: new Date().toISOString() });
   } catch (error) {
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+    // Log the detail server-side only — String(error) can leak internal paths
+    console.error("[sync]", error);
+    return NextResponse.json({ success: false, error: "internal_error" }, { status: 500 });
   }
 }
 
