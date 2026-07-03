@@ -27,8 +27,9 @@ export default function FeaturedProperties({ properties }: Props) {
                   {t("featuredLabel")}
                 </span>
               </div>
-              <h2 className="font-display text-3xl lg:text-4xl text-white font-light leading-tight">
-                {t("featuredTitle")}
+              <h2 className="font-display text-3xl lg:text-4xl text-white font-light leading-[1.05]">
+                {t("featuredTitle").split(" ").slice(0, -1).join(" ")}{" "}
+                <span className="text-[#C9B99A]">{t("featuredTitle").split(" ").at(-1)}</span>
               </h2>
             </div>
             <Link

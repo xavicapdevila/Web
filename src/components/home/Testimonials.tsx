@@ -103,8 +103,9 @@ export default function Testimonials({ reviews, rating, totalReviews }: Props) {
 
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div className="max-w-2xl">
-              <h2 className="font-display text-3xl lg:text-4xl text-white font-light leading-tight mb-4">
-                {t("testimonialsTitle")}
+              <h2 className="font-display text-3xl lg:text-4xl text-white font-light leading-[1.05] mb-4">
+                {t("testimonialsTitle").split(" ").slice(0, -1).join(" ")}{" "}
+                <span className="text-[#C9B99A]">{t("testimonialsTitle").split(" ").at(-1)}</span>
               </h2>
               <p className="text-[#888] text-base leading-relaxed">
                 {t("testimonialsSubtitle")}
