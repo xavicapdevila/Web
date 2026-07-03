@@ -51,9 +51,10 @@ function readConsentCookie(): ConsentState | null {
 function writeConsentCookie(state: ConsentState) {
   const expires = new Date();
   expires.setDate(expires.getDate() + COOKIE_DAYS);
+  const secure = location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
     JSON.stringify(state)
-  )}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+  )}; expires=${expires.toUTCString()}; path=/; SameSite=Lax${secure}`;
 }
 
 // ── Context ────────────────────────────────────────────────────────────────
@@ -86,12 +87,45 @@ function loadGA(id: string) {
   document.head.appendChild(init);
 }
 
+// ── Meta Pixel loader ───────────────────────────────────────────────────────
+
+function loadMetaPixel(id: string) {
+  if (typeof window === "undefined") return;
+  // Ya inicializado (fbq presente): no re-inyectar.
+  const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+  if (w.fbq) return;
+
+  /* eslint-disable */
+  // Snippet oficial del Meta Pixel (base code).
+  (function (f: any, b: any, e: string, v: string) {
+    if (f.fbq) return;
+    const n: any = (f.fbq = function () {
+      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+    });
+    if (!f._fbq) f._fbq = n;
+    n.push = n;
+    n.loaded = true;
+    n.version = "2.0";
+    n.queue = [];
+    const t = b.createElement(e);
+    t.async = true;
+    t.src = v;
+    const s = b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t, s);
+  })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+  /* eslint-enable */
+
+  w.fbq!("init", id);
+  w.fbq!("track", "PageView");
+}
+
 // ── Provider ───────────────────────────────────────────────────────────────
 
 export function CookieConsentProvider({ children }: { children: React.ReactNode }) {
   const [consent, setConsent] = useState<ConsentState | null>(null);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const gaLoaded = useRef(false);
+  const pixelLoaded = useRef(false);
 
   // Read cookie on mount
   useEffect(() => {
@@ -105,6 +139,16 @@ export function CookieConsentProvider({ children }: { children: React.ReactNode 
     if (consent?.analytics) {
       gaLoaded.current = true;
       loadGA(gaId);
+    }
+  }, [consent]);
+
+  // Load Meta Pixel when marketing consent is granted
+  useEffect(() => {
+    const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+    if (!pixelId || pixelLoaded.current) return;
+    if (consent?.marketing) {
+      pixelLoaded.current = true;
+      loadMetaPixel(pixelId);
     }
   }, [consent]);
 

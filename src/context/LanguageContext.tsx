@@ -21,11 +21,31 @@ const LanguageContext = createContext<LanguageContextValue>({
   translate: async (text) => text,
 });
 
-function readLangCookie(): Lang {
-  if (typeof document === "undefined") return DEFAULT_LANG;
+const SUPPORTED: Lang[] = ["es", "ca", "en", "fr"];
+
+/** Cookie explícita (elección previa del usuario), o null si no hay. */
+function readLangCookie(): Lang | null {
+  if (typeof document === "undefined") return null;
   const match = document.cookie.match(/(?:^|;\s*)tvh_lang=([^;]+)/);
   const val = match?.[1] as Lang | undefined;
-  return val && ["es", "ca", "en", "fr"].includes(val) ? val : DEFAULT_LANG;
+  return val && SUPPORTED.includes(val) ? val : null;
+}
+
+/**
+ * Idioma inicial cuando el usuario aún no ha elegido: primero `?lang=` de la
+ * URL (útil para enlazar anuncios ya en un idioma), y si no, el idioma del
+ * navegador/dispositivo. Cae a español si no es ninguno de los soportados.
+ */
+function detectLang(): Lang {
+  if (typeof window === "undefined") return DEFAULT_LANG;
+  const param = new URLSearchParams(window.location.search).get("lang");
+  if (param && SUPPORTED.includes(param as Lang)) return param as Lang;
+  const candidates = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const raw of candidates) {
+    const code = raw?.slice(0, 2).toLowerCase() as Lang;
+    if (SUPPORTED.includes(code)) return code;
+  }
+  return DEFAULT_LANG;
 }
 
 // Map our lang codes to MyMemory language codes
@@ -45,17 +65,22 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Pending promises to avoid duplicate simultaneous requests
   const pending = useRef<Map<string, Promise<string>>>(new Map());
 
-  // On mount, read from cookie
+  // On mount: respetar la elección previa (cookie); si no la hay, detectar por
+  // ?lang= o idioma del navegador y fijarla para que persista.
   useEffect(() => {
     const saved = readLangCookie();
-    setLangState(saved);
-    setTranslations(getTranslations(saved));
+    const initial = saved ?? detectLang();
+    setLangState(initial);
+    setTranslations(getTranslations(initial));
+    if (!saved && initial !== DEFAULT_LANG) {
+      document.cookie = `${COOKIE_NAME}=${initial}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
+    }
   }, []);
 
   const setLang = useCallback((newLang: Lang) => {
     setLangState(newLang);
     setTranslations(getTranslations(newLang));
-    document.cookie = `${COOKIE_NAME}=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    document.cookie = `${COOKIE_NAME}=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
   }, []);
 
   const t = useCallback((key: TKey): string => translations[key], [translations]);
