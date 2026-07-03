@@ -76,8 +76,13 @@ export default function ValoracionContent() {
 
               {/* min-h ≈ alto real del primer paso del widget (~333px): evita el
                   salto durante la carga sin dejar un hueco negro debajo. Si el
-                  widget crece en pasos posteriores, el contenedor crece con él. */}
-              <div className="min-h-[340px]">
+                  widget crece en pasos posteriores, el contenedor crece con él.
+
+                  El filtro es la «máscara» de marca: invierte el blanco del
+                  widget de Idealista a oscuro y le da el tono crema de la web.
+                  Es puramente óptico (no toca el shadow DOM del widget), así
+                  que no depende de sus clases internas ni puede romperlo. */}
+              <div className="min-h-[340px] [filter:invert(0.94)_hue-rotate(180deg)_sepia(0.18)]">
                 <Script
                   type="module"
                   src="https://st1.idealista.com/data/static/embeds/valuation-agency/assets/index.js"
