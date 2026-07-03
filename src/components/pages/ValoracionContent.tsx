@@ -24,7 +24,10 @@ function useWidgetBrandFont() {
           const style = document.createElement("style");
           style.id = "tvh-font-override";
           style.textContent =
-            "* { font-family: var(--font-inter), Inter, system-ui, sans-serif !important; }";
+            "* { font-family: var(--font-inter), Inter, system-ui, sans-serif !important; } " +
+            // Título del widget con la misma voz que el titular de la página
+            // (font-light ~30px, como el h1 de al lado).
+            "h1, .kiwi-headline__l { font-weight: 300 !important; font-size: 1.875rem !important; line-height: 1.15 !important; }";
           root.appendChild(style);
         }
         clearInterval(interval);
