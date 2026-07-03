@@ -120,13 +120,14 @@ const nextConfig: NextConfig = {
        key: "Content-Security-Policy",
        value: [
          "default-src 'self'",
-         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com",
-         "style-src 'self' 'unsafe-inline'",
+         // *.idealista.com: widget de valoración de /valoracion (script + API + estilos + fuentes)
+         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com https://*.idealista.com",
+         "style-src 'self' 'unsafe-inline' https://*.idealista.com",
          "img-src 'self' data: blob: https:",
-         "font-src 'self' data:",
+         "font-src 'self' data: https://*.idealista.com",
          // Incluye los endpoints de conversión de Google Ads (googleadservices,
          // doubleclick, google.com) — sin ellos las campañas no medirían.
-         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://*.googleadservices.com https://www.google.com https://www.facebook.com https://api.mymemory.translated.net https://challenges.cloudflare.com",
+         "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://stats.g.doubleclick.net https://googleads.g.doubleclick.net https://*.googleadservices.com https://www.google.com https://www.facebook.com https://api.mymemory.translated.net https://challenges.cloudflare.com https://*.idealista.com",
          "frame-src https:",
          "media-src 'self' https:",
          "object-src 'none'",
