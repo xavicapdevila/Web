@@ -84,6 +84,9 @@ export function generateStaticParams() {
   return Object.keys(CATEGORIAS).map((cat) => ({ cat }));
 }
 
+// Categorías = conjunto fijo → slug desconocido da 404 real, no 200+noindex.
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cat } = await params;
   const config = CATEGORIAS[cat];

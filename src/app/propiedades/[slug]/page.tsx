@@ -20,10 +20,20 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
+  // notFound() aquí (y no solo en la página): con streaming (loading.tsx) la
+  // respuesta ya ha salido con 200 cuando la página lanza el 404 → Google lo
+  // ve como soft-404 y deja de indexar bien /propiedades. generateMetadata se
+  // resuelve ANTES de transmitir, así el inmueble vendido/retirado devuelve un
+  // 404 real. Un error transitorio del feed NO debe dar 404 (se desindexarían
+  // fichas válidas): solo se lanza cuando el dato responde "no existe" (null).
+  let property;
   try {
-    const property = await getCachedPropertyBySlug(slug);
-    if (!property) return { title: "Propiedad no encontrada" };
-
+    property = await getCachedPropertyBySlug(slug);
+  } catch {
+    return { title: "Propiedad" };
+  }
+  if (!property) notFound();
+  try {
     const features: string[] = [];
     if (property.habitaciones) features.push(`${property.habitaciones} hab.`);
     if (property.banos) features.push(`${property.banos} baños`);

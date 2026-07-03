@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond, DM_Serif_Display, DM_Sans } from "next/font/google";
-import { headers } from "next/headers";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import WhatsAppButton from "@/components/layout/WhatsAppButton";
-import CookieBanner from "@/components/layout/CookieBanner";
-import { LanguageProvider } from "@/context/LanguageContext";
-import { CookieConsentProvider } from "@/context/CookieConsentContext";
+import PublicChrome from "@/components/layout/PublicChrome";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -144,20 +138,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+// OJO: este layout no debe leer headers()/cookies(). Hacerlo convierte TODA la
+// web en render dinámico (adiós estático/ISR y adiós 404 reales). La decisión
+// de mostrar u ocultar el chrome público vive en <PublicChrome> (cliente).
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") ?? "";
-  const isAdmin = pathname.startsWith("/admin");
-  const isStandalone =
-    pathname.startsWith("/links") ||
-    pathname.startsWith("/trabaja") ||
-    pathname.startsWith("/vender") ||
-    pathname.startsWith("/resena");
-
   return (
     <html
       lang="es"
@@ -171,20 +159,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
-        {isAdmin || isStandalone ? (
-          // Admin routes: no public chrome
-          <>{children}</>
-        ) : (
-          <LanguageProvider>
-            <CookieConsentProvider>
-              <Navbar />
-              <main className="flex-1">{children}</main>
-              <Footer />
-              <WhatsAppButton />
-              <CookieBanner />
-            </CookieConsentProvider>
-          </LanguageProvider>
-        )}
+        <PublicChrome>{children}</PublicChrome>
       </body>
     </html>
   );

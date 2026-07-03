@@ -304,10 +304,17 @@ export function generateStaticParams() {
   return Object.keys(ZONAS).map((slug) => ({ ciudad: slug }));
 }
 
+// Las zonas son un conjunto fijo: cualquier slug fuera de la lista debe dar un
+// 404 REAL (con streaming, el notFound() de la página llega tarde y devuelve
+// 200 + noindex, que Google trata peor que un 404 limpio).
+export const dynamicParams = false;
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { ciudad } = await params;
   const zona = ZONAS[ciudad];
-  if (!zona) return { title: "Zona no encontrada" };
+  // 404 real desde generateMetadata: con streaming, el notFound() de la página
+  // llega tarde (la respuesta ya salió con 200) y Google lo trata de soft-404.
+  if (!zona) notFound();
 
   const canonicalUrl = `${BASE_URL}/zona/${ciudad}`;
   return {

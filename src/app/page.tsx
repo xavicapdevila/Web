@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://www.thevilahome.com" },
 };
 
+// ISR horario: la home es estática (rápida y siempre indexable) pero los
+// destacados y las reseñas de Google se refrescan cada hora.
+export const revalidate = 3600;
+
 const schemaWebSite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
