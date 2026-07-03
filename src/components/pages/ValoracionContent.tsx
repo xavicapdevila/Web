@@ -64,12 +64,9 @@ export default function ValoracionContent() {
 
           {/* Right — Idealista embed */}
           <div>
-            <div className="relative border border-[#C9B99A]/25 bg-[#0d0d0d] p-6">
-              <span className="absolute top-0 left-0 w-5 h-5 border-t border-l border-[#C9B99A]/60" />
-              <span className="absolute top-0 right-0 w-5 h-5 border-t border-r border-[#C9B99A]/60" />
-              <span className="absolute bottom-0 left-0 w-5 h-5 border-b border-l border-[#C9B99A]/60" />
-              <span className="absolute bottom-0 right-0 w-5 h-5 border-b border-r border-[#C9B99A]/60" />
-
+            {/* Sin marco: con la máscara de marca sobre el widget, el recuadro
+                dorado era un doble marco innecesario. */}
+            <div>
               <p className="text-[#888] text-xs font-body tracking-[0.3em] uppercase mb-5">
                 {t("valorWidgetLabel")}
               </p>
