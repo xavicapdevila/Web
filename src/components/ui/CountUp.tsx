@@ -8,6 +8,8 @@ interface Props {
   suffix?: string;
   prefix?: string;
   className?: string;
+  /** Decimales a mostrar (con coma, estilo es-ES). 0 = entero. */
+  decimals?: number;
 }
 
 export default function CountUp({
@@ -16,6 +18,7 @@ export default function CountUp({
   suffix = "",
   prefix = "",
   className = "",
+  decimals = 0,
 }: Props) {
   const ref = useRef<HTMLSpanElement>(null);
   // Inicia en `target` para que el HTML del servidor (y los buscadores / sin JS)
@@ -37,7 +40,7 @@ export default function CountUp({
             const progress = Math.min(elapsed / duration, 1);
             // easeOutCubic
             const ease = 1 - Math.pow(1 - progress, 3);
-            setValue(Math.round(ease * target));
+            setValue(ease * target);
             if (progress < 1) requestAnimationFrame(tick);
           };
           requestAnimationFrame(tick);
@@ -50,9 +53,14 @@ export default function CountUp({
     return () => observer.disconnect();
   }, [target, duration]);
 
+  const shown =
+    decimals > 0
+      ? value.toFixed(decimals).replace(".", ",")
+      : String(Math.round(value));
+
   return (
     <span ref={ref} className={className}>
-      {prefix}{value}{suffix}
+      {prefix}{shown}{suffix}
     </span>
   );
 }

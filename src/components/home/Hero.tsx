@@ -88,7 +88,8 @@ export default function Hero({ rating, totalReviews }: HeroProps) {
             {typeof rating === "number" && rating > 0 && (
               <div>
                 <div className="font-display text-3xl text-[#C9B99A]">
-                  {rating.toFixed(1).replace(".", ",")}<span className="text-2xl align-top">★</span>
+                  <CountUp target={rating} decimals={1} duration={1400} />
+                  <span className="text-2xl align-top">★</span>
                 </div>
                 <div className="text-white/60 text-xs font-body tracking-wide mt-1">
                   {totalReviews ? `${totalReviews} ${t("heroReviews")}` : t("heroReviews")}
