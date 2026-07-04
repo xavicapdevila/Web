@@ -25,13 +25,24 @@ const nextConfig: NextConfig = {
 
  async redirects() {
    return [
-     // www redirect
+     // Canonicalización de host: sin www y dominios propios antiguos → dominio
+     // canónico. Vive AQUÍ (capa de routing de Vercel, gratis) y no en un
+     // middleware: un middleware con matcher global corre en CADA asset de CADA
+     // visita y dispara el consumo de invocaciones.
      {
        source: "/:path*",
        has: [{ type: "host", value: "thevilahome.com" }],
        destination: "https://www.thevilahome.com/:path*",
        permanent: true,
      },
+     ...["thevilahome.es", "www.thevilahome.es", "thevilahomebcn.com", "www.thevilahomebcn.com"].map(
+       (host) => ({
+         source: "/:path*" as const,
+         has: [{ type: "host" as const, value: host }],
+         destination: "https://www.thevilahome.com/:path*",
+         permanent: true,
+       }),
+     ),
 
      // --- Redirecciones web antigua (WordPress) ---
 
