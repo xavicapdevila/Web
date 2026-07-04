@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Script from "next/script";
-import { getCachedPropertyBySlug, getCachedSlugs } from "@/lib/sync";
+import { getCachedPropertyBySlug, getCachedSlugs, getCachedPropertiesList } from "@/lib/sync";
+import Link from "next/link";
+import PropertyCard from "@/components/properties/PropertyCard";
 import { getAgentInfo } from "@/lib/agents";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import PropertyPageContent from "@/components/properties/PropertyPageContent";
@@ -20,19 +21,23 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  // notFound() aquí (y no solo en la página): con streaming (loading.tsx) la
-  // respuesta ya ha salido con 200 cuando la página lanza el 404 → Google lo
-  // ve como soft-404 y deja de indexar bien /propiedades. generateMetadata se
-  // resuelve ANTES de transmitir, así el inmueble vendido/retirado devuelve un
-  // 404 real. Un error transitorio del feed NO debe dar 404 (se desindexarían
-  // fichas válidas): solo se lanza cuando el dato responde "no existe" (null).
+  // Inmueble desactivado (vendido/retirado): estas fichas acumulan visitas desde
+  // Google, así que en vez de un 404 seco se sirve una página útil («ya no está
+  // disponible» + propiedades similares) con NOINDEX: el visitante se queda y
+  // Google la retira del índice. Un error transitorio del feed NO debe marcar
+  // noindex (se desindexarían fichas válidas): solo cuando el dato dice null.
   let property;
   try {
     property = await getCachedPropertyBySlug(slug);
   } catch {
     return { title: "Propiedad" };
   }
-  if (!property) notFound();
+  if (!property) {
+    return {
+      title: "Este inmueble ya no está disponible · The Vila Home",
+      robots: { index: false, follow: true },
+    };
+  }
   try {
     const features: string[] = [];
     if (property.habitaciones) features.push(`${property.habitaciones} hab.`);
@@ -93,10 +98,56 @@ export const revalidate = 3600;
 // Allow on-demand generation for slugs not in generateStaticParams
 export const dynamicParams = true;
 
+// Ficha desactivada: mensaje claro + propiedades activas para aprovechar la
+// visita (estas URLs siguen recibiendo tráfico desde Google una temporada).
+async function InmuebleNoDisponible() {
+  const { properties } = await getCachedPropertiesList({});
+  const similares = properties.slice(0, 3);
+  return (
+    <div className="pt-20 min-h-screen bg-[#0a0a0a]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-10 py-16">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/40">The Vila Home</p>
+        <h1 className="mt-3 text-3xl md:text-4xl font-light text-white">
+          Este inmueble ya no está disponible
+        </h1>
+        <p className="mt-4 max-w-xl text-white/60 leading-relaxed">
+          Lo más probable es que ya se haya vendido. Pero seguimos teniendo propiedades que podrían
+          encajarte — y si buscas algo concreto, cuéntanoslo y te avisamos cuando entre en cartera.
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/propiedades"
+            className="rounded-full bg-white px-6 py-3 text-sm font-medium text-black transition-opacity hover:opacity-85"
+          >
+            Ver propiedades disponibles
+          </Link>
+          <Link
+            href="/contacto"
+            className="rounded-full border border-white/25 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+          >
+            Cuéntanos qué buscas
+          </Link>
+        </div>
+
+        {similares.length > 0 && (
+          <div className="mt-16">
+            <h2 className="mb-6 text-lg font-light text-white/80">Ahora mismo en venta</h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {similares.map((p) => (
+                <PropertyCard key={p.ref} property={p} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default async function PropertyPage({ params }: Props) {
   const { slug } = await params;
   const property = await getCachedPropertyBySlug(slug);
-  if (!property) notFound();
+  if (!property) return <InmuebleNoDisponible />;
 
   const isReserved = property.estadoFicha === 7;
 

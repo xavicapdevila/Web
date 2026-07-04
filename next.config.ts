@@ -101,6 +101,50 @@ const nextConfig: NextConfig = {
      { source: "/servicios{/}?", destination: "/quienes-somos", permanent: true },
      { source: "/empresa{/}?", destination: "/quienes-somos", permanent: true },
 
+     // Fichas de propiedad del theme antiguo (Houzez) — /properties y /property/slug
+     // siguen INDEXADAS en buscadores y daban 404 (detectado jul 2026).
+     { source: "/properties/:path*", destination: "/propiedades", permanent: true },
+     { source: "/properties{/}?", destination: "/propiedades", permanent: true },
+     { source: "/property/:path*", destination: "/propiedades", permanent: true },
+     { source: "/property{/}?", destination: "/propiedades", permanent: true },
+     { source: "/listing/:path*", destination: "/propiedades", permanent: true },
+     { source: "/comprar{/}?", destination: "/propiedades", permanent: true },
+
+     // Más páginas de la web antigua sin equivalente directo
+     { source: "/vender-piso{/}?", destination: "/vender", permanent: true },
+     { source: "/equipo{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/nosotros{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/politica-privacidad{/}?", destination: "/privacidad", permanent: true },
+     { source: "/politica-de-privacidad{/}?", destination: "/privacidad", permanent: true },
+     { source: "/faq{/}?", destination: "/", permanent: true },
+     { source: "/faqs{/}?", destination: "/", permanent: true },
+     { source: "/preguntas-frecuentes{/}?", destination: "/", permanent: true },
+     { source: "/en/:path*", destination: "/", permanent: true },
+     { source: "/es/:path*", destination: "/", permanent: true },
+     { source: "/search", destination: "/propiedades", permanent: true },
+
+     // Fichas del theme antiguo (Houzez): /properties y /property/slug siguen
+     // INDEXADAS en buscadores y daban 404 (detectado jul 2026).
+     { source: "/properties/:path*", destination: "/propiedades", permanent: true },
+     { source: "/properties{/}?", destination: "/propiedades", permanent: true },
+     { source: "/property/:path*", destination: "/propiedades", permanent: true },
+     { source: "/property{/}?", destination: "/propiedades", permanent: true },
+     { source: "/listing/:path*", destination: "/propiedades", permanent: true },
+     { source: "/comprar{/}?", destination: "/propiedades", permanent: true },
+
+     // Más páginas de la web antigua sin equivalente directo
+     { source: "/vender-piso{/}?", destination: "/vender", permanent: true },
+     { source: "/equipo{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/nosotros{/}?", destination: "/quienes-somos", permanent: true },
+     { source: "/politica-privacidad{/}?", destination: "/privacidad", permanent: true },
+     { source: "/politica-de-privacidad{/}?", destination: "/privacidad", permanent: true },
+     { source: "/faq{/}?", destination: "/", permanent: true },
+     { source: "/faqs{/}?", destination: "/", permanent: true },
+     { source: "/preguntas-frecuentes{/}?", destination: "/", permanent: true },
+     { source: "/en/:path*", destination: "/", permanent: true },
+     { source: "/es/:path*", destination: "/", permanent: true },
+     { source: "/search", destination: "/propiedades", permanent: true },
+
      // Paginación y taxonomías WordPress
      { source: "/page/:num{/}?", destination: "/propiedades", permanent: true },
      { source: "/category/:path*", destination: "/blog", permanent: true },
