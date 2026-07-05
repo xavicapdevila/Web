@@ -145,7 +145,14 @@ const nextConfig: NextConfig = {
      { source: "/es/:path*", destination: "/", permanent: true },
      { source: "/search", destination: "/propiedades", permanent: true },
 
-     // Paginación y taxonomías WordPress
+     // Contacto de la web antigua (sale como sitelink en Google y daba 404)
+     { source: "/hablemos{/}?", destination: "/contacto", permanent: true },
+
+     // Paginación y taxonomías WordPress. La categoría «agencias inmobiliarias»
+     // tiene destino PROPIO antes de la regla genérica: como sitelink duplicaba
+     // el de /blog; el contenido afín es el artículo de elegir inmobiliaria.
+     { source: "/category/agencias-inmobiliarias{/}?", destination: "/blog/elegir-inmobiliaria-vender-piso", permanent: true },
+     { source: "/tag/agencias-inmobiliarias{/}?", destination: "/blog/elegir-inmobiliaria-vender-piso", permanent: true },
      { source: "/page/:num{/}?", destination: "/propiedades", permanent: true },
      { source: "/category/:path*", destination: "/blog", permanent: true },
      { source: "/tag/:path*", destination: "/blog", permanent: true },

@@ -16,7 +16,7 @@ function newEventId(): string {
   return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export default function LeadForm() {
+export default function LeadForm({ source = "vender" }: { source?: string }) {
   const { lang } = useLanguage();
   const c = (venderContent[lang] ?? venderContent.es).form;
 
@@ -44,7 +44,7 @@ export default function LeadForm() {
     try {
       const w = window as unknown as { fbq?: (...a: unknown[]) => void };
       if (w.fbq) {
-        w.fbq("track", "Lead", { content_name: "vender", content_category: situation }, { eventID: eventId });
+        w.fbq("track", "Lead", { content_name: source, content_category: situation }, { eventID: eventId });
       }
     } catch {}
 
@@ -74,6 +74,12 @@ export default function LeadForm() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error(String(res.status));
+      // Evento de conversión en GA4 (si el visitante aceptó analítica). Desde
+      // Google Ads se importa «generate_lead» como conversión de las campañas.
+      try {
+        const w = window as unknown as { gtag?: (...a: unknown[]) => void };
+        w.gtag?.("event", "generate_lead", { lead_source: source, lead_situation: situation });
+      } catch {}
       setStatus("ok");
     } catch {
       setStatus("error");
