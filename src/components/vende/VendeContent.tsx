@@ -422,10 +422,6 @@ export default function VendeContent({ reviews = [], rating: ratingProp, totalRe
             <div className="mt-10">
               <a href="#formulario" className="inline-flex rounded-full bg-[#F2EEE6] text-[#14120C] text-base font-semibold px-8 py-4 hover:bg-white transition-colors duration-300">{c.finalCta.button}</a>
             </div>
-            <p className="text-sm text-[#857E70] mt-8">{c.finalCta.orLabel}</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 mt-3">
-              <a href={`tel:${siteConfig.phone}`} className="text-sm font-medium text-[#F2EEE6] underline underline-offset-4 decoration-[#F2EEE6]/40 hover:decoration-[#F2EEE6] transition-colors">{siteConfig.phoneDisplay}</a>
-            </div>
           </AnimateIn>
         </div>
       </section>

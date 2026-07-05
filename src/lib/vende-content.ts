@@ -75,7 +75,6 @@ export interface VendeCopy {
     title: string;
     sub: string;
     button: string;
-    orLabel: string;
   };
 
   footer: { legal: string; privacy: string; cookies: string; tagline: string };
@@ -171,7 +170,6 @@ const es: VendeCopy = {
     title: "¿Le damos una vuelta a tu caso?",
     sub: "Rellenar el formulario no te compromete a nada: es la manera de que te llamemos y te digamos, con datos, cuánto vale tu casa y cómo la venderíamos.",
     button: "Ir al formulario",
-    orLabel: "¿Prefieres hablar directamente?",
   },
   footer: { legal: "Aviso legal", privacy: "Privacidad", cookies: "Cookies", tagline: "Inmobiliaria en Vilanova i la Geltrú" },
 };
@@ -266,7 +264,6 @@ const ca: VendeCopy = {
     title: "Li donem una volta al teu cas?",
     sub: "Omplir el formulari no et compromet a res: és la manera que et truquem i et diguem, amb dades, quant val casa teva i com la vendríem.",
     button: "Anar al formulari",
-    orLabel: "Prefereixes parlar directament?",
   },
   footer: { legal: "Avís legal", privacy: "Privacitat", cookies: "Galetes", tagline: "Immobiliària a Vilanova i la Geltrú" },
 };
@@ -361,7 +358,6 @@ const en: VendeCopy = {
     title: "Shall we look at your case?",
     sub: "Filling in the form commits you to nothing: it's simply how we get to call you and tell you, with data, what your home is worth and how we would sell it.",
     button: "Go to the form",
-    orLabel: "Prefer to talk directly?",
   },
   footer: { legal: "Legal notice", privacy: "Privacy", cookies: "Cookies", tagline: "Estate agency in Vilanova i la Geltrú" },
 };
@@ -456,7 +452,6 @@ const fr: VendeCopy = {
     title: "On se penche sur votre cas ?",
     sub: "Remplir le formulaire ne vous engage à rien : c'est simplement la façon de vous appeler et de vous dire, données à l'appui, combien vaut votre maison et comment nous la vendrions.",
     button: "Aller au formulaire",
-    orLabel: "Vous préférez parler directement ?",
   },
   footer: { legal: "Mentions légales", privacy: "Confidentialité", cookies: "Cookies", tagline: "Agence immobilière à Vilanova i la Geltrú" },
 };

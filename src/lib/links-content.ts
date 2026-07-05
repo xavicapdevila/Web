@@ -90,9 +90,18 @@ export const DEFAULT_CONTENT: LinksDoc = {
           },
         },
         {
+          id: 'vendre', icon: 'sell', href: '/vende-tu-casa',
+          external: false, comingSoon: false, active: true,
+          label: { ca: 'Vols vendre?', es: '¿Quieres vender?', en: 'Want to sell?', fr: 'Vous vendez ?' },
+          desc: {
+            ca: "T'expliquem com vendríem casa teva", es: 'Te contamos cómo venderíamos tu casa',
+            en: 'How we would sell your home', fr: 'Comment nous vendrions votre maison',
+          },
+        },
+        {
           id: 'sell', icon: 'sell', href: '/valoracion',
           external: false, comingSoon: false, active: true,
-          label: { ca: 'Vull vendre casa meva', es: 'Quiero vender mi casa', en: 'I want to sell', fr: 'Je veux vendre' },
+          label: { ca: 'Valora casa teva', es: 'Valora tu casa', en: 'Value your home', fr: 'Estimez votre maison' },
           desc: {
             ca: 'Et diem el que val. Sense embuts.', es: 'Te decimos lo que vale. Sin rodeos.',
             en: "We tell you what it's worth. No nonsense.", fr: 'On vous dit ce que ça vaut. Sans détour.',
