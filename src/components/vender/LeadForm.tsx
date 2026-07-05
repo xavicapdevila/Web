@@ -8,6 +8,44 @@ import { useTurnstile } from "@/hooks/useTurnstile";
 
 type Status = "idle" | "sending" | "ok" | "error";
 
+/* ── Mayúsculas automáticas (regla global: iniciales en mayúscula) ──
+   capWords: primera letra de cada palabra, respetando partículas en
+   minúscula («de», «la», «i»…) para nombres y municipios — «vilanova i
+   la geltrú» → «Vilanova i la Geltrú». Nunca fuerza minúsculas.
+   capFirst: solo la primera letra (para el mensaje). */
+const MINOR_WORDS = new Set(["de", "del", "la", "las", "los", "le", "i", "y", "o", "en", "d", "da", "di"]);
+function capWords(s: string): string {
+  let first = true;
+  return s.replace(/\p{L}+/gu, (w) => {
+    const isFirst = first;
+    first = false;
+    if (!isFirst && MINOR_WORDS.has(w.toLocaleLowerCase("es"))) return w;
+    return w.charAt(0).toLocaleUpperCase("es") + w.slice(1);
+  });
+}
+function capFirst(s: string): string {
+  return s ? s.charAt(0).toLocaleUpperCase("es") + s.slice(1) : s;
+}
+
+/* Municipios sugeridos en «Zona» (datalist nativo: sugiere sin obligar). */
+const ZONE_SUGGESTIONS = [
+  "Vilanova i la Geltrú",
+  "Sant Pere de Ribes",
+  "Les Roquetes",
+  "Sitges",
+  "Cubelles",
+  "Canyelles",
+  "Olivella",
+  "Cunit",
+  "Calafell",
+  "Segur de Calafell",
+  "El Vendrell",
+  "Coma-ruga",
+  "Vilafranca del Penedès",
+  "Castelldefels",
+  "Barcelona",
+];
+
 /** Genera un id único para deduplicar el evento entre Pixel y Conversions API. */
 function newEventId(): string {
   try {
@@ -54,11 +92,11 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
     const payload = {
       situation,
       turnstileToken,
-      name: fd.get("name"),
+      name: capWords(String(fd.get("name") ?? "")),
       phone: fd.get("phone"),
       email: fd.get("email"),
-      zone: fd.get("zone"),
-      message: fd.get("message"),
+      zone: capWords(String(fd.get("zone") ?? "")),
+      message: capFirst(String(fd.get("message") ?? "")),
       company: fd.get("company"), // honeypot
       lang,
       eventId,
@@ -144,7 +182,12 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
           teléfono de entrada. */}
       <div className="grid sm:grid-cols-2 gap-4 mt-7">
         <div className="sm:col-span-2">
-          <Field name="zone" label={c.zone} placeholder={c.zonePh} required autoComplete="address-level2" />
+          <Field name="zone" label={c.zone} placeholder={c.zonePh} required autoComplete="address-level2" capitalize="words" listId="tvh-zonas" />
+          <datalist id="tvh-zonas">
+            {ZONE_SUGGESTIONS.map((z) => (
+              <option key={z} value={z} />
+            ))}
+          </datalist>
         </div>
         <div className="sm:col-span-2">
           <label className="block">
@@ -155,11 +198,13 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
               name="message"
               rows={3}
               placeholder={c.messagePh}
+              autoCapitalize="sentences"
+              onBlur={(e) => { e.target.value = capFirst(e.target.value); }}
               className="mt-1.5 w-full rounded-xl border border-[#E6E7E1] bg-white px-4 py-3 text-[15px] text-[#1A1A18] placeholder:text-[#B4AF9F] focus:border-[#1A1A18] focus:outline-none transition-colors resize-none"
             />
           </label>
         </div>
-        <Field name="name" label={c.name} placeholder={c.namePh} required autoComplete="name" />
+        <Field name="name" label={c.name} placeholder={c.namePh} required autoComplete="name" capitalize="words" />
         <Field name="phone" label={c.phone} placeholder={c.phonePh} required type="tel" autoComplete="tel" />
         <div className="sm:col-span-2">
           <Field name="email" label={c.email} placeholder={c.emailPh} required type="email" autoComplete="email" />
@@ -211,6 +256,8 @@ function Field({
   required = false,
   optionalText,
   autoComplete,
+  capitalize,
+  listId,
 }: {
   name: string;
   label: string;
@@ -219,6 +266,8 @@ function Field({
   required?: boolean;
   optionalText?: string;
   autoComplete?: string;
+  capitalize?: "words" | "first";
+  listId?: string;
 }) {
   return (
     <label className="block">
@@ -231,6 +280,9 @@ function Field({
         required={required}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        list={listId}
+        autoCapitalize={capitalize === "words" ? "words" : capitalize === "first" ? "sentences" : undefined}
+        onBlur={capitalize ? (e) => { e.target.value = capitalize === "words" ? capWords(e.target.value) : capFirst(e.target.value); } : undefined}
         className="mt-1.5 w-full rounded-xl border border-[#E6E7E1] bg-white px-4 py-3 text-[15px] text-[#1A1A18] placeholder:text-[#B4AF9F] focus:border-[#1A1A18] focus:outline-none transition-colors"
       />
     </label>

@@ -179,9 +179,10 @@ export default function VendeContent({ reviews = [], rating: ratingProp, totalRe
 
       {/* ── HERO con formulario ────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-[#14120C]">
-        {/* En lg el formulario ocupa la derecha: el encuadre va a tope a la
-            derecha de la foto para que las tres caras queden a la izquierda. */}
-        <Image src="/hero.jpg" alt="El equipo de The Vila Home" fill priority sizes="100vw" className="object-cover object-[68%_50%] lg:object-right" />
+        {/* En lg el formulario ocupa la derecha: encuadre a tope a la derecha
+            + desplazamiento extra a la izquierda (con un leve zoom que cubre
+            el hueco) para que las tres caras queden fuera del formulario. */}
+        <Image src="/hero.jpg" alt="El equipo de The Vila Home" fill priority sizes="100vw" className="object-cover object-[68%_50%] lg:object-right lg:scale-[1.14] lg:-translate-x-[6.5%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#14120C] via-[#14120C]/80 to-[#14120C]/55" aria-hidden />
 
         <div className={`relative ${WRAP} pt-28 lg:pt-36 pb-16 lg:pb-24`}>
