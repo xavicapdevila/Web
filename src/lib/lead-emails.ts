@@ -140,7 +140,7 @@ export function buildAutoReplyEmail(name: string, lang: Lang): { subject: string
   <div style="margin:0;padding:0;background:#f4f2ec">
     <div style="max-width:560px;margin:0 auto;padding:40px 24px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a18">
       <div style="text-align:center;margin-bottom:28px">
-        <span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;letter-spacing:0.04em;color:#1a1a18">The Vila&nbsp;Home</span>
+        <img src="https://www.thevilahome.com/images/email/logo.png" alt="The Vila Home" width="160" height="51" style="display:inline-block;width:160px;height:auto;border:0" />
       </div>
       <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:16px;padding:32px 28px">
         <p style="font-size:16px;margin:0 0 16px">${c.greeting(firstName)}</p>
