@@ -65,14 +65,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // Pending promises to avoid duplicate simultaneous requests
   const pending = useRef<Map<string, Promise<string>>>(new Map());
 
-  // On mount: respetar la elección previa (cookie); si no la hay, detectar por
-  // ?lang= o idioma del navegador y fijarla para que persista.
+  // On mount: un `?lang=` explícito en la URL manda SIEMPRE (anuncios y
+  // enlaces segmentados por idioma) y actualiza la cookie; sin parámetro,
+  // se respeta la elección previa (cookie) y, si tampoco hay, se detecta
+  // por idioma del navegador y se fija para que persista.
   useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("lang") as Lang | null;
+    const fromUrl = param && SUPPORTED.includes(param) ? param : null;
     const saved = readLangCookie();
-    const initial = saved ?? detectLang();
+    const initial = fromUrl ?? saved ?? detectLang();
     setLangState(initial);
     setTranslations(getTranslations(initial));
-    if (!saved && initial !== DEFAULT_LANG) {
+    if (initial !== saved) {
       document.cookie = `${COOKIE_NAME}=${initial}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
     }
   }, []);

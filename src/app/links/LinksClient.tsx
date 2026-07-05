@@ -133,6 +133,14 @@ export default function LinksClient({ data, defaultJobsOpen = false }: { data: L
     setJobsOpen(true)
   }, [trackClick])
 
+  // Los enlaces internos arrastran el idioma elegido aquí: las páginas
+  // multiidioma (/vende-tu-casa, /vender) se abren en el mismo idioma.
+  const withLang = useCallback(
+    (href: string, external: boolean) =>
+      external || !href.startsWith('/') ? href : `${href}${href.includes('?') ? '&' : '?'}lang=${lang}`,
+    [lang],
+  )
+
   return (
     <>
       {GA_ID && (
@@ -213,7 +221,7 @@ export default function LinksClient({ data, defaultJobsOpen = false }: { data: L
                 return (
                   <a
                     key={item.id}
-                    href={item.href}
+                    href={withLang(item.href, item.external)}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     onClick={() => trackClick(label, item.href, item.id)}
