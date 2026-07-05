@@ -139,13 +139,10 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
         </div>
       </fieldset>
 
-      {/* Campos */}
+      {/* Campos — primero la vivienda, los datos de contacto al final:
+          las preguntas fáciles primero convierten mejor que pedir el
+          teléfono de entrada. */}
       <div className="grid sm:grid-cols-2 gap-4 mt-7">
-        <Field name="name" label={c.name} placeholder={c.namePh} required autoComplete="name" />
-        <Field name="phone" label={c.phone} placeholder={c.phonePh} required type="tel" autoComplete="tel" />
-        <div className="sm:col-span-2">
-          <Field name="email" label={c.email} placeholder={c.emailPh} required type="email" autoComplete="email" />
-        </div>
         <div className="sm:col-span-2">
           <Field name="zone" label={c.zone} placeholder={c.zonePh} required autoComplete="address-level2" />
         </div>
@@ -161,6 +158,11 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
               className="mt-1.5 w-full rounded-xl border border-[#E6E7E1] bg-white px-4 py-3 text-[15px] text-[#1A1A18] placeholder:text-[#B4AF9F] focus:border-[#1A1A18] focus:outline-none transition-colors resize-none"
             />
           </label>
+        </div>
+        <Field name="name" label={c.name} placeholder={c.namePh} required autoComplete="name" />
+        <Field name="phone" label={c.phone} placeholder={c.phonePh} required type="tel" autoComplete="tel" />
+        <div className="sm:col-span-2">
+          <Field name="email" label={c.email} placeholder={c.emailPh} required type="email" autoComplete="email" />
         </div>
       </div>
 

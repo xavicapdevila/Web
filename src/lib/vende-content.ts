@@ -4,6 +4,13 @@ import type { Lang } from "@/lib/i18n";
    Copy de la landing de Google Ads /vende-tu-casa (ES · CA · EN · FR).
    Página corta y sin fugas: un solo objetivo (el formulario del hero).
    El formulario reutiliza LeadForm y su copy de vender-content.ts.
+
+   Decisiones de copy (Xavi, jul 2026):
+   - NO hablar de permanencias/exclusivas: se explica en persona.
+   - NO transmitir «pocas casas» (suena pequeño): en su lugar, recursos
+     y posicionamiento (agencia destacada en Idealista, redes).
+   - Reportaje completo SIEMPRE: foto + tour virtual + vídeo + plano.
+   - Vilanova i la Geltrú como base, pero dejando claro el ámbito amplio.
    ───────────────────────────────────────────────────────────────────── */
 
 export interface VendeCopy {
@@ -22,6 +29,7 @@ export interface VendeCopy {
     ownersLabel: string; // "familias acompañadas"
     reviewsLabel: string; // "reseñas"
     inGoogle: string; // "en Google"
+    scrollHint: string; // pista de que hay más página debajo
   };
 
   strip: string[]; // banda de confianza bajo el hero
@@ -44,6 +52,8 @@ export interface VendeCopy {
     title: string;
     sub: string;
     items: { title: string; text: string }[];
+    channelsLabel: string;
+    channelsNote: string; // coletilla tras los logos (web propia + base de compradores)
   };
 
   team: {
@@ -57,6 +67,8 @@ export interface VendeCopy {
     title: string;
     reviewsLabel: string; // "reseñas en Google"
     reviewTag: string; // etiqueta bajo el nombre
+    readMore: string; // abre la reseña entera en un modal
+    close: string; // aria-label del botón de cerrar
   };
 
   finalCta: {
@@ -81,21 +93,22 @@ const es: VendeCopy = {
     bullets: [
       "Precio con cierres reales de tu zona, no una cifra inflada para captarte.",
       "El mismo asesor desde la primera llamada hasta la firma.",
-      "Reportaje profesional incluido: fotografía, vídeo, plano y tour virtual.",
-      "Sin permanencias eternas ni letra pequeña.",
+      "Reportaje completo en todas las casas: fotografía profesional, tour virtual, vídeo y plano distributivo.",
+      "Agencia destacada en Idealista y anuncios con máxima visibilidad en portales y redes.",
     ],
     formTitle: "Cuéntanos tu caso",
     formSub: "Dos minutos. Te respondemos en menos de 24 h laborables, sin presiones y sin spam.",
     ownersLabel: "familias acompañadas",
     reviewsLabel: "reseñas",
     inGoogle: "en Google",
+    scrollHint: "Cómo trabajamos, paso a paso",
   },
   strip: [
     "Precio real de mercado",
     "Un único asesor",
-    "Reportaje profesional incluido",
-    "Sin exclusivas eternas",
-    "Garraf · Penedès · donde nos llames",
+    "Tour virtual y vídeo en todas las casas",
+    "Agencia destacada en Idealista",
+    "Vilanova i la Geltrú · Garraf · Penedès",
   ],
   after: {
     eyebrow: "Sin sorpresas",
@@ -112,7 +125,7 @@ const es: VendeCopy = {
       },
       {
         title: "Tú decides, con todo claro",
-        text: "Te explicamos cómo la venderíamos, qué incluye y cuánto cobramos. Sin compromiso: si no somos tu mejor opción, te lo decimos y tan amigos.",
+        text: "Te explicamos cómo la venderíamos, qué incluye y cuánto cobramos. Y la decisión es tuya: si no somos tu mejor opción te lo diremos, y si nuestra propuesta no te convence, no pasa nada. Sin compromiso y sin perseguirte.",
       },
     ],
   },
@@ -121,9 +134,9 @@ const es: VendeCopy = {
     quote: "Preferimos perder un encargo antes que prometerte algo que no podemos cumplir.",
     points: [
       "Te decimos el precio real, aunque no sea el que esperabas oír.",
-      "Trabajamos pocas casas a la vez, para trabajarlas de verdad.",
+      "Cada casa sale al mercado con un plan propio: nada de publicar y esperar.",
       "Informes claros durante toda la venta: siempre sabes qué está pasando.",
-      "Sin cláusulas eternas: si no estás contento, te vas.",
+      "Si no somos la mejor opción para tu caso, te lo decimos.",
     ],
   },
   includes: {
@@ -133,11 +146,13 @@ const es: VendeCopy = {
     items: [
       { title: "Precio real, no un cebo", text: "El valor de mercado con datos y comparables. Nunca una cifra inflada solo para llevarnos el encargo." },
       { title: "Un asesor, todo el proceso", text: "El mismo interlocutor de principio a fin. Ni call centers ni explicar tu caso tres veces." },
-      { title: "Reportaje que vende", text: "Fotografía profesional, plano, vídeo y tour virtual cuando suma. Tu casa presentada como merece, sin coste extra." },
-      { title: "Difusión con criterio", text: "En los portales y canales que mueven a tu comprador, con un anuncio escrito a mano. No spam en cuarenta sitios." },
+      { title: "Reportaje completo, siempre", text: "Fotografía profesional, tour virtual, vídeo y plano distributivo en todas las casas. Sin coste extra." },
+      { title: "Posicionamiento en portales", text: "Agencia destacada en Idealista en Vilanova i la Geltrú, Cunit y Olivella. Tu anuncio arriba, no enterrado en la página doce." },
       { title: "Solo visitas que valen la pena", text: "Cualificamos a cada interesado antes de abrir tu puerta. No pierdes tardes con curiosos." },
       { title: "Papeleo resuelto", text: "Cédula, certificados, nota simple, arras y notaría. Los papeles los perseguimos nosotros, tú no." },
     ],
+    channelsLabel: "Y la difundimos donde está tu comprador",
+    channelsNote: "Además de nuestra web propia y nuestra base de compradores activos.",
   },
   team: {
     eyebrow: "Quiénes somos",
@@ -149,6 +164,8 @@ const es: VendeCopy = {
     title: "Vendidas con tranquilidad",
     reviewsLabel: "reseñas en Google",
     reviewTag: "Reseña en Google",
+    readMore: "Leer la reseña entera",
+    close: "Cerrar",
   },
   finalCta: {
     title: "¿Le damos una vuelta a tu caso?",
@@ -171,21 +188,22 @@ const ca: VendeCopy = {
     bullets: [
       "Preu amb tancaments reals de la teva zona, no una xifra inflada per captar-te.",
       "El mateix assessor des de la primera trucada fins a la signatura.",
-      "Reportatge professional inclòs: fotografia, vídeo, plànol i tour virtual.",
-      "Sense permanències eternes ni lletra petita.",
+      "Reportatge complet a totes les cases: fotografia professional, tour virtual, vídeo i plànol distributiu.",
+      "Agència destacada a Idealista i anuncis amb màxima visibilitat a portals i xarxes.",
     ],
     formTitle: "Explica'ns el teu cas",
     formSub: "Dos minuts. Et responem en menys de 24 h laborables, sense pressions i sense spam.",
     ownersLabel: "famílies acompanyades",
     reviewsLabel: "ressenyes",
     inGoogle: "a Google",
+    scrollHint: "Com treballem, pas a pas",
   },
   strip: [
     "Preu real de mercat",
     "Un únic assessor",
-    "Reportatge professional inclòs",
-    "Sense exclusives eternes",
-    "Garraf · Penedès · on ens truquis",
+    "Tour virtual i vídeo a totes les cases",
+    "Agència destacada a Idealista",
+    "Vilanova i la Geltrú · Garraf · Penedès",
   ],
   after: {
     eyebrow: "Sense sorpreses",
@@ -202,7 +220,7 @@ const ca: VendeCopy = {
       },
       {
         title: "Tu decideixes, amb tot clar",
-        text: "T'expliquem com la vendríem, què inclou i quant cobrem. Sense compromís: si no som la teva millor opció, t'ho diem i tan amics.",
+        text: "T'expliquem com la vendríem, què inclou i quant cobrem. I la decisió és teva: si no som la teva millor opció t'ho direm, i si la nostra proposta no et convenç, no passa res. Sense compromís i sense perseguir-te.",
       },
     ],
   },
@@ -211,9 +229,9 @@ const ca: VendeCopy = {
     quote: "Preferim perdre un encàrrec abans que prometre't res que no puguem complir.",
     points: [
       "Et diem el preu real, encara que no sigui el que esperaves sentir.",
-      "Treballem poques cases alhora, per treballar-les de veritat.",
+      "Cada casa surt al mercat amb un pla propi: res de publicar i esperar.",
       "Informes clars durant tota la venda: sempre saps què està passant.",
-      "Sense clàusules eternes: si no estàs content, marxes.",
+      "Si no som la millor opció per al teu cas, t'ho diem.",
     ],
   },
   includes: {
@@ -223,11 +241,13 @@ const ca: VendeCopy = {
     items: [
       { title: "Preu real, no un esquer", text: "El valor de mercat amb dades i comparables. Mai una xifra inflada només per endur-nos l'encàrrec." },
       { title: "Un assessor, tot el procés", text: "El mateix interlocutor de principi a fi. Ni call centers ni explicar el teu cas tres vegades." },
-      { title: "Reportatge que ven", text: "Fotografia professional, plànol, vídeo i tour virtual quan suma. Casa teva presentada com mereix, sense cost extra." },
-      { title: "Difusió amb criteri", text: "Als portals i canals que mouen el teu comprador, amb un anunci escrit a mà. No spam a quaranta llocs." },
+      { title: "Reportatge complet, sempre", text: "Fotografia professional, tour virtual, vídeo i plànol distributiu a totes les cases. Sense cost extra." },
+      { title: "Posicionament als portals", text: "Agència destacada a Idealista a Vilanova i la Geltrú, Cunit i Olivella. El teu anunci a dalt, no enterrat a la pàgina dotze." },
       { title: "Només visites que valen la pena", text: "Qualifiquem cada interessat abans d'obrir la teva porta. No perds tardes amb curiosos." },
       { title: "Paperassa resolta", text: "Cèdula, certificats, nota simple, arres i notaria. Els papers els perseguim nosaltres, tu no." },
     ],
+    channelsLabel: "I la difonem on hi ha el teu comprador",
+    channelsNote: "A més de la nostra web pròpia i la nostra base de compradors actius.",
   },
   team: {
     eyebrow: "Qui som",
@@ -239,6 +259,8 @@ const ca: VendeCopy = {
     title: "Venudes amb tranquil·litat",
     reviewsLabel: "ressenyes a Google",
     reviewTag: "Ressenya a Google",
+    readMore: "Llegir la ressenya sencera",
+    close: "Tancar",
   },
   finalCta: {
     title: "Li donem una volta al teu cas?",
@@ -261,21 +283,22 @@ const en: VendeCopy = {
     bullets: [
       "A price based on real closed sales in your area, not an inflated figure to win you over.",
       "The same advisor from the first call to the signing.",
-      "Professional media included: photography, video, floor plan and virtual tour.",
-      "No endless tie-ins, no small print.",
+      "Full media on every home: professional photography, virtual tour, video and floor plan.",
+      "Featured agency on Idealista and listings with top visibility on portals and social media.",
     ],
     formTitle: "Tell us about your case",
     formSub: "Two minutes. We reply within 24 working hours — no pressure, no spam.",
     ownersLabel: "families guided",
     reviewsLabel: "reviews",
     inGoogle: "on Google",
+    scrollHint: "How we work, step by step",
   },
   strip: [
     "Real market price",
     "One dedicated advisor",
-    "Professional media included",
-    "No endless exclusivity",
-    "Garraf · Penedès · wherever you call us from",
+    "Virtual tour & video on every home",
+    "Featured agency on Idealista",
+    "Vilanova i la Geltrú · Garraf · Penedès",
   ],
   after: {
     eyebrow: "No surprises",
@@ -292,7 +315,7 @@ const en: VendeCopy = {
       },
       {
         title: "You decide, with everything clear",
-        text: "We explain how we would sell it, what's included and what we charge. No commitment: if we're not your best option, we'll say so — no hard feelings.",
+        text: "We explain how we would sell it, what's included and what we charge. And the decision is yours: if we're not your best option we'll say so, and if our proposal doesn't convince you, that's fine too. No commitment, no chasing.",
       },
     ],
   },
@@ -301,9 +324,9 @@ const en: VendeCopy = {
     quote: "We would rather lose a listing than promise you something we can't deliver.",
     points: [
       "We tell you the real price, even if it's not the one you were hoping to hear.",
-      "We take on few homes at a time, so we can truly work each one.",
+      "Every home goes to market with its own plan: no publish-and-wait.",
       "Clear reports throughout the sale: you always know what's going on.",
-      "No endless clauses: if you're not happy, you walk away.",
+      "If we're not the best option for your case, we'll tell you.",
     ],
   },
   includes: {
@@ -313,11 +336,13 @@ const en: VendeCopy = {
     items: [
       { title: "A real price, not bait", text: "The market value backed by data and comparables. Never an inflated figure just to win the listing." },
       { title: "One advisor, the whole way", text: "The same person from start to finish. No call centers, no explaining your case three times." },
-      { title: "Media that sells", text: "Professional photography, floor plan, video and virtual tour when it adds value. Your home presented as it deserves, at no extra cost." },
-      { title: "Smart exposure", text: "On the portals and channels that actually reach your buyer, with a listing written by hand. No spam across forty sites." },
+      { title: "Full media, every time", text: "Professional photography, virtual tour, video and floor plan on every home. At no extra cost." },
+      { title: "Top placement on portals", text: "Featured agency on Idealista in Vilanova i la Geltrú, Cunit and Olivella. Your listing at the top, not buried on page twelve." },
       { title: "Only visits worth having", text: "We qualify every prospect before opening your door. No afternoons wasted on the merely curious." },
       { title: "Paperwork handled", text: "Occupancy certificate, energy certificate, land registry, deposit contract and notary. We chase the papers, not you." },
     ],
+    channelsLabel: "And we show it where your buyer is",
+    channelsNote: "Plus our own website and our database of active buyers.",
   },
   team: {
     eyebrow: "Who we are",
@@ -329,6 +354,8 @@ const en: VendeCopy = {
     title: "Sold with peace of mind",
     reviewsLabel: "reviews on Google",
     reviewTag: "Google review",
+    readMore: "Read the full review",
+    close: "Close",
   },
   finalCta: {
     title: "Shall we look at your case?",
@@ -351,21 +378,22 @@ const fr: VendeCopy = {
     bullets: [
       "Un prix basé sur les ventes réellement conclues dans votre quartier, pas un chiffre gonflé pour vous séduire.",
       "Le même conseiller du premier appel jusqu'à la signature.",
-      "Reportage professionnel inclus : photographie, vidéo, plan et visite virtuelle.",
-      "Sans engagement à durée illimitée ni petites lignes.",
+      "Reportage complet pour chaque maison : photographie professionnelle, visite virtuelle, vidéo et plan de distribution.",
+      "Agence mise en avant sur Idealista et annonces à visibilité maximale sur les portails et réseaux.",
     ],
     formTitle: "Parlez-nous de votre cas",
     formSub: "Deux minutes. Nous répondons sous 24 h ouvrées — sans pression, sans spam.",
     ownersLabel: "familles accompagnées",
     reviewsLabel: "avis",
     inGoogle: "sur Google",
+    scrollHint: "Notre façon de travailler, pas à pas",
   },
   strip: [
     "Prix réel du marché",
     "Un seul conseiller",
-    "Reportage professionnel inclus",
-    "Sans exclusivité à rallonge",
-    "Garraf · Penedès · où que vous soyez",
+    "Visite virtuelle et vidéo pour chaque maison",
+    "Agence mise en avant sur Idealista",
+    "Vilanova i la Geltrú · Garraf · Penedès",
   ],
   after: {
     eyebrow: "Sans surprises",
@@ -382,7 +410,7 @@ const fr: VendeCopy = {
       },
       {
         title: "Vous décidez, en toute clarté",
-        text: "Nous vous expliquons comment nous la vendrions, ce qui est inclus et nos honoraires. Sans engagement : si nous ne sommes pas votre meilleure option, nous vous le dirons, bons amis.",
+        text: "Nous vous expliquons comment nous la vendrions, ce qui est inclus et nos honoraires. Et la décision vous appartient : si nous ne sommes pas votre meilleure option nous vous le dirons, et si notre proposition ne vous convainc pas, ce n'est pas grave. Sans engagement et sans vous relancer.",
       },
     ],
   },
@@ -391,9 +419,9 @@ const fr: VendeCopy = {
     quote: "Nous préférons perdre un mandat plutôt que de vous promettre ce que nous ne pouvons pas tenir.",
     points: [
       "Nous vous disons le prix réel, même si ce n'est pas celui que vous espériez entendre.",
-      "Nous prenons peu de maisons à la fois, pour les travailler vraiment.",
+      "Chaque maison arrive sur le marché avec son propre plan : rien de « publier et attendre ».",
       "Des rapports clairs tout au long de la vente : vous savez toujours où vous en êtes.",
-      "Sans clauses interminables : si vous n'êtes pas satisfait, vous partez.",
+      "Si nous ne sommes pas la meilleure option pour votre cas, nous vous le dirons.",
     ],
   },
   includes: {
@@ -403,11 +431,13 @@ const fr: VendeCopy = {
     items: [
       { title: "Un prix réel, pas un appât", text: "La valeur de marché, données et comparables à l'appui. Jamais un chiffre gonflé juste pour obtenir le mandat." },
       { title: "Un conseiller, tout le processus", text: "Le même interlocuteur du début à la fin. Ni call centers, ni votre histoire à répéter trois fois." },
-      { title: "Un reportage qui vend", text: "Photographie professionnelle, plan, vidéo et visite virtuelle quand cela apporte. Votre maison présentée comme elle le mérite, sans surcoût." },
-      { title: "Une diffusion réfléchie", text: "Sur les portails et canaux qui touchent vraiment votre acheteur, avec une annonce écrite à la main. Pas de spam sur quarante sites." },
+      { title: "Reportage complet, toujours", text: "Photographie professionnelle, visite virtuelle, vidéo et plan pour chaque maison. Sans surcoût." },
+      { title: "Positionnement sur les portails", text: "Agence mise en avant sur Idealista à Vilanova i la Geltrú, Cunit et Olivella. Votre annonce en haut, pas enterrée en page douze." },
       { title: "Seulement des visites utiles", text: "Nous qualifions chaque intéressé avant d'ouvrir votre porte. Pas d'après-midis perdus avec les curieux." },
       { title: "Paperasse réglée", text: "Certificats, cadastre, compromis et notaire. C'est nous qui courons après les papiers, pas vous." },
     ],
+    channelsLabel: "Et nous la diffusons là où se trouve votre acheteur",
+    channelsNote: "En plus de notre propre site web et de notre base d'acheteurs actifs.",
   },
   team: {
     eyebrow: "Qui sommes-nous",
@@ -419,6 +449,8 @@ const fr: VendeCopy = {
     title: "Vendues en toute sérénité",
     reviewsLabel: "avis sur Google",
     reviewTag: "Avis Google",
+    readMore: "Lire l'avis complet",
+    close: "Fermer",
   },
   finalCta: {
     title: "On se penche sur votre cas ?",
