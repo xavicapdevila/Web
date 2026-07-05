@@ -119,7 +119,7 @@ export const DEFAULT_CONTENT: LinksDoc = {
         {
           id: 'contact', icon: 'contact', href: '/contacto',
           external: false, comingSoon: false, active: true,
-          label: { ca: 'Parlem', es: 'Hablamos', en: "Let's talk", fr: 'Parlons' },
+          label: { ca: 'Parlem', es: 'Hablemos', en: "Let's talk", fr: 'Parlons' },
           desc: {
             ca: 'Sense compromís. De veritat.', es: 'Sin compromiso. En serio.',
             en: 'No commitment. Seriously.', fr: 'Sans engagement. Vraiment.',
