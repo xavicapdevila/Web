@@ -44,39 +44,6 @@ export type LinksDoc = {
 export const DEFAULT_CONTENT: LinksDoc = {
   sections: [
     {
-      id: 'find-us',
-      title: { ca: "Troba'ns", es: 'Encuéntranos', en: 'Find us', fr: 'Retrouvez-nous' },
-      items: [
-        {
-          id: 'ig', icon: 'ig', href: 'https://www.instagram.com/thevilahome',
-          external: true, comingSoon: false, active: true,
-          label: { ca: 'Instagram', es: 'Instagram', en: 'Instagram', fr: 'Instagram' },
-          desc: {
-            ca: 'El dia a dia, sense filtres', es: 'El día a día, sin filtros',
-            en: 'Day to day, no filters', fr: 'Le quotidien, sans filtres',
-          },
-        },
-        {
-          id: 'fb', icon: 'fb', href: 'https://www.facebook.com/profile.php?id=100093001283637',
-          external: true, comingSoon: false, active: true,
-          label: { ca: 'Facebook', es: 'Facebook', en: 'Facebook', fr: 'Facebook' },
-          desc: {
-            ca: 'Per als que encara esteu per aquí', es: 'Para los que aún están por aquí',
-            en: 'For those still around', fr: 'Pour ceux qui sont encore là',
-          },
-        },
-        {
-          id: 'tk', icon: 'tk', href: 'https://www.tiktok.com/@thevilahome',
-          external: true, comingSoon: false, active: true,
-          label: { ca: 'TikTok', es: 'TikTok', en: 'TikTok', fr: 'TikTok' },
-          desc: {
-            ca: 'Cases, persones i alguna sorpresa', es: 'Casas, personas y alguna sorpresa',
-            en: 'Homes, people and some surprises', fr: 'Maisons, personnes et surprises',
-          },
-        },
-      ],
-    },
-    {
       id: 'what-we-do',
       title: { ca: 'El que fem', es: 'Lo que hacemos', en: 'What we do', fr: 'Ce que nous faisons' },
       items: [
@@ -132,6 +99,39 @@ export const DEFAULT_CONTENT: LinksDoc = {
           desc: {
             ca: 'Potser ets tu qui busquem', es: 'Quizás eres tú quien buscamos',
             en: "Maybe you're who we're looking for", fr: 'Peut-être êtes-vous qui nous cherchons',
+          },
+        },
+      ],
+    },
+    {
+      id: 'find-us',
+      title: { ca: "Troba'ns", es: 'Encuéntranos', en: 'Find us', fr: 'Retrouvez-nous' },
+      items: [
+        {
+          id: 'ig', icon: 'ig', href: 'https://www.instagram.com/thevilahome',
+          external: true, comingSoon: false, active: true,
+          label: { ca: 'Instagram', es: 'Instagram', en: 'Instagram', fr: 'Instagram' },
+          desc: {
+            ca: 'El dia a dia, sense filtres', es: 'El día a día, sin filtros',
+            en: 'Day to day, no filters', fr: 'Le quotidien, sans filtres',
+          },
+        },
+        {
+          id: 'fb', icon: 'fb', href: 'https://www.facebook.com/profile.php?id=100093001283637',
+          external: true, comingSoon: false, active: true,
+          label: { ca: 'Facebook', es: 'Facebook', en: 'Facebook', fr: 'Facebook' },
+          desc: {
+            ca: 'Per als que encara esteu per aquí', es: 'Para los que aún están por aquí',
+            en: 'For those still around', fr: 'Pour ceux qui sont encore là',
+          },
+        },
+        {
+          id: 'tk', icon: 'tk', href: 'https://www.tiktok.com/@thevilahome',
+          external: true, comingSoon: false, active: true,
+          label: { ca: 'TikTok', es: 'TikTok', en: 'TikTok', fr: 'TikTok' },
+          desc: {
+            ca: 'Cases, persones i alguna sorpresa', es: 'Casas, personas y alguna sorpresa',
+            en: 'Homes, people and some surprises', fr: 'Maisons, personnes et surprises',
           },
         },
       ],
