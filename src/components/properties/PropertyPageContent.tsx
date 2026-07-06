@@ -206,8 +206,8 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left — main info: order-2 on mobile so sidebar shows first */}
-        <div className="lg:col-span-2 space-y-10 order-2 lg:order-1">
+        {/* Left — main info: order-1 on mobile so price shows right after the gallery */}
+        <div className="lg:col-span-2 space-y-10 order-1 lg:order-1">
           {/* Header */}
           <div>
             <div className="flex items-center gap-3 mb-3">
@@ -275,8 +275,8 @@ export default function PropertyPageContent({ property, agentInfo, contactEmail,
 
         </div>
 
-        {/* Right — sidebar: order-1 on mobile to appear first (price+CTA visible early) */}
-        <div className="space-y-6 order-1 lg:order-2">
+        {/* Right — sidebar: order-2 on mobile so the contact box drops to the end */}
+        <div className="space-y-6 order-2 lg:order-2">
           {/* Contact card */}
           <div className="bg-[#111] border border-[#1e1e1e] p-6">
             {/* Agent */}
