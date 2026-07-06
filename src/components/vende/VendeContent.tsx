@@ -155,10 +155,12 @@ export default function VendeContent({ reviews = [], rating: ratingProp, totalRe
 
   return (
     <div className="font-dm-sans bg-[#D9D3C7] text-[#1C1913] min-h-screen antialiased selection:bg-[#1C1913]/20">
-      {/* ── Cabecera mínima (sin fugas: logo no navegable, teléfono y CTA) ── */}
+      {/* ── Cabecera mínima: logo → web (pestaña nueva, no pierde la landing) ── */}
       <header className={`fixed top-0 inset-x-0 z-50 transition-colors duration-300 ${scrolled ? "bg-[#EEEAE1]/90 backdrop-blur-md border-b border-[#C7BFB0]" : "bg-gradient-to-b from-[#14120C]/90 to-transparent"}`}>
         <nav className="w-full max-w-[1500px] mx-auto px-6 lg:px-12 h-[72px] flex items-center justify-between gap-4">
-          <Wordmark dark={scrolled} />
+          <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home — ir a la web">
+            <Wordmark dark={scrolled} />
+          </a>
           <div className="flex items-center gap-3 sm:gap-5">
             <div className="hidden sm:flex items-center gap-1" role="group" aria-label={c.langLabel}>
               {LANGS.map(({ code, label }) => (
@@ -431,7 +433,9 @@ export default function VendeContent({ reviews = [], rating: ratingProp, totalRe
         <div className={`${WRAP} py-12`}>
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col items-center md:items-start gap-2">
-              <Wordmark dark />
+              <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home — ir a la web">
+                <Wordmark dark />
+              </a>
               <p className="text-xs text-[#9A9384]">{c.footer.tagline}</p>
             </div>
             <nav className="flex items-center gap-7 text-sm text-[#857E70]">
