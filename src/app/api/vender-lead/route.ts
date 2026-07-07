@@ -21,6 +21,25 @@ function attrStr(v: unknown): string | undefined {
 }
 
 /**
+ * Reenvía el lead al hub Ora (bandeja de gestión de leads), firmado con el
+ * secreto compartido. Best-effort: si Ora no responde, el lead ya está a salvo
+ * (email + Blob), así que nunca bloqueamos al usuario.
+ */
+async function forwardLeadToOra(lead: StoredLead): Promise<void> {
+  const url = process.env.ORA_LEADS_INGEST_URL
+  const secret = process.env.LEADS_INGEST_SECRET
+  if (!url || !secret) return
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` },
+    body: JSON.stringify(lead),
+    // No queremos que un Ora lento retrase la respuesta al usuario.
+    signal: AbortSignal.timeout(4000),
+  })
+  if (!res.ok) throw new Error(`ora ingest ${res.status}`)
+}
+
+/**
  * RGPD: el envío de PII a Meta (Conversions API) y el uso de identificadores
  * de click (fbclid/gclid/fbp/fbc) requieren consentimiento de marketing.
  * Se lee la cookie del banner (tvh_consent) que llega con la petición.
@@ -138,8 +157,10 @@ export async function POST(request: Request) {
       }),
       // 3) Persistir el lead con su atribución
       saveLead(lead),
+      // 4) Reenviar a Ora (bandeja de gestión de leads). Best-effort.
+      forwardLeadToOra(lead),
     ]
-    // 4) Conversions API server-side (dedup con el Pixel por eventId).
+    // 5) Conversions API server-side (dedup con el Pixel por eventId).
     //    RGPD: solo si el visitante consintió cookies de marketing.
     if (marketingOk) {
       tasks.push(
