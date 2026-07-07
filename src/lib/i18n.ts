@@ -297,6 +297,9 @@ const dict = {
     // Zona pages
     footerZonasTitle: "Zonas",
     footerPopularTitle: "Búsquedas frecuentes",
+    footerRealEstateIn: "Inmobiliaria en",
+    footerFlatsForSaleVilanova: "Pisos en venta en Vilanova i la Geltrú",
+    footerBuyHomeVilanova: "Comprar casa en Vilanova i la Geltrú",
     zonaHome: "Inicio",
     zonaIn: "en",
     zonaActiveLabel: "Activos en esta zona",
@@ -589,6 +592,9 @@ const dict = {
     // Zona pages
     footerZonasTitle: "Zones",
     footerPopularTitle: "Cerques freqüents",
+    footerRealEstateIn: "Immobiliària a",
+    footerFlatsForSaleVilanova: "Pisos en venda a Vilanova i la Geltrú",
+    footerBuyHomeVilanova: "Comprar casa a Vilanova i la Geltrú",
     zonaHome: "Inici",
     zonaIn: "a",
     zonaActiveLabel: "Actius en aquesta zona",
@@ -881,6 +887,9 @@ const dict = {
     // Zona pages
     footerZonasTitle: "Areas",
     footerPopularTitle: "Popular searches",
+    footerRealEstateIn: "Real estate in",
+    footerFlatsForSaleVilanova: "Flats for sale in Vilanova i la Geltrú",
+    footerBuyHomeVilanova: "Buy a home in Vilanova i la Geltrú",
     zonaHome: "Home",
     zonaIn: "in",
     zonaActiveLabel: "Active in this area",
@@ -1173,6 +1182,9 @@ const dict = {
     // Zona pages
     footerZonasTitle: "Zones",
     footerPopularTitle: "Recherches fréquentes",
+    footerRealEstateIn: "Immobilier à",
+    footerFlatsForSaleVilanova: "Appartements à vendre à Vilanova i la Geltrú",
+    footerBuyHomeVilanova: "Acheter une maison à Vilanova i la Geltrú",
     zonaHome: "Accueil",
     zonaIn: "à",
     zonaActiveLabel: "Actifs dans cette zone",

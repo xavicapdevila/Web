@@ -161,18 +161,21 @@ export default function Footer() {
           </h3>
           <ul className="flex flex-wrap gap-x-6 gap-y-3">
             {[
-              { href: "/pisos-en-venta-vilanova-i-la-geltru", label: "Pisos en venta en Vilanova i la Geltrú" },
-              { href: "/comprar-casa-vilanova-i-la-geltru",   label: "Comprar casa en Vilanova i la Geltrú" },
-              { href: "/zona/sitges",                          label: "Inmobiliaria en Sitges" },
-              { href: "/zona/cubelles",                        label: "Inmobiliaria en Cubelles" },
-              { href: "/zona/sant-pere-de-ribes",              label: "Inmobiliaria en Sant Pere de Ribes" },
-              { href: "/zona/cunit",                           label: "Inmobiliaria en Cunit" },
-              { href: "/zona/vilafranca",                      label: "Inmobiliaria en Vilafranca del Penedès" },
-              { href: "/zona/olivella",                        label: "Inmobiliaria en Olivella" },
-              { href: "/zona/canyelles",                       label: "Inmobiliaria en Canyelles" },
-              { href: "/zona/calafell",                        label: "Inmobiliaria en Calafell" },
-              { href: "/zona/el-vendrell",                     label: "Inmobiliaria en El Vendrell" },
-              { href: "/zona/sant-sadurni-d-anoia",            label: "Inmobiliaria en Sant Sadurní d'Anoia" },
+              { href: "/pisos-en-venta-vilanova-i-la-geltru", label: t("footerFlatsForSaleVilanova") },
+              { href: "/comprar-casa-vilanova-i-la-geltru",   label: t("footerBuyHomeVilanova") },
+              // El prefijo se traduce (t) y el nombre de población es invariable.
+              ...[
+                { href: "/zona/sitges",             name: "Sitges" },
+                { href: "/zona/cubelles",           name: "Cubelles" },
+                { href: "/zona/sant-pere-de-ribes", name: "Sant Pere de Ribes" },
+                { href: "/zona/cunit",              name: "Cunit" },
+                { href: "/zona/vilafranca",         name: "Vilafranca del Penedès" },
+                { href: "/zona/olivella",           name: "Olivella" },
+                { href: "/zona/canyelles",          name: "Canyelles" },
+                { href: "/zona/calafell",           name: "Calafell" },
+                { href: "/zona/el-vendrell",        name: "El Vendrell" },
+                { href: "/zona/sant-sadurni-d-anoia", name: "Sant Sadurní d'Anoia" },
+              ].map(({ href, name }) => ({ href, label: `${t("footerRealEstateIn")} ${name}` })),
             ].map((link) => (
               <li key={link.href}>
                 <Link
