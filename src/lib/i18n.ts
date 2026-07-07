@@ -20,6 +20,7 @@ const dict = {
     // Hero
     heroSeeProperties: "Ver propiedades",
     heroValueHome: "Valorar mi casa",
+    heroLocation: "Inmobiliaria en Vilanova i la Geltrú · Garraf y Penedès",
     heroFamilies: "Familias acompañadas",
     heroYears: "Años de experiencia",
     heroReviews: "reseñas en Google",
@@ -332,6 +333,7 @@ const dict = {
 
     heroSeeProperties: "Veure propietats",
     heroValueHome: "Valorar la meva casa",
+    heroLocation: "Immobiliària a Vilanova i la Geltrú · Garraf i Penedès",
     heroFamilies: "Famílies acompanyades",
     heroYears: "Anys d'experiència",
     heroReviews: "ressenyes a Google",
@@ -627,6 +629,7 @@ const dict = {
 
     heroSeeProperties: "See properties",
     heroValueHome: "Value my home",
+    heroLocation: "Real estate in Vilanova i la Geltrú · Garraf & Penedès",
     heroFamilies: "Families helped",
     heroYears: "Years of experience",
     heroReviews: "Google reviews",
@@ -922,6 +925,7 @@ const dict = {
 
     heroSeeProperties: "Voir les propriétés",
     heroValueHome: "Estimer mon bien",
+    heroLocation: "Immobilier à Vilanova i la Geltrú · Garraf & Penedès",
     heroFamilies: "Familles accompagnées",
     heroYears: "Années d'expérience",
     heroReviews: "avis Google",

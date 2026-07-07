@@ -40,6 +40,15 @@ export default function Hero({ rating, totalReviews }: HeroProps) {
       {/* Content — left-aligned */}
       <div className="relative z-20 w-full max-w-7xl mx-auto px-6 lg:px-10 pt-24 pb-28">
         <div className="max-w-2xl">
+          {/* Antetítulo local VISIBLE — señal SEO on-page para «inmobiliaria
+              Vilanova» sin texto oculto. Sustituye al antiguo sr-only. */}
+          <p
+            className="text-[#C9B99A] text-xs sm:text-sm font-body tracking-[0.22em] uppercase mb-5 animate-fade-up"
+            style={{ animationDelay: "120ms", animationFillMode: "both" }}
+          >
+            {t("heroLocation")}
+          </p>
+
           <h1
             className="font-display text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-10 animate-fade-up"
             style={{ animationDelay: "200ms", animationFillMode: "both" }}
@@ -47,7 +56,6 @@ export default function Hero({ rating, totalReviews }: HeroProps) {
             <span className="text-white">Human</span>
             <br />
             <span className="text-[#C9B99A]">Real Estate</span>
-            <span className="sr-only"> — Inmobiliaria en Vilanova i la Geltrú</span>
           </h1>
 
           <div
