@@ -9,6 +9,7 @@ import { verifyTurnstile } from '@/lib/turnstile'
 
 const MAX = 2000 // límite defensivo por campo
 const TEAM_INBOX = 'info@thevilahome.com'
+const TEAM_CC = ['a.garcia@thevilahome.com'] // Ariadna recibe copia de cada lead
 const FROM = 'The Vila Home <noreply@thevilahome.com>'
 const VALID_LANGS: Lang[] = ['es', 'ca', 'en', 'fr']
 
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
       resend.emails.send({
         from: FROM,
         to: TEAM_INBOX,
+        cc: TEAM_CC,
         replyTo: email,
         subject: team.subject,
         html: team.html,
