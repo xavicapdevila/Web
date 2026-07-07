@@ -75,7 +75,7 @@ const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
     intro:
       "Gracias por escribirnos. Hemos recibido tu solicitud y ya está sobre nuestra mesa.",
     reassure:
-      "Un asesor real —no un formulario que se pierde— la está revisando ahora mismo.",
+      "No somos un call center: te atenderá una persona de nuestro equipo, no un número de expediente.",
     next: "Te llamaremos o escribiremos en menos de 24 horas laborables para entender tu caso y contarte, con honestidad, cómo te ayudaríamos.",
     meanwhile: "Mientras tanto, si quieres una primera idea del valor de tu casa:",
     siteCta: "Valoración online al instante",
@@ -90,7 +90,7 @@ const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
     intro:
       "Gràcies per escriure'ns. Hem rebut la teva sol·licitud i ja la tenim sobre la taula.",
     reassure:
-      "Un assessor real —no un formulari que es perd— l'està revisant ara mateix.",
+      "No som un call center: t'atendrà una persona del nostre equip, no un número d'expedient.",
     next: "Et trucarem o escriurem en menys de 24 hores laborables per entendre el teu cas i explicar-te, amb honestedat, com t'ajudaríem.",
     meanwhile: "Mentrestant, si vols una primera idea del valor de casa teva:",
     siteCta: "Valoració online a l'instant",
@@ -105,7 +105,7 @@ const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
     intro:
       "Thanks for reaching out. We've received your request and it's on our desk.",
     reassure:
-      "A real advisor — not a form that gets lost — is reviewing it right now.",
+      "We're not a call center: you'll be looked after by a real person from our team, not a case number.",
     next: "We'll call or write within 24 working hours to understand your case and tell you, honestly, how we'd help.",
     meanwhile: "In the meantime, if you'd like a first idea of what your home is worth:",
     siteCta: "Instant online valuation",
@@ -120,7 +120,7 @@ const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
     intro:
       "Merci de nous avoir écrit. Nous avons bien reçu votre demande, elle est sur notre bureau.",
     reassure:
-      "Un vrai conseiller — pas un formulaire qui se perd — l'examine en ce moment même.",
+      "Nous ne sommes pas un call center : vous serez suivi par une vraie personne de notre équipe, pas un numéro de dossier.",
     next: "Nous vous appellerons ou écrirons sous 24 heures ouvrées pour comprendre votre cas et vous dire, en toute honnêteté, comment nous aiderions.",
     meanwhile: "En attendant, si vous voulez une première idée de la valeur de votre maison :",
     siteCta: "Estimation en ligne instantanée",
