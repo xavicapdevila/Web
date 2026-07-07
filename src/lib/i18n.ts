@@ -296,6 +296,7 @@ const dict = {
 
     // Zona pages
     footerZonasTitle: "Zonas",
+    footerPopularTitle: "Búsquedas frecuentes",
     zonaHome: "Inicio",
     zonaIn: "en",
     zonaActiveLabel: "Activos en esta zona",
@@ -587,6 +588,7 @@ const dict = {
 
     // Zona pages
     footerZonasTitle: "Zones",
+    footerPopularTitle: "Cerques freqüents",
     zonaHome: "Inici",
     zonaIn: "a",
     zonaActiveLabel: "Actius en aquesta zona",
@@ -878,6 +880,7 @@ const dict = {
 
     // Zona pages
     footerZonasTitle: "Areas",
+    footerPopularTitle: "Popular searches",
     zonaHome: "Home",
     zonaIn: "in",
     zonaActiveLabel: "Active in this area",
@@ -1169,6 +1172,7 @@ const dict = {
 
     // Zona pages
     footerZonasTitle: "Zones",
+    footerPopularTitle: "Recherches fréquentes",
     zonaHome: "Accueil",
     zonaIn: "à",
     zonaActiveLabel: "Actifs dans cette zone",

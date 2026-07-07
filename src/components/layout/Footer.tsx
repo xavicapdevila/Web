@@ -152,6 +152,40 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Búsquedas frecuentes — enlaces internos a las landings transaccionales
+            y a las zonas clave. Refuerza el SEO local (nada oculto): son enlaces
+            reales, visibles y navegables. */}
+        <div className="mt-12 pt-8 border-t border-[#1a1a1a]">
+          <h3 className="text-white text-xs font-body tracking-widest uppercase mb-5">
+            {t("footerPopularTitle")}
+          </h3>
+          <ul className="flex flex-wrap gap-x-6 gap-y-3">
+            {[
+              { href: "/pisos-en-venta-vilanova-i-la-geltru", label: "Pisos en venta en Vilanova i la Geltrú" },
+              { href: "/comprar-casa-vilanova-i-la-geltru",   label: "Comprar casa en Vilanova i la Geltrú" },
+              { href: "/zona/sitges",                          label: "Inmobiliaria en Sitges" },
+              { href: "/zona/cubelles",                        label: "Inmobiliaria en Cubelles" },
+              { href: "/zona/sant-pere-de-ribes",              label: "Inmobiliaria en Sant Pere de Ribes" },
+              { href: "/zona/cunit",                           label: "Inmobiliaria en Cunit" },
+              { href: "/zona/vilafranca",                      label: "Inmobiliaria en Vilafranca del Penedès" },
+              { href: "/zona/olivella",                        label: "Inmobiliaria en Olivella" },
+              { href: "/zona/canyelles",                       label: "Inmobiliaria en Canyelles" },
+              { href: "/zona/calafell",                        label: "Inmobiliaria en Calafell" },
+              { href: "/zona/el-vendrell",                     label: "Inmobiliaria en El Vendrell" },
+              { href: "/zona/sant-sadurni-d-anoia",            label: "Inmobiliaria en Sant Sadurní d'Anoia" },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className="mt-12 pt-8 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[#444] text-xs">{t("footerRights")}</p>
           <div className="flex items-center gap-6 flex-wrap justify-center">
