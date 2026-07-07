@@ -162,14 +162,41 @@ export function buildAutoReplyEmail(name: string, lang: Lang): { subject: string
 
 // ── Aviso interno al equipo ──────────────────────────────────────────────────
 
+// Idioma del lead (nombre nativo), para saber en qué idioma llamar.
+const LANG_NAMES: Record<string, string> = {
+  es: "Español",
+  ca: "Català",
+  en: "English",
+  fr: "Français",
+};
+
+// Urgencia por situación: color del badge y microcopy de prioridad.
+const SITUATION_URGENCY: Record<string, { bg: string; fg: string; tag: string }> = {
+  ahora: { bg: "#0f7a4f", fg: "#ffffff", tag: "🔥 PRIORIDAD ALTA · llamar hoy" },
+  en_venta: { bg: "#b0451e", fg: "#ffffff", tag: "⚡ Ya a la venta · llamar hoy" },
+  meses: { bg: "#b8860b", fg: "#ffffff", tag: "Seguimiento · próximos meses" },
+  explorando: { bg: "#5b6470", fg: "#ffffff", tag: "Nutrir · aún explorando" },
+};
+
+// Sólo dígitos, con prefijo 34 si parece un móvil español de 9 cifras.
+function waNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 9) return "34" + digits;
+  return digits;
+}
+
 function attrRow(label: string, value?: string): string {
   if (!value) return "";
-  return `<tr><td style="padding:3px 10px 3px 0;color:#888;font-size:12px">${label}</td><td style="padding:3px 0;color:#222;font-size:12px"><strong>${escapeHtml(value)}</strong></td></tr>`;
+  return `<tr><td style="padding:4px 14px 4px 0;color:#8a8578;font-size:12px;white-space:nowrap">${label}</td><td style="padding:4px 0;color:#2a281f;font-size:12px"><strong>${escapeHtml(value)}</strong></td></tr>`;
 }
 
 /** HTML del aviso al equipo, con todos los datos y la atribución de campaña. */
 export function buildTeamEmail(lead: StoredLead): { subject: string; html: string } {
   const situation = situationLabel(lead.situation, "es");
+  const urgency = SITUATION_URGENCY[lead.situation] ?? SITUATION_URGENCY.explorando;
+  const langKey = (lead.lang || "es").toLowerCase();
+  const langName = LANG_NAMES[langKey] ?? (lead.lang || "—");
+
   const source =
     lead.utm_source ||
     (lead.fbclid ? "facebook/instagram (fbclid)" : "") ||
@@ -188,21 +215,70 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
     .filter(Boolean)
     .join("");
 
+  const phone = escapeHtml(lead.phone);
+  const wa = waNumber(lead.phone);
+  const btn =
+    "display:inline-block;text-decoration:none;font-size:14px;font-weight:600;padding:11px 18px;border-radius:999px;margin:0 8px 8px 0";
+
   const html = `
-  <div style="font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;max-width:560px;color:#222">
-    <h2 style="margin:0 0 4px;font-size:19px">Nuevo lead desde /vender</h2>
-    <p style="color:#917330;font-weight:600;margin:0 0 4px">${escapeHtml(situation)}</p>
-    <p style="color:#999;font-size:12px;margin:0 0 16px">${escapeHtml(new Date(lead.ts).toLocaleString("es-ES"))} · idioma: ${escapeHtml(lead.lang)}</p>
-    <hr style="border:none;border-top:1px solid #eee;margin:12px 0"/>
-    <p style="margin:6px 0"><strong>Nombre:</strong> ${escapeHtml(lead.name)}</p>
-    <p style="margin:6px 0"><strong>Teléfono:</strong> <a href="tel:${escapeHtml(lead.phone)}">${escapeHtml(lead.phone)}</a></p>
-    <p style="margin:6px 0"><strong>Email:</strong> <a href="mailto:${escapeHtml(lead.email)}">${escapeHtml(lead.email)}</a></p>
-    ${lead.zone ? `<p style="margin:6px 0"><strong>Zona / dirección:</strong> ${escapeHtml(lead.zone)}</p>` : ""}
-    ${lead.message ? `<p style="margin:6px 0"><strong>Mensaje:</strong><br/>${escapeHtml(lead.message).replace(/\n/g, "<br/>")}</p>` : ""}
-    <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
-    <p style="color:#888;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px">Atribución</p>
-    <table style="border-collapse:collapse">${attrTable || attrRow("Origen", "directo/orgánico")}</table>
+  <div style="margin:0;padding:0;background:#f4f2ec">
+    <div style="max-width:600px;margin:0 auto;padding:32px 20px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a18">
+
+      <!-- Cabecera -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8a8578">The Vila Home · Captación</span>
+      </div>
+
+      <!-- Badge de urgencia -->
+      <div style="margin-bottom:14px">
+        <span style="display:inline-block;background:${urgency.bg};color:${urgency.fg};font-size:12px;font-weight:700;letter-spacing:0.04em;padding:6px 14px;border-radius:999px">${urgency.tag}</span>
+      </div>
+
+      <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:16px;padding:26px 24px">
+
+        <h1 style="margin:0 0 2px;font-size:24px;line-height:1.2;color:#1a1a18">${escapeHtml(lead.name)}</h1>
+        <p style="margin:0 0 4px;font-size:15px;font-weight:600;color:#4a473c">${escapeHtml(situation)}</p>
+        <p style="margin:0 0 20px;font-size:13px;color:#8a8578">
+          <span style="display:inline-block;background:#f4f2ec;border:1px solid #e6e4dd;border-radius:999px;padding:2px 10px;font-weight:600;color:#4a473c">Idioma: ${escapeHtml(langName)}</span>
+          &nbsp;·&nbsp;${escapeHtml(new Date(lead.ts).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }))}
+        </p>
+
+        <!-- Acciones rápidas -->
+        <div style="margin:0 0 18px">
+          <a href="tel:${phone}" style="${btn};background:#1c1913;color:#ffffff">📞 Llamar</a>
+          ${wa ? `<a href="https://wa.me/${wa}" style="${btn};background:#128c4a;color:#ffffff">💬 WhatsApp</a>` : ""}
+          <a href="mailto:${escapeHtml(lead.email)}" style="${btn};background:#ffffff;color:#1c1913;border:1px solid #d9d6cd">✉️ Email</a>
+        </div>
+
+        <!-- Datos de contacto -->
+        <table style="border-collapse:collapse;width:100%;font-size:14px">
+          <tr><td style="padding:5px 14px 5px 0;color:#8a8578;width:96px">Teléfono</td><td style="padding:5px 0"><a href="tel:${phone}" style="color:#1c1913;font-weight:600;text-decoration:none">${phone}</a></td></tr>
+          <tr><td style="padding:5px 14px 5px 0;color:#8a8578">Email</td><td style="padding:5px 0"><a href="mailto:${escapeHtml(lead.email)}" style="color:#1c1913;font-weight:600;text-decoration:none">${escapeHtml(lead.email)}</a></td></tr>
+          ${lead.zone ? `<tr><td style="padding:5px 14px 5px 0;color:#8a8578;vertical-align:top">Zona</td><td style="padding:5px 0;color:#2a281f;font-weight:600">${escapeHtml(lead.zone)}</td></tr>` : ""}
+        </table>
+
+        ${
+          lead.message
+            ? `<div style="margin:16px 0 0;padding:14px 16px;background:#faf9f4;border-left:3px solid #c9c4b4;border-radius:0 8px 8px 0">
+                 <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#8a8578">Mensaje</p>
+                 <p style="margin:0;font-size:14px;line-height:1.55;color:#2a281f">${escapeHtml(lead.message).replace(/\n/g, "<br/>")}</p>
+               </div>`
+            : ""
+        }
+      </div>
+
+      <!-- Atribución -->
+      <div style="margin-top:14px;padding:16px 20px;background:#efece3;border-radius:12px">
+        <p style="color:#8a8578;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px">Atribución</p>
+        <table style="border-collapse:collapse">${attrTable || attrRow("Origen", "directo/orgánico")}</table>
+      </div>
+
+      <p style="text-align:center;color:#b0ab9c;font-size:11px;margin:16px 0 0">Lead #${escapeHtml(lead.id)}</p>
+    </div>
   </div>`;
 
-  return { subject: `Nuevo lead (vender): ${lead.name} — ${situation}`, html };
+  return {
+    subject: `Nuevo lead (vender): ${lead.name} — ${situation}`,
+    html,
+  };
 }
