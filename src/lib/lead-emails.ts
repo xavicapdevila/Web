@@ -56,13 +56,14 @@ export function situationLabel(key: string, lang: Lang = "es"): string {
 
 interface AutoReplyCopy {
   subject: string;
-  greeting: (name: string) => string;
+  headline: (name: string) => string;
   intro: string;
-  reassure: string;
   next: string;
+  meanwhileLabel: string;
   meanwhile: string;
   siteCta: string;
   siteUrl: string;
+  disclaimer: string;
   signoff: string;
   team: string;
   legal: string;
@@ -71,63 +72,63 @@ interface AutoReplyCopy {
 const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
   es: {
     subject: "Hemos recibido tu solicitud — The Vila Home",
-    greeting: (n) => `Hola ${n},`,
-    intro:
-      "Gracias por escribirnos. Hemos recibido tu solicitud y ya está sobre nuestra mesa.",
-    reassure:
-      "No somos un call center: te atenderá una persona de nuestro equipo, no un número de expediente.",
-    next: "Te llamaremos o escribiremos en menos de 24 horas laborables para entender tu caso y contarte, con honestidad, cómo te ayudaríamos.",
-    meanwhile: "Mientras tanto, si quieres una primera idea del valor de tu casa:",
-    siteCta: "Valoración online al instante",
+    headline: (n) => `Recibido, ${n}.`,
+    intro: "Gracias por escribirnos. Ya tenemos tu mensaje.",
+    next: "En menos de 24 horas laborables te llamamos o escribimos para conocer tu caso con calma y ver cómo podemos ayudarte. Sin compromiso.",
+    meanwhileLabel: "Mientras tanto",
+    meanwhile: "Calcula una primera estimación del valor de tu casa en un minuto.",
+    siteCta: "Ver mi valoración",
     siteUrl: "https://www.thevilahome.com/valoracion",
+    disclaimer:
+      "Es una estimación automática y orientativa. Cuando conozcamos tu casa, te daremos nuestra recomendación de precio.",
     signoff: "Un saludo,",
     team: "El equipo de The Vila Home",
-    legal: "Recibes este correo porque solicitaste información en thevilahome.com. No compartimos tus datos ni te llenamos el buzón de spam.",
+    legal: "Recibes este correo porque solicitaste información en thevilahome.com.<br/>No compartimos tus datos ni te llenamos el buzón de spam.",
   },
   ca: {
     subject: "Hem rebut la teva sol·licitud — The Vila Home",
-    greeting: (n) => `Hola ${n},`,
-    intro:
-      "Gràcies per escriure'ns. Hem rebut la teva sol·licitud i ja la tenim sobre la taula.",
-    reassure:
-      "No som un call center: t'atendrà una persona del nostre equip, no un número d'expedient.",
-    next: "Et trucarem o escriurem en menys de 24 hores laborables per entendre el teu cas i explicar-te, amb honestedat, com t'ajudaríem.",
-    meanwhile: "Mentrestant, si vols una primera idea del valor de casa teva:",
-    siteCta: "Valoració online a l'instant",
+    headline: (n) => `Rebut, ${n}.`,
+    intro: "Gràcies per escriure'ns. Ja tenim el teu missatge.",
+    next: "En menys de 24 hores laborables et truquem o escrivim per conèixer el teu cas amb calma i veure com podem ajudar-te. Sense compromís.",
+    meanwhileLabel: "Mentrestant",
+    meanwhile: "Calcula una primera estimació del valor de casa teva en un minut.",
+    siteCta: "Veure la meva valoració",
     siteUrl: "https://www.thevilahome.com/valoracion",
+    disclaimer:
+      "És una estimació automàtica i orientativa. Quan coneguem casa teva, et donarem la nostra recomanació de preu.",
     signoff: "Una salutació,",
     team: "L'equip de The Vila Home",
-    legal: "Reps aquest correu perquè vas sol·licitar informació a thevilahome.com. No compartim les teves dades ni t'omplim la bústia de spam.",
+    legal: "Reps aquest correu perquè vas sol·licitar informació a thevilahome.com.<br/>No compartim les teves dades ni t'omplim la bústia de spam.",
   },
   en: {
     subject: "We've received your request — The Vila Home",
-    greeting: (n) => `Hi ${n},`,
-    intro:
-      "Thanks for reaching out. We've received your request and it's on our desk.",
-    reassure:
-      "We're not a call center: you'll be looked after by a real person from our team, not a case number.",
-    next: "We'll call or write within 24 working hours to understand your case and tell you, honestly, how we'd help.",
-    meanwhile: "In the meantime, if you'd like a first idea of what your home is worth:",
-    siteCta: "Instant online valuation",
+    headline: (n) => `Got it, ${n}.`,
+    intro: "Thanks for reaching out. We've got your message.",
+    next: "Within 24 working hours we'll call or write to understand your case calmly and see how we can help. No commitment.",
+    meanwhileLabel: "In the meantime",
+    meanwhile: "Get a first estimate of your home's value in a minute.",
+    siteCta: "See my valuation",
     siteUrl: "https://www.thevilahome.com/valoracion",
+    disclaimer:
+      "It's an automatic, indicative estimate. Once we get to know your home, we'll give you our recommended price.",
     signoff: "Best,",
     team: "The Vila Home team",
-    legal: "You're receiving this email because you requested information at thevilahome.com. We don't share your data or fill your inbox with spam.",
+    legal: "You're receiving this email because you requested information at thevilahome.com.<br/>We don't share your data or fill your inbox with spam.",
   },
   fr: {
     subject: "Nous avons reçu votre demande — The Vila Home",
-    greeting: (n) => `Bonjour ${n},`,
-    intro:
-      "Merci de nous avoir écrit. Nous avons bien reçu votre demande, elle est sur notre bureau.",
-    reassure:
-      "Nous ne sommes pas un call center : vous serez suivi par une vraie personne de notre équipe, pas un numéro de dossier.",
-    next: "Nous vous appellerons ou écrirons sous 24 heures ouvrées pour comprendre votre cas et vous dire, en toute honnêteté, comment nous aiderions.",
-    meanwhile: "En attendant, si vous voulez une première idée de la valeur de votre maison :",
-    siteCta: "Estimation en ligne instantanée",
+    headline: (n) => `Bien reçu, ${n}.`,
+    intro: "Merci de nous avoir écrit. Nous avons bien votre message.",
+    next: "En moins de 24 heures ouvrées, nous vous appelons ou écrivons pour comprendre votre situation en toute tranquillité et voir comment nous pouvons vous aider. Sans engagement.",
+    meanwhileLabel: "En attendant",
+    meanwhile: "Obtenez une première estimation de la valeur de votre maison en une minute.",
+    siteCta: "Voir mon estimation",
     siteUrl: "https://www.thevilahome.com/valoracion",
+    disclaimer:
+      "C'est une estimation automatique et indicative. Une fois que nous connaîtrons votre maison, nous vous donnerons notre recommandation de prix.",
     signoff: "Cordialement,",
     team: "L'équipe The Vila Home",
-    legal: "Vous recevez cet e-mail car vous avez demandé des informations sur thevilahome.com. Nous ne partageons pas vos données et n'inondons pas votre boîte de spam.",
+    legal: "Vous recevez cet e-mail car vous avez demandé des informations sur thevilahome.com.<br/>Nous ne partageons pas vos données et n'inondons pas votre boîte de spam.",
   },
 };
 
@@ -136,24 +137,40 @@ export function buildAutoReplyEmail(name: string, lang: Lang): { subject: string
   const c = AUTO_REPLY[lang] ?? AUTO_REPLY.es;
   const firstName = escapeHtml((name.trim().split(/\s+/)[0] || name).trim());
 
+  const body = "font-family:'Inter','Helvetica Neue',Arial,sans-serif";
+  const display = "font-family:'Inter Tight','Helvetica Neue',Arial,sans-serif";
+
   const html = `
-  <div style="margin:0;padding:0;background:#f4f2ec">
-    <div style="max-width:560px;margin:0 auto;padding:40px 24px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a18">
-      <div style="text-align:center;margin-bottom:28px">
-        <img src="https://www.thevilahome.com/images/email/logo.png" alt="The Vila Home" width="160" height="51" style="display:inline-block;width:160px;height:auto;border:0" />
+  <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap');</style>
+  <div style="margin:0;padding:0;background:#ececec">
+    <div style="max-width:560px;margin:0 auto;padding:36px 18px">
+      <div style="background:#ffffff;border-radius:6px;overflow:hidden">
+        <div style="height:4px;background:#111111;font-size:0;line-height:0">&nbsp;</div>
+        <div style="padding:44px 42px 36px;${body};color:#454545">
+
+          <img src="https://www.thevilahome.com/images/email/logo.png" alt="The Vila Home" width="150" style="display:block;width:150px;height:auto;border:0" />
+
+          <div style="height:1px;background:#ececec;margin:28px 0 32px;font-size:0;line-height:0">&nbsp;</div>
+
+          <p style="${display};font-size:30px;font-weight:600;letter-spacing:-.025em;line-height:1.15;margin:0 0 22px;color:#111111">${c.headline(firstName)}</p>
+
+          <p style="font-size:15px;line-height:1.75;margin:0 0 15px;color:#454545">${c.intro}</p>
+          <p style="font-size:15px;line-height:1.75;margin:0;color:#454545">${c.next}</p>
+
+          <div style="height:1px;background:#ececec;margin:34px 0;font-size:0;line-height:0">&nbsp;</div>
+
+          <p style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#9a9a9a;margin:0 0 8px">${c.meanwhileLabel}</p>
+          <p style="font-size:15px;line-height:1.6;margin:0 0 20px;color:#454545">${c.meanwhile}</p>
+          <a href="${c.siteUrl}" style="display:inline-block;${display};background:#111111;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.01em;padding:15px 30px;border-radius:8px">${c.siteCta}&nbsp;&rarr;</a>
+          <p style="font-size:13px;line-height:1.6;margin:16px 0 0;color:#8f8f8f">${c.disclaimer}</p>
+
+          <div style="height:1px;background:#ececec;margin:34px 0 26px;font-size:0;line-height:0">&nbsp;</div>
+
+          <p style="font-size:15px;line-height:1.6;margin:0;color:#454545">${c.signoff}<br/><strong style="color:#111111;font-weight:600">${c.team}</strong></p>
+
+        </div>
       </div>
-      <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:16px;padding:32px 28px">
-        <p style="font-size:16px;margin:0 0 16px">${c.greeting(firstName)}</p>
-        <p style="font-size:15px;line-height:1.6;margin:0 0 14px;color:#3a382f">${c.intro}</p>
-        <p style="font-size:15px;line-height:1.6;margin:0 0 14px;color:#3a382f">${c.reassure}</p>
-        <p style="font-size:15px;line-height:1.6;margin:0 0 22px;color:#3a382f"><strong style="color:#1a1a18">${c.next}</strong></p>
-        <p style="font-size:14px;line-height:1.6;margin:0 0 14px;color:#6a6658">${c.meanwhile}</p>
-        <p style="margin:0 0 8px">
-          <a href="${c.siteUrl}" style="display:inline-block;background:#1c1913;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;padding:12px 22px;border-radius:999px">${c.siteCta}</a>
-        </p>
-        <p style="font-size:15px;line-height:1.6;margin:26px 0 0;color:#3a382f">${c.signoff}<br/><strong style="color:#1a1a18">${c.team}</strong></p>
-      </div>
-      <p style="font-size:11px;line-height:1.5;color:#a8a294;text-align:center;margin:20px 8px 0">${c.legal}</p>
+      <p style="${body};font-size:11px;line-height:1.6;color:#9a9a9a;text-align:center;margin:22px 12px 0">${c.legal}</p>
     </div>
   </div>`;
 

@@ -346,7 +346,7 @@ const es: VenderCopy = {
     consentAfter: ". No compartimos tus datos ni te llenamos el buzón de spam.",
     error: "No se ha podido enviar. Inténtalo de nuevo o escríbenos a ",
     okTitle: "Recibido. Gracias.",
-    okText: "Te escribiremos o llamaremos en menos de 24 h laborables. Sin compromiso y sin presiones: solo para entender tu caso y decirte cómo te ayudaríamos.",
+    okText: "Te escribiremos o llamaremos en menos de 24 h laborables. Sin compromiso y sin presiones: solo para entender tu caso y decirte cómo podemos ayudarte.",
   },
   footer: { legal: "Aviso legal", privacy: "Privacidad", cookies: "Cookies" },
 };
@@ -548,7 +548,7 @@ const ca: VenderCopy = {
     consentAfter: ". No compartim les teves dades ni t'omplim la bústia de spam.",
     error: "No s'ha pogut enviar. Torna-ho a provar o escriu-nos a ",
     okTitle: "Rebut. Gràcies.",
-    okText: "T'escriurem o trucarem en menys de 24 h laborables. Sense compromís i sense pressions: només per entendre el teu cas i dir-te com t'ajudaríem.",
+    okText: "T'escriurem o trucarem en menys de 24 h laborables. Sense compromís i sense pressions: només per entendre el teu cas i dir-te com podem ajudar-te.",
   },
   footer: { legal: "Avís legal", privacy: "Privacitat", cookies: "Cookies" },
 };
@@ -750,7 +750,7 @@ const en: VenderCopy = {
     consentAfter: ". We don't share your data or fill your inbox with spam.",
     error: "Couldn't send. Try again or email us at ",
     okTitle: "Received. Thank you.",
-    okText: "We'll write or call you within 24 working hours. No commitment and no pressure: just to understand your case and tell you how we'd help.",
+    okText: "We'll write or call you within 24 working hours. No commitment and no pressure: just to understand your case and tell you how we can help.",
   },
   footer: { legal: "Legal notice", privacy: "Privacy", cookies: "Cookies" },
 };
@@ -952,7 +952,7 @@ const fr: VenderCopy = {
     consentAfter: ". Nous ne partageons pas vos données et n'inondons pas votre boîte de spam.",
     error: "Envoi impossible. Réessayez ou écrivez-nous à ",
     okTitle: "Bien reçu. Merci.",
-    okText: "Nous vous écrirons ou appellerons en moins de 24 h ouvrées. Sans engagement et sans pression : juste pour comprendre votre cas et vous dire comment nous aiderions.",
+    okText: "Nous vous écrirons ou appellerons en moins de 24 h ouvrées. Sans engagement et sans pression : juste pour comprendre votre cas et vous dire comment nous pouvons vous aider.",
   },
   footer: { legal: "Mentions légales", privacy: "Confidentialité", cookies: "Cookies" },
 };
