@@ -189,10 +189,10 @@ const LANG_NAMES: Record<string, string> = {
 
 // Urgencia por situación: color del badge y microcopy de prioridad.
 const SITUATION_URGENCY: Record<string, { bg: string; fg: string; tag: string }> = {
-  ahora: { bg: "#0f7a4f", fg: "#ffffff", tag: "🔥 PRIORIDAD ALTA · llamar hoy" },
-  en_venta: { bg: "#b0451e", fg: "#ffffff", tag: "⚡ Ya a la venta · llamar hoy" },
-  meses: { bg: "#b8860b", fg: "#ffffff", tag: "Seguimiento · próximos meses" },
-  explorando: { bg: "#5b6470", fg: "#ffffff", tag: "Nutrir · aún explorando" },
+  ahora: { bg: "#111111", fg: "#ffffff", tag: "Prioridad alta · llamar hoy" },
+  en_venta: { bg: "#b0451e", fg: "#ffffff", tag: "Ya a la venta · llamar hoy" },
+  meses: { bg: "#5b6470", fg: "#ffffff", tag: "Seguimiento · próximos meses" },
+  explorando: { bg: "#9a9a9a", fg: "#ffffff", tag: "Nutrir · aún explorando" },
 };
 
 // Sólo dígitos, con prefijo 34 si parece un móvil español de 9 cifras.
@@ -202,9 +202,19 @@ function waNumber(phone: string): string {
   return digits;
 }
 
-function attrRow(label: string, value?: string): string {
-  if (!value) return "";
-  return `<tr><td style="padding:4px 14px 4px 0;color:#8a8578;font-size:12px;white-space:nowrap">${label}</td><td style="padding:4px 0;color:#2a281f;font-size:12px"><strong>${escapeHtml(value)}</strong></td></tr>`;
+// Origen legible del lead (de dónde viene), a partir de UTMs / click ids.
+function originLabel(lead: StoredLead): string {
+  const s = (lead.utm_source || "").toLowerCase();
+  if (s.includes("google")) return "Google";
+  if (s.includes("insta")) return "Instagram";
+  if (s.includes("facebook") || s === "fb" || s === "meta") return "Facebook";
+  if (s.includes("bing")) return "Bing";
+  if (s.includes("tiktok")) return "TikTok";
+  if (s) return s.charAt(0).toUpperCase() + s.slice(1);
+  if (lead.gclid) return "Google Ads";
+  if (lead.fbclid) return "Instagram / Facebook";
+  if (lead.referrer) return "Web referida";
+  return "Directo / orgánico";
 }
 
 /** HTML del aviso al equipo, con todos los datos y la atribución de campaña. */
@@ -214,83 +224,70 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
   const langKey = (lead.lang || "es").toLowerCase();
   const langName = LANG_NAMES[langKey] ?? (lead.lang || "—");
 
-  const source =
-    lead.utm_source ||
-    (lead.fbclid ? "facebook/instagram (fbclid)" : "") ||
-    (lead.gclid ? "google (gclid)" : "") ||
-    (lead.referrer ? "referido" : "directo/orgánico");
-
-  const attrTable = [
-    attrRow("Origen", source),
-    attrRow("Campaña", lead.utm_campaign),
-    attrRow("Anuncio / contenido", lead.utm_content),
-    attrRow("Término", lead.utm_term),
-    attrRow("Medio", lead.utm_medium),
-    attrRow("Referrer", lead.referrer),
-    attrRow("Landing", lead.landing),
-  ]
-    .filter(Boolean)
-    .join("");
+  const origin = escapeHtml(originLabel(lead));
+  const campaign = lead.utm_campaign ? escapeHtml(lead.utm_campaign) : "";
 
   const phone = escapeHtml(lead.phone);
   const wa = waNumber(lead.phone);
+  const body = "font-family:'Inter','Helvetica Neue',Arial,sans-serif";
+  const display = "font-family:'Inter Tight','Helvetica Neue',Arial,sans-serif";
   const btn =
-    "display:inline-block;text-decoration:none;font-size:14px;font-weight:600;padding:11px 18px;border-radius:999px;margin:0 8px 8px 0";
+    "display:inline-block;" + body + ";text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:8px;margin:0 8px 8px 0";
 
   const html = `
-  <div style="margin:0;padding:0;background:#f4f2ec">
-    <div style="max-width:600px;margin:0 auto;padding:32px 20px;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a18">
+  <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap');</style>
+  <div style="margin:0;padding:0;background:#ececec">
+    <div style="max-width:600px;margin:0 auto;padding:32px 18px;${body};color:#454545">
 
-      <!-- Cabecera -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <span style="font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8a8578">The Vila Home · Captación</span>
-      </div>
+      <p style="font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#9a9a9a;margin:0 0 14px">The Vila Home · Captación</p>
 
-      <!-- Badge de urgencia -->
-      <div style="margin-bottom:14px">
-        <span style="display:inline-block;background:${urgency.bg};color:${urgency.fg};font-size:12px;font-weight:700;letter-spacing:0.04em;padding:6px 14px;border-radius:999px">${urgency.tag}</span>
-      </div>
+      <div style="background:#ffffff;border-radius:6px;overflow:hidden">
+        <div style="height:4px;background:#111111;font-size:0;line-height:0">&nbsp;</div>
+        <div style="padding:32px 30px">
 
-      <div style="background:#ffffff;border:1px solid #e6e4dd;border-radius:16px;padding:26px 24px">
+          <div style="margin-bottom:16px">
+            <span style="display:inline-block;background:${urgency.bg};color:${urgency.fg};font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px">${urgency.tag}</span>
+          </div>
 
-        <h1 style="margin:0 0 2px;font-size:24px;line-height:1.2;color:#1a1a18">${escapeHtml(lead.name)}</h1>
-        <p style="margin:0 0 4px;font-size:15px;font-weight:600;color:#4a473c">${escapeHtml(situation)}</p>
-        <p style="margin:0 0 20px;font-size:13px;color:#8a8578">
-          <span style="display:inline-block;background:#f4f2ec;border:1px solid #e6e4dd;border-radius:999px;padding:2px 10px;font-weight:600;color:#4a473c">Idioma: ${escapeHtml(langName)}</span>
-          &nbsp;·&nbsp;${escapeHtml(new Date(lead.ts).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }))}
-        </p>
+          <h1 style="${display};margin:0 0 4px;font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.15;color:#111111">${escapeHtml(lead.name)}</h1>
+          <p style="margin:0 0 14px;font-size:15px;font-weight:500;color:#454545">${escapeHtml(situation)}</p>
 
-        <!-- Acciones rápidas -->
-        <div style="margin:0 0 18px">
-          <a href="tel:${phone}" style="${btn};background:#1c1913;color:#ffffff">📞 Llamar</a>
-          ${wa ? `<a href="https://wa.me/${wa}" style="${btn};background:#128c4a;color:#ffffff">💬 WhatsApp</a>` : ""}
-          <a href="mailto:${escapeHtml(lead.email)}" style="${btn};background:#ffffff;color:#1c1913;border:1px solid #d9d6cd">✉️ Email</a>
+          <p style="margin:0 0 22px;font-size:12px;color:#9a9a9a">
+            <span style="display:inline-block;background:#f4f4f3;border:1px solid #e6e6e4;border-radius:999px;padding:2px 10px;font-weight:600;color:#454545">${escapeHtml(langName)}</span>
+            &nbsp;·&nbsp;${escapeHtml(new Date(lead.ts).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }))}
+          </p>
+
+          <div style="margin:0 0 20px">
+            <a href="tel:${phone}" style="${btn};background:#111111;color:#ffffff">Llamar</a>
+            ${wa ? `<a href="https://wa.me/${wa}" style="${btn};background:#12a150;color:#ffffff">WhatsApp</a>` : ""}
+            <a href="mailto:${escapeHtml(lead.email)}" style="${btn};background:#ffffff;color:#111111;border:1px solid #d9d9d6">Email</a>
+          </div>
+
+          <div style="height:1px;background:#ececec;margin:0 0 18px;font-size:0;line-height:0">&nbsp;</div>
+
+          <table style="border-collapse:collapse;width:100%;font-size:14px">
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;width:90px">Teléfono</td><td style="padding:5px 0"><a href="tel:${phone}" style="color:#111111;font-weight:600;text-decoration:none">${phone}</a></td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Email</td><td style="padding:5px 0"><a href="mailto:${escapeHtml(lead.email)}" style="color:#111111;font-weight:600;text-decoration:none">${escapeHtml(lead.email)}</a></td></tr>
+            ${lead.zone ? `<tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;vertical-align:top">Zona</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(lead.zone)}</td></tr>` : ""}
+          </table>
+
+          ${
+            lead.message
+              ? `<div style="margin:18px 0 0;padding:16px 18px;background:#f7f7f6;border-radius:6px">
+                   <p style="margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;font-weight:600;color:#9a9a9a">Mensaje</p>
+                   <p style="margin:0;font-size:14px;line-height:1.6;color:#222222">${escapeHtml(lead.message).replace(/\n/g, "<br/>")}</p>
+                 </div>`
+              : ""
+          }
         </div>
-
-        <!-- Datos de contacto -->
-        <table style="border-collapse:collapse;width:100%;font-size:14px">
-          <tr><td style="padding:5px 14px 5px 0;color:#8a8578;width:96px">Teléfono</td><td style="padding:5px 0"><a href="tel:${phone}" style="color:#1c1913;font-weight:600;text-decoration:none">${phone}</a></td></tr>
-          <tr><td style="padding:5px 14px 5px 0;color:#8a8578">Email</td><td style="padding:5px 0"><a href="mailto:${escapeHtml(lead.email)}" style="color:#1c1913;font-weight:600;text-decoration:none">${escapeHtml(lead.email)}</a></td></tr>
-          ${lead.zone ? `<tr><td style="padding:5px 14px 5px 0;color:#8a8578;vertical-align:top">Zona</td><td style="padding:5px 0;color:#2a281f;font-weight:600">${escapeHtml(lead.zone)}</td></tr>` : ""}
-        </table>
-
-        ${
-          lead.message
-            ? `<div style="margin:16px 0 0;padding:14px 16px;background:#faf9f4;border-left:3px solid #c9c4b4;border-radius:0 8px 8px 0">
-                 <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#8a8578">Mensaje</p>
-                 <p style="margin:0;font-size:14px;line-height:1.55;color:#2a281f">${escapeHtml(lead.message).replace(/\n/g, "<br/>")}</p>
-               </div>`
-            : ""
-        }
       </div>
 
-      <!-- Atribución -->
-      <div style="margin-top:14px;padding:16px 20px;background:#efece3;border-radius:12px">
-        <p style="color:#8a8578;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px">Atribución</p>
-        <table style="border-collapse:collapse">${attrTable || attrRow("Origen", "directo/orgánico")}</table>
+      <div style="margin-top:14px;padding:16px 20px;background:#e4e4e2;border-radius:6px">
+        <span style="color:#8a8a8a;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;font-weight:600">Origen</span>
+        <span style="margin-left:12px;font-size:14px;font-weight:600;color:#222222">${origin}</span>${campaign ? `<span style="margin-left:8px;font-size:13px;color:#9a9a9a">· ${campaign}</span>` : ""}
       </div>
 
-      <p style="text-align:center;color:#b0ab9c;font-size:11px;margin:16px 0 0">Lead #${escapeHtml(lead.id)}</p>
+      <p style="text-align:center;color:#b0b0b0;font-size:11px;margin:16px 0 0">Lead #${escapeHtml(lead.id)}</p>
     </div>
   </div>`;
 
