@@ -3,6 +3,7 @@
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { siteConfig } from "@/lib/config";
+import { trackContact } from "@/lib/track-client";
 
 export default function ContactoContent() {
   const { t } = useLanguage();
@@ -46,6 +47,7 @@ export default function ContactoContent() {
               {/* Phone */}
               <a
                 href={`tel:${siteConfig.phone}`}
+                onClick={() => trackContact("phone")}
                 className="flex items-start gap-5 bg-[#111] border border-[#1e1e1e] p-6 hover:border-[#C9B99A]/40 transition-colors group"
               >
                 <div className="w-12 h-12 border border-[#C9B99A]/30 flex items-center justify-center shrink-0 group-hover:bg-[#C9B99A]/5 transition-colors">
@@ -67,6 +69,7 @@ export default function ContactoContent() {
                 href={siteConfig.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackContact("whatsapp")}
                 className="flex items-start gap-5 bg-[#111] border border-[#1e1e1e] p-6 hover:border-[#25D366]/30 transition-colors group"
               >
                 <div className="w-12 h-12 border border-[#25D366]/20 flex items-center justify-center shrink-0 group-hover:bg-[#25D366]/5 transition-colors">
@@ -86,6 +89,7 @@ export default function ContactoContent() {
               {/* Email */}
               <a
                 href={`mailto:${siteConfig.email}`}
+                onClick={() => trackContact("email")}
                 className="flex items-start gap-5 bg-[#111] border border-[#1e1e1e] p-6 hover:border-[#C9B99A]/40 transition-colors group"
               >
                 <div className="w-12 h-12 border border-[#C9B99A]/30 flex items-center justify-center shrink-0 group-hover:bg-[#C9B99A]/5 transition-colors">
