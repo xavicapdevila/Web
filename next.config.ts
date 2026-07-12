@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
  poweredByHeader: false,
  reactStrictMode: true,
 
+ // Solo tooling local: permite a una segunda sesión (otro chat/preview) arrancar
+ // su propio `next dev` con un distDir separado (Next 16 bloquea dos dev servers
+ // sobre el mismo .next). Sin la variable — Vercel incluido — no cambia nada.
+ ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
+
  serverExternalPackages: ["better-sqlite3", "sharp"],
 
  experimental: {
