@@ -25,12 +25,12 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex flex-col leading-none items-start">
-              <img src="/logo.svg" alt="The Vila Home" className="h-10 w-auto -ml-[9px]" />
-              <span className="text-[#555] text-[10px] tracking-[0.3em] uppercase font-body mt-2">
+              <img src="/logo.svg" alt="The Vila Home" width={180} height={57} className="h-10 w-auto -ml-[9px]" />
+              <span className="text-[#8a8a8a] text-[10px] tracking-[0.3em] uppercase font-body mt-2">
                 Human Real Estate
               </span>
             </Link>
-            <p className="mt-6 text-[#666] text-sm leading-relaxed max-w-xs">
+            <p className="mt-6 text-[#8a8a8a] text-sm leading-relaxed max-w-xs">
               {t("footerTagline")}
             </p>
             <div className="flex items-center gap-4 mt-6">
@@ -80,7 +80,7 @@ export default function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors"
+                    className="text-[#8a8a8a] hover:text-[#C9B99A] text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -101,7 +101,7 @@ export default function Footer() {
                 { href: "/zona/vilafranca",        label: "Vilafranca del Penedès" },
               ].map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors">
+                  <Link href={link.href} className="text-[#8a8a8a] hover:text-[#C9B99A] text-sm transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -118,7 +118,7 @@ export default function Footer() {
               <li>
                 <a
                   href={`tel:${siteConfig.phone}`}
-                  className="flex items-start gap-3 text-[#666] hover:text-[#C9B99A] transition-colors group"
+                  className="flex items-start gap-3 text-[#8a8a8a] hover:text-[#C9B99A] transition-colors group"
                 >
                   <Phone size={14} className="mt-0.5 shrink-0" />
                   <span className="text-sm">{siteConfig.phoneDisplay}</span>
@@ -127,7 +127,7 @@ export default function Footer() {
               <li>
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="flex items-start gap-3 text-[#666] hover:text-[#C9B99A] transition-colors"
+                  className="flex items-start gap-3 text-[#8a8a8a] hover:text-[#C9B99A] transition-colors"
                 >
                   <Mail size={14} className="mt-0.5 shrink-0" />
                   <span className="text-sm">{siteConfig.email}</span>
@@ -138,7 +138,7 @@ export default function Footer() {
                   href={siteConfig.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 text-[#666] hover:text-[#C9B99A] transition-colors"
+                  className="flex items-start gap-3 text-[#8a8a8a] hover:text-[#C9B99A] transition-colors"
                 >
                   <MapPin size={14} className="mt-0.5 shrink-0" />
                   <span className="text-sm leading-relaxed">
@@ -180,7 +180,7 @@ export default function Footer() {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-[#666] hover:text-[#C9B99A] text-sm transition-colors"
+                  className="text-[#8a8a8a] hover:text-[#C9B99A] text-sm transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -190,20 +190,20 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[#444] text-xs">{t("footerRights")}</p>
+          <p className="text-[#7a7a7a] text-xs">{t("footerRights")}</p>
           <div className="flex items-center gap-6 flex-wrap justify-center">
-            <Link href="/aviso-legal" className="text-[#444] hover:text-[#666] text-xs transition-colors">
+            <Link href="/aviso-legal" className="text-[#7a7a7a] hover:text-[#C9B99A] text-xs transition-colors">
               {t("footerLegal")}
             </Link>
-            <Link href="/privacidad" className="text-[#444] hover:text-[#666] text-xs transition-colors">
+            <Link href="/privacidad" className="text-[#7a7a7a] hover:text-[#C9B99A] text-xs transition-colors">
               {t("footerPrivacy")}
             </Link>
-            <Link href="/cookies" className="text-[#444] hover:text-[#666] text-xs transition-colors">
+            <Link href="/cookies" className="text-[#7a7a7a] hover:text-[#C9B99A] text-xs transition-colors">
               {t("footerCookies")}
             </Link>
             <button
               onClick={openPreferences}
-              className="text-[#444] hover:text-[#666] text-xs transition-colors"
+              className="text-[#7a7a7a] hover:text-[#C9B99A] text-xs transition-colors"
             >
               {t("cookieManage")}
             </button>
@@ -211,7 +211,7 @@ export default function Footer() {
               href={siteConfig.canalDenuncia}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#444] hover:text-[#666] text-xs transition-colors"
+              className="text-[#7a7a7a] hover:text-[#C9B99A] text-xs transition-colors"
             >
               {t("footerComplaints")}
             </a>

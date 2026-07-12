@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
 
  images: {
    formats: ["image/avif", "image/webp"],
+   // Next 16 exige declarar toda calidad no estándar que se use en <Image quality>.
+   // 65 = miniaturas de tarjeta (PropertyCard); 75 = resto (por defecto).
+   qualities: [65, 75],
    minimumCacheTTL: 604800, // 7 days — property images rarely change
    // Restricted to the hosts we actually load images from. A wildcard ("**")
    // turns /_next/image into an open proxy → SSRF + bandwidth/quota abuse.

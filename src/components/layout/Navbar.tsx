@@ -59,7 +59,7 @@ export default function Navbar() {
             className="flex items-center leading-none group cursor-pointer"
             aria-label={isHome ? "Volver arriba" : "Inicio"}
           >
-            <img src="/logo.svg" alt="The Vila Home" className="h-9 w-auto" />
+            <img src="/logo.svg" alt="The Vila Home" width={180} height={57} className="h-9 w-auto" />
           </Link>
 
           {/* Desktop nav */}

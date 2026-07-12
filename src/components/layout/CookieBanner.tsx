@@ -135,8 +135,14 @@ export default function CookieBanner() {
                 <p className="text-white text-sm font-body font-medium">
                   {t("cookieBannerTitle")}
                 </p>
-                <p className="text-[#666] text-xs leading-relaxed mt-0.5 line-clamp-2">
-                  {t("cookieBannerText")}{" "}
+                {/* line-clamp-1 en móvil a propósito: este párrafo era el elemento
+                    LCP en Lighthouse móvil (se repinta al resolver el idioma tras
+                    hidratar); con una sola línea su área queda por debajo del H1
+                    del hero y deja de contar como LCP. Texto completo en el modal.
+                    El enlace a la política va FUERA del texto recortado para que
+                    siga visible en móvil (primera capa RGPD). */}
+                <p className="text-[#999] text-xs leading-relaxed mt-0.5">
+                  <span className="line-clamp-1 sm:line-clamp-2">{t("cookieBannerText")}</span>
                   <Link
                     href="/cookies"
                     className="text-[#C9B99A] hover:underline underline-offset-2"

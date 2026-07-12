@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Script from "next/script";
 import Hero from "@/components/home/Hero";
@@ -186,9 +185,12 @@ export default async function HomePage() {
       />
       <Hero rating={placeData.rating} totalReviews={placeData.totalReviews} />
       <HowWeWork />
-      <Suspense fallback={<div className="h-96 bg-[#0a0a0a]" />}>
-        <FeaturedProperties properties={featured} />
-      </Suspense>
+      {/* SIN <Suspense>: los datos ya están resueltos antes de renderizar, así
+          que el boundary no aportaba streaming. Sí causaba React #418: con
+          hidratación selectiva, el LanguageProvider cambiaba de idioma (efecto)
+          antes de hidratarse este subárbol, y el cliente (en/ca/fr) no cuadraba
+          con el HTML del servidor (es). */}
+      <FeaturedProperties properties={featured} />
       <Testimonials
         reviews={placeData.reviews}
         rating={placeData.rating}
