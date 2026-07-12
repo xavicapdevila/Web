@@ -160,7 +160,12 @@
 
 @keyframes fadeUp {
   from {
-    opacity: 0;
+    /* 0.01 y no 0 A PROPÓSITO: Chrome excluye del LCP los elementos que se
+       pintan por primera vez con opacity:0, y el hero entero usa esta
+       animación. Con 0.01 (invisible al ojo) el H1 cuenta como candidato LCP
+       desde el primer frame; con 0, el LCP acababa siendo el texto del banner
+       de cookies a los 4,5 s. Mismo efecto visual. */
+    opacity: 0.01;
     transform: translateY(20px);
   }
   to {
