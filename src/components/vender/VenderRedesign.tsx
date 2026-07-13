@@ -43,18 +43,27 @@ function useLenis() {
 function Cursor() {
   const dot = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState(false);
+  /* Oculto hasta el primer mousemove (si no, nace clavado en el centro de
+     la pantalla) y también sobre iframes (el documento deja de recibir
+     mousemove dentro del Matterport y el punto se quedaba congelado
+     encima del tour, negro por el mix-blend-difference). */
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
     if (!window.matchMedia("(pointer:fine)").matches) return;
     const el = dot.current!;
     let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, raf = 0;
-    const move = (e: MouseEvent) => { x = e.clientX; y = e.clientY; };
-    const over = (e: MouseEvent) => setHovering(!!(e.target as HTMLElement).closest("a,button,[data-cursor]"));
+    const move = (e: MouseEvent) => { x = e.clientX; y = e.clientY; setVisible(true); };
+    const over = (e: MouseEvent) => {
+      const t = e.target as HTMLElement;
+      setHovering(!!t.closest("a,button,[data-cursor]"));
+      if (t.tagName === "IFRAME" || t.closest("iframe")) setVisible(false);
+    };
     const loop = () => { cx += (x - cx) * 0.18; cy += (y - cy) * 0.18; el.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`; raf = requestAnimationFrame(loop); };
     addEventListener("mousemove", move); addEventListener("mouseover", over); raf = requestAnimationFrame(loop);
     return () => { removeEventListener("mousemove", move); removeEventListener("mouseover", over); cancelAnimationFrame(raf); };
   }, []);
   return (
-    <div ref={dot} aria-hidden className="pointer-events-none fixed left-0 top-0 z-[90] hidden lg:block mix-blend-difference">
+    <div ref={dot} aria-hidden className={`pointer-events-none fixed left-0 top-0 z-[90] hidden lg:block mix-blend-difference transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
       <div className={`rounded-full bg-white transition-[width,height] duration-300 ease-out ${hovering ? "w-12 h-12" : "w-2.5 h-2.5"}`} />
     </div>
   );
