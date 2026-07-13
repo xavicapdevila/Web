@@ -184,6 +184,19 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaFaq) }}
       />
       <Hero rating={placeData.rating} totalReviews={placeData.totalReviews} />
+      {/* Retira el splash (#app-splash, ver layout.tsx) en cuanto el hero está
+          parseado, sin esperar a DOMContentLoaded: el overlay es opaco y Chrome
+          no pinta nada debajo, así que mantenerlo hasta DCL convertía la
+          retirada del splash en el FCP/LCP de la home (4,5 s en móvil PSI).
+          <script> nativo a propósito: se ejecuta durante el parseo (tras el CSS
+          bloqueante) — next/script llegaría tarde. El listener de layout.tsx y
+          el fallback CSS de 6s siguen como red de seguridad. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "(function(){var e=document.getElementById('app-splash');if(e)e.classList.add('app-splash-done')})();",
+        }}
+      />
       <HowWeWork />
       {/* SIN <Suspense>: los datos ya están resueltos antes de renderizar, así
           que el boundary no aportaba streaming. Sí causaba React #418: con
