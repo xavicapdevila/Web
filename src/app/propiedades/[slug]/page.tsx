@@ -56,6 +56,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .filter(Boolean)
       .join(" ");
 
+    // Vista previa al compartir (WhatsApp/Telegram/redes): SIN precio, para que
+    // tengan que entrar a la web a verlo y así generamos tráfico. El precio sí
+    // se mantiene en el <title> HTML y la description (Google/SEO), que no son
+    // lo que renderiza el enlace compartido.
+    const socialTitle = `${property.tipo} en ${property.ciudad}${property.zona ? ` — ${property.zona}` : ""}`;
+    const socialDescription = [
+      `${property.tipo} en venta en ${property.ciudad}${property.zona ? ` (${property.zona})` : ""}.`,
+      features.length ? features.join(", ") + "." : "",
+      property.descripcion
+        ? property.descripcion.replace(/\n/g, " ").slice(0, 120) + "…"
+        : "Descubre el precio y todos los detalles en la ficha.",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     const canonicalUrl = `${BASE_URL}/propiedades/${slug}`;
     // Use the first property photo directly — most reliable for WhatsApp/Telegram scrapers
     const ogImage = property.imagenes[0]?.url ?? `${BASE_URL}/og-image.jpg`;
@@ -69,8 +84,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         url: canonicalUrl,
         siteName: "The Vila Home",
         locale: "es_ES",
-        title,
-        description,
+        title: socialTitle,
+        description: socialDescription,
         images: [
           {
             url: ogImage,
@@ -83,8 +98,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: {
         card: "summary_large_image",
         site: "@thevilahome",
-        title,
-        description,
+        title: socialTitle,
+        description: socialDescription,
         images: [ogImage],
       },
     };
