@@ -58,6 +58,7 @@ export interface TpCopy {
   how1: string;
   how2: string;
   how3: string;
+  how3b: string;
   cta2h: string;
   cta2b: string;
   flegal: string;
@@ -124,7 +125,7 @@ export const TP_COPY: Record<TpLang, TpCopy> = {
     wa: "¿Prefieres escribirnos? WhatsApp directo",
     okfollow: "Mientras tanto, mira cómo trabajamos:",
     s1: "familias acompañadas",
-    s2: "años en el Garraf",
+    s2: "años de experiencia",
     ovHon: "SIN LETRA PEQUEÑA",
     hon1: "Nada de prometerte la luna para conseguir tu firma.",
     hon2: "Una opinión honesta, un plan claro,",
@@ -133,7 +134,8 @@ export const TP_COPY: Record<TpLang, TpCopy> = {
     ovHow: "CÓMO FUNCIONA",
     how1: "Nos dices tu cifra.",
     how2: "La miramos con ventas reales de tu zona.",
-    how3: "Te llamamos con una propuesta clara. 15 minutos, sin compromiso.",
+    how3: "Te llamamos con una propuesta clara.",
+    how3b: "15 minutos, sin compromiso.",
     cta2h: "¿Tienes tu cifra?",
     cta2b: "Empezar — 30 segundos",
     flegal: "Aviso legal",
@@ -210,7 +212,7 @@ export const TP_COPY: Record<TpLang, TpCopy> = {
     wa: "Prefereixes escriure’ns? WhatsApp directe",
     okfollow: "Mentrestant, mira com treballem:",
     s1: "famílies acompanyades",
-    s2: "anys al Garraf",
+    s2: "anys d’experiència",
     ovHon: "SENSE LLETRA PETITA",
     hon1: "Res de prometre’t la lluna per aconseguir la teva firma.",
     hon2: "Una opinió honesta, un pla clar,",
@@ -219,7 +221,8 @@ export const TP_COPY: Record<TpLang, TpCopy> = {
     ovHow: "COM FUNCIONA",
     how1: "Ens dius la teva xifra.",
     how2: "La mirem amb vendes reals de la teva zona.",
-    how3: "Et truquem amb una proposta clara. 15 minuts, sense compromís.",
+    how3: "Et truquem amb una proposta clara.",
+    how3b: "15 minuts, sense compromís.",
     cta2h: "Tens la teva xifra?",
     cta2b: "Comença — 30 segons",
     flegal: "Avís legal",
@@ -268,16 +271,18 @@ export const TP_COPY: Record<TpLang, TpCopy> = {
   },
 };
 
-/* Frases del marquee tipográfico (decorativo, aria-hidden). Extractos reales
-   de reseñas de Google, fijados a propósito: el ancho del marquee no debe
-   depender del feed vivo. */
+/* Zonas donde se ha vendido, para el marquee (decorativo, aria-hidden).
+   Orden de Xavi: comarca primero, Tarragona y Barcelona al final. */
 export const TP_MARQUEE = [
-  "«La seva gestió ha estat impecable»",
-  "«Trato cercano y transparente»",
-  "«Transparència des del principi»",
-  "«Recomendable totalmente»",
-  "«Siempre atenta y dispuesta a ayudarnos»",
-  "«Honesta, eficiente»",
+  "Vilanova i la Geltrú",
+  "Sant Pere de Ribes",
+  "Cubelles",
+  "Cunit",
+  "Calafell",
+  "Vilafranca del Penedès",
+  "Olivella",
+  "Tarragona",
+  "Barcelona",
 ];
 
 /** Datos de reseñas que recibe la landing (server → cliente). */

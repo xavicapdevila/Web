@@ -673,18 +673,37 @@ export default function TuPrecioLanding({
               <div className="oksoc">
                 <p className="okfollow">{t.okfollow}</p>
                 <div className="socrow">
-                  <a href="https://www.instagram.com/thevilahome" target="_blank" rel="noopener">
-                    Instagram
-                  </a>
-                  <a href="https://www.tiktok.com/@thevilahome" target="_blank" rel="noopener">
-                    TikTok
+                  <a
+                    href="https://www.instagram.com/thevilahome"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Instagram"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                      <rect x="2.8" y="2.8" width="18.4" height="18.4" rx="5.4" />
+                      <circle cx="12" cy="12" r="4.2" />
+                      <circle cx="17.4" cy="6.6" r="1.15" fill="currentColor" stroke="none" />
+                    </svg>
                   </a>
                   <a
                     href="https://www.facebook.com/profile.php?id=100093001283637"
                     target="_blank"
                     rel="noopener"
+                    aria-label="Facebook"
                   >
-                    Facebook
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M13.4 21.5v-7.1h2.38l.45-2.93H13.4V9.56c0-.8.39-1.58 1.65-1.58h1.28V5.49s-1.16-.2-2.27-.2c-2.31 0-3.82 1.4-3.82 3.94v2.24H7.9v2.93h2.34v7.1a11.9 11.9 0 0 0 3.16 0Z" />
+                    </svg>
+                  </a>
+                  <a
+                    href="https://www.tiktok.com/@thevilahome"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="TikTok"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M16.6 5.82A4.28 4.28 0 0 1 15.52 3h-3.09v12.4a2.6 2.6 0 1 1-2.59-2.72c.26 0 .52.04.77.11V9.64a5.92 5.92 0 0 0-.77-.05A5.7 5.7 0 1 0 15.53 15.3V9.86a7.3 7.3 0 0 0 4.27 1.37V8.14a4.31 4.31 0 0 1-3.2-2.32Z" />
+                    </svg>
                   </a>
                 </div>
               </div>
@@ -701,7 +720,7 @@ export default function TuPrecioLanding({
           </span>
           <span className="sti">
             <b>
-              <CountN n={15} />
+              +<CountN n={15} />
             </b>{" "}
             {t.s2}
           </span>
@@ -713,11 +732,11 @@ export default function TuPrecioLanding({
           </span>
         </div>
 
+        {/* Zonas donde hemos vendido (marquee decorativo) */}
         <div className="mq rv" aria-hidden="true">
           <div className="mqt">
             {[...TP_MARQUEE, ...TP_MARQUEE].map((q, i) => (
               <span key={i} className="mqi">
-                <b>★★★★★</b>
                 {q}
               </span>
             ))}
@@ -726,9 +745,15 @@ export default function TuPrecioLanding({
 
         <section className="manif">
           <p className="overline rv">{t.ovHon}</p>
-          <p className="rv">
-            <span>{t.hon1}</span> <span>{t.hon2}</span> <span className="mks">{t.hon3}</span>
-          </p>
+          <div className="manifbox rv">
+            <span className="masterisk" aria-hidden="true">
+              ✱
+            </span>
+            <p className="mbig">{t.hon1}</p>
+            <p className="msub">
+              {t.hon2} <span className="mks">{t.hon3}</span>
+            </p>
+          </div>
         </section>
 
         <section className="proof">
@@ -760,16 +785,23 @@ export default function TuPrecioLanding({
           <p className="overline rv">{t.ovHow}</p>
           <ol>
             <li className="rv">
-              <span className="n">01</span>
-              <p>{t.how1}</p>
+              <span className="dot">01</span>
+              <div className="hstep">
+                <p>{t.how1}</p>
+              </div>
             </li>
             <li className="rv">
-              <span className="n">02</span>
-              <p>{t.how2}</p>
+              <span className="dot">02</span>
+              <div className="hstep">
+                <p>{t.how2}</p>
+              </div>
             </li>
             <li className="rv">
-              <span className="n">03</span>
-              <p>{t.how3}</p>
+              <span className="dot">03</span>
+              <div className="hstep">
+                <p>{t.how3}</p>
+                <p className="hsub">{t.how3b}</p>
+              </div>
             </li>
           </ol>
         </section>
