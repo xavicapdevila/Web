@@ -10,6 +10,10 @@ export interface PlaceData {
   reviews: GoogleReview[];
   rating: number;
   totalReviews: number;
+  /** true = datos reales de la API de Places; false = fallback estático.
+      Las superficies que prometen «nunca un número inventado» (landing
+      Tu precio) ocultan el contador cuando esto es false. */
+  live: boolean;
 }
 
 const PLACE_ID = "ChIJhciFmN6HoxIRfBIcpyI-w6Q";
@@ -17,6 +21,7 @@ const PLACE_ID = "ChIJhciFmN6HoxIRfBIcpyI-w6Q";
 export const FALLBACK_PLACE_DATA: PlaceData = {
   rating: 4.9,
   totalReviews: 106,
+  live: false,
   reviews: [
     {
       author: "Jordi Pons",
@@ -88,6 +93,7 @@ async function fetchPlaceData(): Promise<PlaceData> {
       reviews: reviews.length > 0 ? reviews : FALLBACK_PLACE_DATA.reviews,
       rating: data.rating ?? FALLBACK_PLACE_DATA.rating,
       totalReviews: data.userRatingCount ?? FALLBACK_PLACE_DATA.totalReviews,
+      live: typeof data.userRatingCount === "number",
     };
   } catch (err) {
     console.error("[Google Places]", err);
@@ -95,8 +101,10 @@ async function fetchPlaceData(): Promise<PlaceData> {
   }
 }
 
+// 6 h: mantiene el contador de reseñas razonablemente fresco (la landing de
+// campaña lo enseña en grande) por ~4 llamadas a Places al día.
 export const getGooglePlaceData = unstable_cache(
   fetchPlaceData,
   ["google-place-data"],
-  { revalidate: 86400 }
+  { revalidate: 21600 }
 );
