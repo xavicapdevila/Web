@@ -160,6 +160,27 @@ function CompareRooms({ c }: { c: ComoCopy }) {
 function PhoneReel({ c }: { c: ComoCopy }) {
   const v = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+
+  // Precalentado sin recomprimir: al acercarse el vídeo a la vista, empezar a
+  // bufferizar (preload auto) para que el play sea instantáneo. Se dispara una
+  // sola vez y solo si el usuario llega a la sección del vídeo.
+  useEffect(() => {
+    const el = v.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          el.preload = "auto";
+          try { el.load(); } catch {}
+          io.disconnect();
+        }
+      },
+      { rootMargin: "250px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const toggle = () => {
     const el = v.current;
     if (!el) return;
@@ -170,7 +191,7 @@ function PhoneReel({ c }: { c: ComoCopy }) {
     <div className="relative mx-auto w-[min(74vw,330px)] text-center">
       <div data-cursor className="relative aspect-[9/16] overflow-hidden rounded-[2.4rem] bg-[#0C0B09] ring-1 ring-[#16150F]/15 shadow-[0_70px_140px_-60px_rgba(22,21,15,0.65)]">
         <video
-          ref={v} src={c.video.src} poster={c.video.poster} preload="none" loop playsInline
+          ref={v} src={c.video.src} poster={c.video.poster} preload="metadata" loop playsInline
           onClick={toggle} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
           className="absolute inset-0 h-full w-full object-cover"
         />

@@ -222,6 +222,13 @@ const nextConfig: NextConfig = {
        source: "/(favicon.ico|favicon.svg|favicon-:size.png|apple-touch-icon.png|android-chrome-:size.png)",
        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
      },
+     // Vídeos estáticos (p.ej. el reel de /como-trabajamos): por defecto Next
+     // los sirve con max-age=0, así que se re-descargan en CADA reproducción.
+     // Se cachean 30 días (URL estable; si se cambia el vídeo, renómbralo).
+     {
+       source: "/:path*.mp4",
+       headers: [{ key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" }],
+     },
    ];
  },
 };
