@@ -32,7 +32,7 @@ export const COMO_COPY = {
 
   intro: {
     lines: ["La mayoría de anuncios se preparan en una tarde.", "El tuyo va a competir contra todos ellos."],
-    strong: "Por eso, antes de publicar tu casa, la producimos entera.",
+    strong: "Por eso, antes de publicarla, preparamos cada detalle.",
   },
 
   foto: {

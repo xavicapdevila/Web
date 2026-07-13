@@ -139,6 +139,7 @@ export interface VenderCopy {
     consent: string; // texto antes del enlace
     consentLink: string; // "política de privacidad"
     consentAfter: string; // texto después del enlace
+    consentCheck: string; // etiqueta de la casilla obligatoria de RGPD
     error: string;
     okTitle: string;
     okText: string;
@@ -350,6 +351,7 @@ const es: VenderCopy = {
     consent: "Al enviar aceptas nuestra ",
     consentLink: "política de privacidad",
     consentAfter: ". No compartimos tus datos ni te llenamos el buzón de spam.",
+    consentCheck: "He leído y acepto la",
     error: "No se ha podido enviar. Inténtalo de nuevo o escríbenos a ",
     okTitle: "Recibido. Gracias.",
     okText: "Uno de nosotros —una persona, no un robot— te llamará en menos de 24 h laborables para conocer tu caso. Si lo prefieres, escríbenos ahora mismo por WhatsApp.",
@@ -556,6 +558,7 @@ const ca: VenderCopy = {
     consent: "En enviar acceptes la nostra ",
     consentLink: "política de privacitat",
     consentAfter: ". No compartim les teves dades ni t'omplim la bústia de spam.",
+    consentCheck: "He llegit i accepto la",
     error: "No s'ha pogut enviar. Torna-ho a provar o escriu-nos a ",
     okTitle: "Rebut. Gràcies.",
     okText: "Un de nosaltres —una persona, no un robot— et trucarà en menys de 24 h laborables per conèixer el teu cas. Si ho prefereixes, escriu-nos ara mateix per WhatsApp.",
@@ -762,6 +765,7 @@ const en: VenderCopy = {
     consent: "By submitting you accept our ",
     consentLink: "privacy policy",
     consentAfter: ". We don't share your data or fill your inbox with spam.",
+    consentCheck: "I have read and accept the",
     error: "Couldn't send. Try again or email us at ",
     okTitle: "Received. Thank you.",
     okText: "One of us —a real person, not a bot— will call you within 24 working hours to learn about your case. If you prefer, message us right now on WhatsApp.",
@@ -968,6 +972,7 @@ const fr: VenderCopy = {
     consent: "En envoyant, vous acceptez notre ",
     consentLink: "politique de confidentialité",
     consentAfter: ". Nous ne partageons pas vos données et n'inondons pas votre boîte de spam.",
+    consentCheck: "J'ai lu et j'accepte la",
     error: "Envoi impossible. Réessayez ou écrivez-nous à ",
     okTitle: "Bien reçu. Merci.",
     okText: "L'un de nous —une personne, pas un robot— vous appellera sous 24 heures ouvrées pour comprendre votre situation. Si vous préférez, écrivez-nous maintenant sur WhatsApp.",

@@ -98,6 +98,12 @@ export async function POST(request: Request) {
     if (!name || !phone || !email || !zone) {
       return NextResponse.json({ error: 'missing_fields' }, { status: 400 })
     }
+    // RGPD: si el formulario envía la casilla de consentimiento y llega sin
+    // marcar, no procesamos el lead. El formulario clásico (que no envía este
+    // campo) no se ve afectado.
+    if (body.consent === false) {
+      return NextResponse.json({ error: 'consent_required' }, { status: 400 })
+    }
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
       return NextResponse.json({ error: 'invalid_email' }, { status: 400 })
     }
@@ -127,6 +133,7 @@ export async function POST(request: Request) {
       email,
       zone,
       precio: precio || undefined,
+      consent: body.consent === true ? true : undefined, // traza RGPD
       message: message || undefined,
       source,
       utm_source: attrStr(attribution.utm_source),

@@ -26,6 +26,7 @@ export interface StoredLead {
   email: string;
   zone: string;
   precio?: string; // precio pensado por el vendedor (formulario «pon tu precio»)
+  consent?: boolean; // aceptación explícita de la política de privacidad (RGPD)
   message?: string;
   source?: string; // formulario de origen (vender | como-trabajamos | …)
   // Atribución

@@ -124,6 +124,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
       email: fd.get("email"),
       zone: capWords(zone),
       precio: askPrice ? String(fd.get("precio") ?? "").trim() : "",
+      consent: fd.get("consent") === "on", // RGPD (la casilla es obligatoria)
       message: "",
       source,
       company: fd.get("company"), // honeypot
@@ -280,8 +281,17 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
                 className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
             </label>
           </div>
+          {/* RGPD: casilla de consentimiento OBLIGATORIA (required) — el
+              navegador bloquea el envío si no está marcada. */}
+          <label className="flex items-start gap-2.5 mt-5 cursor-pointer">
+            <input type="checkbox" name="consent" required={step === 2}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[#16150F] cursor-pointer" />
+            <span className="text-[12px] text-[#6a665c] leading-snug">
+              {c.consentCheck} <a href="/privacidad" target="_blank" rel="noopener" className="underline hover:text-[#16150F]">{c.consentLink}</a>.
+            </span>
+          </label>
           <button type="submit" disabled={status === "sending"}
-            className="mt-5 w-full rounded-full bg-[#16150F] text-white text-[15px] font-semibold py-4 hover:bg-black transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+            className="mt-4 w-full rounded-full bg-[#16150F] text-white text-[15px] font-semibold py-4 hover:bg-black transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
             {status === "sending" ? c.sending : (submitLabel ?? c.submit)}
           </button>
           {status === "error" && (
@@ -291,7 +301,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
           )}
           <button type="button" onClick={back} className="mt-3 text-[13px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">Atrás</button>
           <p className="text-[11px] text-[#A8A294] leading-relaxed mt-4">
-            {c.consent}<a href="/privacidad" className="underline hover:text-[#16150F]">{c.consentLink}</a>{c.consentAfter}
+            {c.consentAfter.replace(/^\.\s*/, "")}
           </p>
         </div>
       </div>
