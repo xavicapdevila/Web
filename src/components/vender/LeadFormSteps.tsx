@@ -6,6 +6,7 @@ import { siteConfig } from "@/lib/config";
 import { venderContent } from "@/lib/vender-content";
 import { captureAttribution, getAttribution, getClickIds } from "@/lib/attribution";
 import { useTurnstile } from "@/hooks/useTurnstile";
+import { MUNICIPIOS_CATALUNYA } from "@/lib/catalunya-municipios";
 
 /* ─────────────────────────────────────────────────────────────────────
    Formulario de captación MULTI-PASO (3 micro-pasos):
@@ -31,16 +32,17 @@ function capWords(s: string): string {
   });
 }
 
-const ZONE_SUGGESTIONS = [
-  "Vilanova i la Geltrú", "Sant Pere de Ribes", "Les Roquetes", "Sitges",
-  "Cubelles", "Canyelles", "Olivella", "Cunit", "Calafell", "Segur de Calafell",
-  "El Vendrell", "Coma-ruga", "Vilafranca del Penedès", "Castelldefels", "Barcelona",
-];
-
 // Comparación sin acentos ni mayúsculas para el autocompletado de población.
 function normalizeZone(s: string): string {
   return s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLocaleLowerCase("es").trim();
 }
+
+// Zona de trabajo: se prioriza en las sugerencias (ya normalizada).
+const LOCAL_PRIORITY = new Set([
+  "vilanova i la geltru", "sant pere de ribes", "sitges", "cubelles", "canyelles",
+  "olivella", "cunit", "calafell", "el vendrell", "vilafranca del penedes",
+  "castelldefels", "barcelona",
+]);
 
 function newEventId(): string {
   try {
@@ -70,13 +72,27 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
   const next = () => setStep((s) => Math.min(2, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
 
-  // Sugerencias: solo tras teclear 2+ letras, sin la coincidencia exacta ya
-  // escrita, y como mucho 6 — nunca la lista entera. Texto libre siempre.
+  // Sugerencias del catálogo de municipios de Catalunya: solo tras 2+ letras,
+  // sin la coincidencia exacta ya escrita, máx. 6, priorizando prefijo y zona
+  // local. El campo admite cualquier texto igualmente (texto libre).
   const nZone = normalizeZone(zone);
   const zoneMatches =
     nZone.length < 2
       ? []
-      : ZONE_SUGGESTIONS.filter((z) => normalizeZone(z).includes(nZone) && normalizeZone(z) !== nZone).slice(0, 6);
+      : MUNICIPIOS_CATALUNYA
+          .map((m) => ({ m, n: normalizeZone(m) }))
+          .filter(({ n }) => n !== nZone && n.includes(nZone))
+          .sort((a, b) => {
+            const ap = a.n.startsWith(nZone) ? 0 : 1;
+            const bp = b.n.startsWith(nZone) ? 0 : 1;
+            if (ap !== bp) return ap - bp;
+            const al = LOCAL_PRIORITY.has(a.n) ? 0 : 1;
+            const bl = LOCAL_PRIORITY.has(b.n) ? 0 : 1;
+            if (al !== bl) return al - bl;
+            return a.n.localeCompare(b.n);
+          })
+          .slice(0, 6)
+          .map(({ m }) => m);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
