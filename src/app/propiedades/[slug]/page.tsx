@@ -72,9 +72,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .join(" ");
 
     const canonicalUrl = `${BASE_URL}/propiedades/${slug}`;
-    // Use the first property photo directly — most reliable for WhatsApp/Telegram scrapers
-    const ogImage = property.imagenes[0]?.url ?? `${BASE_URL}/og-image.jpg`;
 
+    // Imagen de la vista previa: la tarjeta 1200×630 generada en opengraph-image.tsx
+    // (foto + marca, SIN precio). Al no declarar `images` aquí, Next inyecta esa
+    // tarjeta con las dimensiones correctas (1.91:1), que WhatsApp muestra GRANDE.
+    // La foto cruda salía como miniatura pequeña por su formato 4:3.
     return {
       title,
       description,
@@ -86,21 +88,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         locale: "es_ES",
         title: socialTitle,
         description: socialDescription,
-        images: [
-          {
-            url: ogImage,
-            width: 1200,
-            height: 630,
-            alt: `${property.tipo} en ${property.ciudad} — Ref. ${property.ref}`,
-          },
-        ],
       },
       twitter: {
         card: "summary_large_image",
         site: "@thevilahome",
         title: socialTitle,
         description: socialDescription,
-        images: [ogImage],
       },
     };
   } catch {

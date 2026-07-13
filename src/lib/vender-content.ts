@@ -136,6 +136,10 @@ export interface VenderCopy {
     optional: string;
     submit: string;
     sending: string;
+    next: string; // botón «Siguiente» (formulario multi-paso)
+    back: string; // botón «Atrás»
+    thanks: string; // título de éxito personalizado, con {name}
+    waContact: string; // mensaje de WhatsApp con {name} y {phone}
     consent: string; // texto antes del enlace
     consentLink: string; // "política de privacidad"
     consentAfter: string; // texto después del enlace
