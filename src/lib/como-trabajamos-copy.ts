@@ -13,7 +13,7 @@ export const COMO_COPY = {
   hero: {
     eyebrow: "Cómo trabajamos",
     titleLead: "Tu casa solo se vende una vez.",
-    titleSub: "Esto es exactamente lo que haremos para que salga bien.",
+    titleSub: "Por eso cuidamos cada paso, del primer detalle hasta la firma.",
     cta: "Hablemos",
     scrollHint: "Baja para verlo todo",
   },

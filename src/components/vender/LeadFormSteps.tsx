@@ -37,6 +37,11 @@ const ZONE_SUGGESTIONS = [
   "El Vendrell", "Coma-ruga", "Vilafranca del Penedès", "Castelldefels", "Barcelona",
 ];
 
+// Comparación sin acentos ni mayúsculas para el autocompletado de población.
+function normalizeZone(s: string): string {
+  return s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLocaleLowerCase("es").trim();
+}
+
 function newEventId(): string {
   try {
     if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
@@ -52,6 +57,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
 
   const [step, setStep] = useState(0); // 0: zona · 1: situación · 2: contacto
   const [zone, setZone] = useState("");
+  const [zoneOpen, setZoneOpen] = useState(false);
   const [situation, setSituation] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const turnstile = useTurnstile();
@@ -63,6 +69,14 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
 
   const next = () => setStep((s) => Math.min(2, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
+
+  // Sugerencias: solo tras teclear 2+ letras, sin la coincidencia exacta ya
+  // escrita, y como mucho 6 — nunca la lista entera. Texto libre siempre.
+  const nZone = normalizeZone(zone);
+  const zoneMatches =
+    nZone.length < 2
+      ? []
+      : ZONE_SUGGESTIONS.filter((z) => normalizeZone(z).includes(nZone) && normalizeZone(z) !== nZone).slice(0, 6);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -149,19 +163,44 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
       <div ref={cardRef}>
         {/* ── Paso 1: zona ─────────────────────────────────────────── */}
         <div className={step === 0 ? "" : "hidden"}>
-          <label className="block">
-            <span className="block text-[19px] sm:text-[22px] font-medium tracking-[-0.02em] text-[#16150F]">{c.zonePh}</span>
-            <input
-              name="zone" list="tvh-zonas-steps" autoComplete="address-level2" autoCapitalize="words"
-              value={zone} onChange={(e) => setZone(e.target.value)} onBlur={(e) => setZone(capWords(e.target.value))}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); if (zone.trim()) next(); } }}
-              placeholder={c.zone}
-              className="mt-4 w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors"
-            />
-            <datalist id="tvh-zonas-steps">
-              {ZONE_SUGGESTIONS.map((z) => <option key={z} value={z} />)}
-            </datalist>
-          </label>
+          <div>
+            <label htmlFor="tvh-zone-step" className="block text-[19px] sm:text-[22px] font-medium tracking-[-0.02em] text-[#16150F]">{c.zonePh}</label>
+            {/* Autocompletado propio (sin <datalist>, que abría la lista entera al
+                enfocar). Solo sugiere tras 2+ letras y admite cualquier población
+                escrita a mano — texto libre. */}
+            <div className="relative mt-4">
+              <input
+                id="tvh-zone-step" name="zone" autoComplete="off" autoCapitalize="words"
+                role="combobox" aria-expanded={zoneOpen && zoneMatches.length > 0} aria-autocomplete="list"
+                value={zone}
+                onChange={(e) => { setZone(e.target.value); setZoneOpen(true); }}
+                onFocus={() => setZoneOpen(true)}
+                onBlur={(e) => setZone(capWords(e.target.value))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); if (zone.trim()) { setZoneOpen(false); next(); } }
+                  else if (e.key === "Escape") setZoneOpen(false);
+                }}
+                placeholder={c.zone}
+                className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors"
+              />
+              {zoneOpen && zoneMatches.length > 0 && (
+                <ul role="listbox" className="absolute left-0 right-0 top-[calc(100%+6px)] z-20 overflow-hidden rounded-xl border border-[#E7E4DB] bg-white shadow-[0_20px_50px_-20px_rgba(0,0,0,0.35)]">
+                  {zoneMatches.map((z) => (
+                    <li key={z} role="option" aria-selected={false}>
+                      <button
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()} // no perder el foco antes del click
+                        onClick={() => { setZone(z); setZoneOpen(false); }}
+                        className="block w-full text-left px-4 py-2.5 text-[15px] text-[#16150F] hover:bg-[#F4F2ED] transition-colors"
+                      >
+                        {z}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
           <button type="button" disabled={!zone.trim()} onClick={next}
             className="mt-5 w-full rounded-full bg-[#16150F] text-white text-[15px] font-medium py-3.5 hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
             Siguiente
