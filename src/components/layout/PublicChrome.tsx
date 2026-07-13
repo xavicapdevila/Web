@@ -25,6 +25,7 @@ export default function PublicChrome({ children }: { children: React.ReactNode }
     pathname.startsWith("/links") ||
     pathname.startsWith("/trabaja") ||
     pathname.startsWith("/vender") ||
+    pathname.startsWith("/como-trabajamos") ||
     pathname.startsWith("/vende-tu-casa") ||
     pathname.startsWith("/resena");
 
