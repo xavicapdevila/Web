@@ -297,7 +297,9 @@ export default function ComoTrabajamos() {
       {/* ── Nav ─────────────────────────────────────────────────────── */}
       <header className={`nav-swap fixed top-0 inset-x-0 z-50 transition-all duration-500 ${scrolled ? "py-3.5 bg-[#F4F2ED]/85 backdrop-blur-xl" : "py-6"}`}>
         <nav className={`${WRAP} flex items-center justify-between`}>
-          <a href="/" aria-label="The Vila Home">
+          {/* En pestaña nueva: la landing es de captación, no queremos que
+              pierdan el hilo si van a curiosear la web general. */}
+          <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home (se abre en una pestaña nueva)">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="The Vila Home" className="nav-logo h-7 sm:h-8 w-auto transition-all duration-500" style={{ filter: scrolled ? "brightness(0)" : "none" }} />
           </a>
@@ -517,7 +519,7 @@ export default function ComoTrabajamos() {
       {/* ── Footer ──────────────────────────────────────────────────── */}
       <footer className="bg-[#F4F2ED]">
         <div className={`${WRAP} py-9 flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <a href="/" aria-label="The Vila Home — inicio">
+          <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home — inicio (se abre en una pestaña nueva)">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="The Vila Home" className="h-6 w-auto" style={{ filter: "brightness(0)" }} />
           </a>
