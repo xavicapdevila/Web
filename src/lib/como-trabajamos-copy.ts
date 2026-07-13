@@ -101,6 +101,7 @@ export const COMO_COPY = {
     title: "Publicar es fácil. Llegar es otra cosa.",
     body: [
       "Todo este material no se queda esperando en un portal. Lo movemos donde el comprador mira cada día: portales, campañas, redes sociales y nuestra propia base de compradores.",
+      "Y no lo enseñamos a cualquiera: con campañas segmentadas, lo ponemos delante de quien de verdad puede comprar tu casa.",
       "No esperamos a que aparezca. Salimos a buscarlo.",
     ],
     channels: [
@@ -112,6 +113,7 @@ export const COMO_COPY = {
       { src: "/images/portales/luxuryestate.svg", alt: "Luxury Estate" },
       { src: "/images/portales/properstar.svg", alt: "Properstar" },
       { src: "/images/portales/instagram.svg", alt: "Instagram" },
+      { src: "/images/portales/facebook.svg", alt: "Facebook" },
       { src: "/images/portales/tiktok.svg", alt: "TikTok" },
     ],
   },

@@ -51,7 +51,7 @@ function newEventId(): string {
   return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export default function LeadFormSteps({ source = "vender", submitLabel }: { source?: string; submitLabel?: string }) {
+export default function LeadFormSteps({ source = "vender", submitLabel, askPrice = false }: { source?: string; submitLabel?: string; askPrice?: boolean }) {
   const { lang } = useLanguage();
   const full = venderContent[lang] ?? venderContent.es;
   const c = full.form;
@@ -62,6 +62,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
   const [zoneOpen, setZoneOpen] = useState(false);
   const [situation, setSituation] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [sent, setSent] = useState({ name: "", phone: "" }); // para personalizar el éxito y el WhatsApp
   const turnstile = useTurnstile();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -111,14 +112,20 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
 
     const turnstileToken = await turnstile.getToken();
 
+    const cleanName = capWords(String(fd.get("name") ?? ""));
+    const phoneVal = String(fd.get("phone") ?? "");
+    setSent({ name: cleanName, phone: phoneVal });
+
     const payload = {
       situation,
       turnstileToken,
-      name: capWords(String(fd.get("name") ?? "")),
-      phone: fd.get("phone"),
+      name: cleanName,
+      phone: phoneVal,
       email: fd.get("email"),
       zone: capWords(zone),
+      precio: askPrice ? String(fd.get("precio") ?? "").trim() : "",
       message: "",
+      source,
       company: fd.get("company"), // honeypot
       lang,
       eventId,
@@ -145,15 +152,20 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
   }
 
   if (status === "ok") {
+    const firstName = sent.name.trim().split(/\s+/)[0] || "";
+    // Mensaje de WhatsApp con el contacto ya escrito (incluye su teléfono).
+    const waMsg =
+      `Hola 👋 Soy ${sent.name || "un propietario"}. Acabo de rellenar el formulario de vuestra web para vender mi casa.` +
+      (sent.phone ? ` Mi teléfono: ${sent.phone}.` : "");
     return (
       <div className="bg-white rounded-2xl p-9 sm:p-12 text-center shadow-[0_40px_90px_-40px_rgba(0,0,0,0.5)]">
         <div className="mx-auto flex items-center justify-center w-14 h-14 rounded-full bg-[#ECE9E1] text-[#16150F]">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7"><path d="M5 12.5l4 4 10-10" /></svg>
         </div>
-        <h3 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#16150F] mt-6">{c.okTitle}</h3>
+        <h3 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#16150F] mt-6">{firstName ? `¡Gracias, ${firstName}!` : c.okTitle}</h3>
         <p className="text-[#5c584e] text-[15px] leading-relaxed mt-3 max-w-md mx-auto">{c.okText}</p>
         <a
-          href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(c.whatsappText)}`}
+          href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(waMsg)}`}
           target="_blank" rel="noopener noreferrer"
           className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-[#25D366] text-white text-sm font-semibold px-6 py-3.5 shadow-[0_14px_30px_-12px_rgba(37,211,102,0.6)] hover:brightness-105 transition"
         >
@@ -242,14 +254,31 @@ export default function LeadFormSteps({ source = "vender", submitLabel }: { sour
         {/* ── Paso 3: contacto ─────────────────────────────────────── */}
         <div className={step === 2 ? "" : "hidden"}>
           <p className="text-[19px] sm:text-[22px] font-medium tracking-[-0.02em] text-[#16150F]">{full.contact.eyebrow}</p>
-          <div className="grid gap-3.5 mt-4">
-            <input name="name" required={step === 2} placeholder={c.namePh} autoComplete="name" autoCapitalize="words"
-              onBlur={(e) => { e.target.value = capWords(e.target.value); }}
-              className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
-            <input name="phone" required={step === 2} type="tel" placeholder={c.phonePh} autoComplete="tel"
-              className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
-            <input name="email" required={step === 2} type="email" placeholder={c.emailPh} autoComplete="email"
-              className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
+          {/* Cada campo con su etiqueta encima: se ve claro qué va en cada sitio. */}
+          <div className="grid gap-4 mt-4">
+            {askPrice && (
+              <label className="block">
+                <span className="block text-[13px] font-medium text-[#16150F] mb-1.5">{c.priceLabel}</span>
+                <input name="precio" inputMode="numeric" autoComplete="off" placeholder={c.pricePh}
+                  className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
+              </label>
+            )}
+            <label className="block">
+              <span className="block text-[13px] font-medium text-[#16150F] mb-1.5">{c.name}</span>
+              <input name="name" required={step === 2} placeholder={c.namePh} autoComplete="name" autoCapitalize="words"
+                onBlur={(e) => { e.target.value = capWords(e.target.value); }}
+                className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
+            </label>
+            <label className="block">
+              <span className="block text-[13px] font-medium text-[#16150F] mb-1.5">{c.phone}</span>
+              <input name="phone" required={step === 2} type="tel" placeholder={c.phonePh} autoComplete="tel"
+                className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
+            </label>
+            <label className="block">
+              <span className="block text-[13px] font-medium text-[#16150F] mb-1.5">{c.email}</span>
+              <input name="email" required={step === 2} type="email" placeholder={c.emailPh} autoComplete="email"
+                className="w-full rounded-xl border border-[#E7E4DB] bg-white px-4 py-3.5 text-[16px] text-[#16150F] placeholder:text-[#B4AF9F] focus:border-[#16150F] focus:outline-none transition-colors" />
+            </label>
           </div>
           <button type="submit" disabled={status === "sending"}
             className="mt-5 w-full rounded-full bg-[#16150F] text-white text-[15px] font-semibold py-4 hover:bg-black transition-colors disabled:opacity-60 disabled:cursor-not-allowed">

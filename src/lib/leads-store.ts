@@ -25,7 +25,9 @@ export interface StoredLead {
   phone: string;
   email: string;
   zone: string;
+  precio?: string; // precio pensado por el vendedor (formulario «pon tu precio»)
   message?: string;
+  source?: string; // formulario de origen (vender | como-trabajamos | …)
   // Atribución
   utm_source?: string;
   utm_medium?: string;

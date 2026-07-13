@@ -129,6 +129,8 @@ export interface VenderCopy {
     emailPh: string;
     zone: string;
     zonePh: string;
+    priceLabel: string; // pregunta de precio (formulario «pon tu precio»)
+    pricePh: string;
     message: string;
     messagePh: string;
     optional: string;
@@ -335,9 +337,11 @@ const es: VenderCopy = {
     phone: "Teléfono",
     phonePh: "¿Dónde podemos llamarte?",
     email: "Correo electrónico",
-    emailPh: "Solo lo utilizaremos para contactar contigo. Nada de publi.",
+    emailPh: "nombre@correo.com",
     zone: "Población",
     zonePh: "¿Dónde se encuentra la vivienda?",
+    priceLabel: "¿Qué precio tienes pensado?",
+    pricePh: "Ej.: 350.000 € (opcional)",
     message: "Mensaje",
     messagePh: "Cuéntanos un poco sobre tu vivienda o en qué podemos ayudarte.",
     optional: "(opcional)",
@@ -348,7 +352,7 @@ const es: VenderCopy = {
     consentAfter: ". No compartimos tus datos ni te llenamos el buzón de spam.",
     error: "No se ha podido enviar. Inténtalo de nuevo o escríbenos a ",
     okTitle: "Recibido. Gracias.",
-    okText: "Te escribiremos o llamaremos en menos de 24 h laborables. Sin compromiso y sin presiones: solo para entender tu caso y decirte cómo podemos ayudarte.",
+    okText: "Uno de nosotros —una persona, no un robot— te llamará en menos de 24 h laborables para conocer tu caso. Si lo prefieres, escríbenos ahora mismo por WhatsApp.",
     whatsappCta: "Avísanos por WhatsApp",
     whatsappText: "Hola 👋 Acabo de rellenar el formulario de vuestra web para vender mi casa. Os dejo mi contacto por aquí también.",
   },
@@ -542,6 +546,8 @@ const ca: VenderCopy = {
     emailPh: "Només l'utilitzarem per contactar amb tu. Res de publi.",
     zone: "Població",
     zonePh: "On es troba l'habitatge?",
+    priceLabel: "Quin preu tens pensat?",
+    pricePh: "Ex.: 350.000 € (opcional)",
     message: "Missatge",
     messagePh: "Explica'ns una mica sobre el teu habitatge o en què et podem ajudar.",
     optional: "(opcional)",
@@ -552,7 +558,7 @@ const ca: VenderCopy = {
     consentAfter: ". No compartim les teves dades ni t'omplim la bústia de spam.",
     error: "No s'ha pogut enviar. Torna-ho a provar o escriu-nos a ",
     okTitle: "Rebut. Gràcies.",
-    okText: "T'escriurem o trucarem en menys de 24 h laborables. Sense compromís i sense pressions: només per entendre el teu cas i dir-te com podem ajudar-te.",
+    okText: "Un de nosaltres —una persona, no un robot— et trucarà en menys de 24 h laborables per conèixer el teu cas. Si ho prefereixes, escriu-nos ara mateix per WhatsApp.",
     whatsappCta: "Avisa'ns per WhatsApp",
     whatsappText: "Hola 👋 Acabo d'omplir el formulari de la vostra web per vendre casa meva. Us deixo el meu contacte per aquí també.",
   },
@@ -746,6 +752,8 @@ const en: VenderCopy = {
     emailPh: "We'll only use it to get in touch. No spam.",
     zone: "Town",
     zonePh: "Where's the property located?",
+    priceLabel: "What price do you have in mind?",
+    pricePh: "E.g. €350,000 (optional)",
     message: "Message",
     messagePh: "Tell us a bit about your home or how we can help.",
     optional: "(optional)",
@@ -756,7 +764,7 @@ const en: VenderCopy = {
     consentAfter: ". We don't share your data or fill your inbox with spam.",
     error: "Couldn't send. Try again or email us at ",
     okTitle: "Received. Thank you.",
-    okText: "We'll write or call you within 24 working hours. No commitment and no pressure: just to understand your case and tell you how we can help.",
+    okText: "One of us —a real person, not a bot— will call you within 24 working hours to learn about your case. If you prefer, message us right now on WhatsApp.",
     whatsappCta: "Ping us on WhatsApp",
     whatsappText: "Hi 👋 I've just filled in the form on your website to sell my home. Here's my contact via WhatsApp too.",
   },
@@ -950,6 +958,8 @@ const fr: VenderCopy = {
     emailPh: "Uniquement pour vous contacter. Aucune pub.",
     zone: "Ville",
     zonePh: "Où se trouve le bien ?",
+    priceLabel: "Quel prix avez-vous en tête ?",
+    pricePh: "Ex. : 350 000 € (facultatif)",
     message: "Message",
     messagePh: "Parlez-nous un peu de votre bien ou de ce dont vous avez besoin.",
     optional: "(facultatif)",
@@ -960,7 +970,7 @@ const fr: VenderCopy = {
     consentAfter: ". Nous ne partageons pas vos données et n'inondons pas votre boîte de spam.",
     error: "Envoi impossible. Réessayez ou écrivez-nous à ",
     okTitle: "Bien reçu. Merci.",
-    okText: "Nous vous écrirons ou appellerons en moins de 24 h ouvrées. Sans engagement et sans pression : juste pour comprendre votre cas et vous dire comment nous pouvons vous aider.",
+    okText: "L'un de nous —une personne, pas un robot— vous appellera sous 24 heures ouvrées pour comprendre votre situation. Si vous préférez, écrivez-nous maintenant sur WhatsApp.",
     whatsappCta: "Prévenez-nous sur WhatsApp",
     whatsappText: "Bonjour 👋 Je viens de remplir le formulaire sur votre site pour vendre ma maison. Voici aussi mon contact par WhatsApp.",
   },

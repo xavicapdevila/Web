@@ -202,6 +202,13 @@ function waNumber(phone: string): string {
   return digits;
 }
 
+// Etiqueta legible del formulario de origen (qué landing generó el lead).
+const SOURCE_LABELS: Record<string, string> = {
+  "como-trabajamos": "Web · Pon tu precio",
+  "vender-preview": "Web · Vender",
+  vender: "Web · Vender",
+};
+
 // Origen legible del lead (de dónde viene), a partir de UTMs / click ids.
 function originLabel(lead: StoredLead): string {
   const s = (lead.utm_source || "").toLowerCase();
@@ -224,7 +231,9 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
   const langKey = (lead.lang || "es").toLowerCase();
   const langName = LANG_NAMES[langKey] ?? (lead.lang || "—");
 
-  const origin = escapeHtml(originLabel(lead));
+  // El origen prioriza el formulario (landing) sobre la atribución de campaña.
+  const sourceKey = (lead.source || "").toLowerCase();
+  const origin = escapeHtml(SOURCE_LABELS[sourceKey] ?? originLabel(lead));
   const campaign = lead.utm_campaign ? escapeHtml(lead.utm_campaign) : "";
 
   const phone = escapeHtml(lead.phone);
@@ -269,6 +278,7 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
             <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;width:90px">Teléfono</td><td style="padding:5px 0"><a href="tel:${phone}" style="color:#111111;font-weight:600;text-decoration:none">${phone}</a></td></tr>
             <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Email</td><td style="padding:5px 0"><a href="mailto:${escapeHtml(lead.email)}" style="color:#111111;font-weight:600;text-decoration:none">${escapeHtml(lead.email)}</a></td></tr>
             ${lead.zone ? `<tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;vertical-align:top">Zona</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(lead.zone)}</td></tr>` : ""}
+            ${lead.precio ? `<tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;vertical-align:top">Precio pensado</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(lead.precio)}</td></tr>` : ""}
           </table>
 
           ${
@@ -291,8 +301,9 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
     </div>
   </div>`;
 
+  const subjectTag = SOURCE_LABELS[sourceKey] ?? "Web · Vender";
   return {
-    subject: `Nuevo lead (vender): ${lead.name} — ${situation}`,
+    subject: `Nuevo lead · ${subjectTag}: ${lead.name}${lead.precio ? ` — ${lead.precio}` : ` — ${situation}`}`,
     html,
   };
 }

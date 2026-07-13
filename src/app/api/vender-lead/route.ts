@@ -13,6 +13,14 @@ const TEAM_CC = ['a.garcia@thevilahome.com'] // Ariadna recibe copia de cada lea
 const FROM = 'The Vila Home <noreply@thevilahome.com>'
 const VALID_LANGS: Lang[] = ['es', 'ca', 'en', 'fr']
 
+// Enrutado del aviso interno por formulario de origen. El formulario de la
+// landing «cómo trabajamos / pon tu precio» va directo a Xavi; el resto sigue
+// como estaba (info@ + copia a Ariadna), sin tocar el flujo de /vender.
+function inboxFor(source: string): { to: string; cc: string[] } {
+  if (source === 'como-trabajamos') return { to: 'x.capdevila@thevilahome.com', cc: [] }
+  return { to: TEAM_INBOX, cc: TEAM_CC }
+}
+
 /** Extrae y sanea un valor de texto de la atribución (viene del cliente). */
 function attrStr(v: unknown): string | undefined {
   if (typeof v !== 'string') return undefined
@@ -77,8 +85,10 @@ export async function POST(request: Request) {
     const phone = String(body.phone ?? '').trim().slice(0, MAX)
     const email = String(body.email ?? '').trim().slice(0, MAX)
     const zone = String(body.zone ?? '').trim().slice(0, MAX)
+    const precio = String(body.precio ?? '').trim().slice(0, 120)
     const message = String(body.message ?? '').trim().slice(0, MAX)
     const situationKey = String(body.situation ?? '').trim().slice(0, 40)
+    const source = String(body.source ?? 'vender').trim().slice(0, 40)
     const lang: Lang = VALID_LANGS.includes(body.lang) ? body.lang : 'es'
     // Honeypot anti-bots: si viene relleno, fingimos éxito y descartamos.
     const honeypot = String(body.company ?? '').trim()
@@ -116,7 +126,9 @@ export async function POST(request: Request) {
       phone,
       email,
       zone,
+      precio: precio || undefined,
       message: message || undefined,
+      source,
       utm_source: attrStr(attribution.utm_source),
       utm_medium: attrStr(attribution.utm_medium),
       utm_campaign: attrStr(attribution.utm_campaign),
@@ -133,6 +145,7 @@ export async function POST(request: Request) {
     const resend = new Resend(process.env.RESEND_API_KEY)
     const team = buildTeamEmail(lead)
     const auto = buildAutoReplyEmail(name, lang)
+    const inbox = inboxFor(source)
     const [firstName, ...rest] = name.split(/\s+/)
 
     // Todo en paralelo y best-effort: si algo falla, no bloqueamos al usuario.
@@ -141,8 +154,8 @@ export async function POST(request: Request) {
       // 1) Aviso al equipo (crítico)
       resend.emails.send({
         from: FROM,
-        to: TEAM_INBOX,
-        cc: TEAM_CC,
+        to: inbox.to,
+        cc: inbox.cc.length ? inbox.cc : undefined,
         replyTo: email,
         subject: team.subject,
         html: team.html,
@@ -151,7 +164,7 @@ export async function POST(request: Request) {
       resend.emails.send({
         from: FROM,
         to: email,
-        replyTo: TEAM_INBOX,
+        replyTo: inbox.to,
         subject: auto.subject,
         html: auto.html,
       }),
@@ -177,7 +190,7 @@ export async function POST(request: Request) {
           fbc: attrStr(clickIds.fbc),
           fbclid: attrStr(attribution.fbclid),
           custom: {
-            content_name: 'vender',
+            content_name: source,
             content_category: lead.situation,
             lead_lang: lang,
             utm_campaign: lead.utm_campaign,

@@ -496,7 +496,9 @@ export default function ComoTrabajamos() {
           <div className="flex w-max items-center gap-14 lg:gap-20 animate-[marquee-scroll_32s_linear_infinite] motion-reduce:animate-none">
             {[...C.difusion.channels, ...C.difusion.channels].map((ch, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img key={`${ch.alt}-${i}`} src={ch.src} alt={i < C.difusion.channels.length ? ch.alt : ""} className="h-5 lg:h-6 w-auto shrink-0 object-contain grayscale invert opacity-70" />
+              // brightness-0 invert: blanquea CUALQUIER logo (los hay negros y
+              // blancos, p.ej. fotocasa; con solo `invert` el blanco salía negro).
+              <img key={`${ch.alt}-${i}`} src={ch.src} alt={i < C.difusion.channels.length ? ch.alt : ""} className="h-5 lg:h-6 w-auto shrink-0 object-contain brightness-0 invert opacity-70" />
             ))}
           </div>
         </div>
@@ -571,7 +573,7 @@ export default function ComoTrabajamos() {
             <p className="rv mt-6 mx-auto max-w-[52ch] text-center text-[15px] lg:text-[17px] leading-relaxed text-[#B7B2A6] [text-wrap:balance]">{C.cierre.body}</p>
           </div>
           <div className="rv-slow max-w-xl mx-auto mt-8 lg:mt-12">
-            <LeadFormSteps source="como-trabajamos" submitLabel={C.cierre.submitLabel} />
+            <LeadFormSteps source="como-trabajamos" submitLabel={C.cierre.submitLabel} askPrice />
           </div>
         </div>
       </section>
