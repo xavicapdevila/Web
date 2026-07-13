@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { siteConfig } from "@/lib/config";
 import { venderContent } from "@/lib/vender-content";
 import { captureAttribution, getAttribution, getClickIds } from "@/lib/attribution";
 import { useTurnstile } from "@/hooks/useTurnstile";
@@ -54,7 +55,7 @@ function newEventId(): string {
   return `lead_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export default function LeadForm({ source = "vender" }: { source?: string }) {
+export default function LeadForm({ source = "vender", whatsappOnSuccess = false, submitLabel }: { source?: string; whatsappOnSuccess?: boolean; submitLabel?: string }) {
   const { lang } = useLanguage();
   const c = (venderContent[lang] ?? venderContent.es).form;
 
@@ -134,6 +135,20 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
         </div>
         <h3 className="font-dm-serif text-3xl text-[#1A1A18] mt-6">{c.okTitle}</h3>
         <p className="text-[#5A564E] leading-relaxed mt-3 max-w-md mx-auto text-center">{c.okText}</p>
+        {whatsappOnSuccess && (
+          <a
+            href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(c.whatsappText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-[#25D366] text-white text-sm font-semibold px-6 py-3.5 shadow-[0_14px_30px_-12px_rgba(37,211,102,0.6)] hover:brightness-105 transition"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5" aria-hidden>
+              <path d="M17.5 14.4c-.3-.15-1.77-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.48s1.06 2.87 1.21 3.07c.15.2 2.09 3.2 5.07 4.48.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35Z" />
+              <path d="M12.05 2.5A9.45 9.45 0 0 0 3.9 16.73L2.5 21.5l4.9-1.29a9.45 9.45 0 1 0 4.65-17.71Zm0 17.1a7.65 7.65 0 0 1-3.9-1.07l-.28-.16-2.9.76.77-2.83-.18-.29a7.65 7.65 0 1 1 6.49 3.59Z" />
+            </svg>
+            {c.whatsappCta}
+          </a>
+        )}
       </div>
     );
   }
@@ -230,7 +245,7 @@ export default function LeadForm({ source = "vender" }: { source?: string }) {
           disabled={status === "sending"}
           className="w-full sm:w-auto rounded-full bg-[#1C1913] text-white text-sm font-semibold px-8 py-4 hover:bg-black transition-colors duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {status === "sending" ? c.sending : c.submit}
+          {status === "sending" ? c.sending : (submitLabel ?? c.submit)}
         </button>
         {status === "error" && (
           <p className="text-sm text-[#B4443A] mt-4" role="alert">

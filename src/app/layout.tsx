@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond, DM_Serif_Display, DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+
+// General Sans (Fontshare) — tipografía de la landing /vender rediseñada.
+const generalSans = localFont({
+  src: "../../public/fonts/general-sans/GeneralSans-Variable.woff2",
+  variable: "--font-general-sans",
+  weight: "200 700",
+  display: "swap",
+});
 import PublicChrome from "@/components/layout/PublicChrome";
 
 const inter = Inter({
@@ -151,7 +160,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${cormorant.variable} ${dmSerif.variable} ${dmSans.variable}`}
+      className={`${inter.variable} ${cormorant.variable} ${dmSerif.variable} ${dmSans.variable} ${generalSans.variable}`}
     >
       <head>
         {/* next/font self-aloja las fuentes: no hace falta preconnect a Google Fonts */}
@@ -159,6 +168,32 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
+        {/* Splash de arranque universal (iOS/Android/escritorio): se pinta con el
+            primer byte de HTML (antes de hidratar, antes de descargar JS) y se
+            desvanece al terminar de parsear el documento. Evita la pantalla
+            negra "muerta" al abrir la web en móvil. Estilos en globals.css. */}
+        {/* suppressHydrationWarning: el script inline le añade la clase
+            app-splash-done ANTES de que React hidrate; sin esto React se queja
+            del atributo class distinto. El nodo NUNCA se elimina del DOM
+            (solo visibility:hidden) para no romper la hidratación en móviles
+            lentos donde React llega después del DOMContentLoaded. */}
+        <div id="app-splash" aria-hidden="true" suppressHydrationWarning>
+          {/* img nativo a propósito: next/image necesita JS/hidratación y aquí
+              queremos pintar YA. El SVG pesa ~2KB y queda cacheado. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="" width={180} height={57} decoding="async" />
+          <div className="app-splash-spinner" />
+        </div>
+        <script
+          // Oculta el splash en cuanto el HTML está parseado (DOMContentLoaded),
+          // que en streaming SSR ≈ contenido ya visible. Inline a propósito:
+          // next/script se difiere y llegaría tarde. Si JS está bloqueado, el
+          // fallback CSS (animación con delay) lo retira igualmente.
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){function h(){var e=document.getElementById('app-splash');if(e)e.classList.add('app-splash-done')}if(document.readyState!=='loading'){h()}else{document.addEventListener('DOMContentLoaded',h)}})();",
+          }}
+        />
         <PublicChrome>{children}</PublicChrome>
       </body>
     </html>

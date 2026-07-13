@@ -140,6 +140,8 @@ export interface VenderCopy {
     error: string;
     okTitle: string;
     okText: string;
+    whatsappCta: string; // botón que aparece tras enviar
+    whatsappText: string; // mensaje pre-escrito de WhatsApp
   };
 
   footer: {
@@ -347,6 +349,8 @@ const es: VenderCopy = {
     error: "No se ha podido enviar. Inténtalo de nuevo o escríbenos a ",
     okTitle: "Recibido. Gracias.",
     okText: "Te escribiremos o llamaremos en menos de 24 h laborables. Sin compromiso y sin presiones: solo para entender tu caso y decirte cómo podemos ayudarte.",
+    whatsappCta: "Avísanos por WhatsApp",
+    whatsappText: "Hola 👋 Acabo de rellenar el formulario de vuestra web para vender mi casa. Os dejo mi contacto por aquí también.",
   },
   footer: { legal: "Aviso legal", privacy: "Privacidad", cookies: "Cookies" },
 };
@@ -549,6 +553,8 @@ const ca: VenderCopy = {
     error: "No s'ha pogut enviar. Torna-ho a provar o escriu-nos a ",
     okTitle: "Rebut. Gràcies.",
     okText: "T'escriurem o trucarem en menys de 24 h laborables. Sense compromís i sense pressions: només per entendre el teu cas i dir-te com podem ajudar-te.",
+    whatsappCta: "Avisa'ns per WhatsApp",
+    whatsappText: "Hola 👋 Acabo d'omplir el formulari de la vostra web per vendre casa meva. Us deixo el meu contacte per aquí també.",
   },
   footer: { legal: "Avís legal", privacy: "Privacitat", cookies: "Cookies" },
 };
@@ -751,6 +757,8 @@ const en: VenderCopy = {
     error: "Couldn't send. Try again or email us at ",
     okTitle: "Received. Thank you.",
     okText: "We'll write or call you within 24 working hours. No commitment and no pressure: just to understand your case and tell you how we can help.",
+    whatsappCta: "Ping us on WhatsApp",
+    whatsappText: "Hi 👋 I've just filled in the form on your website to sell my home. Here's my contact via WhatsApp too.",
   },
   footer: { legal: "Legal notice", privacy: "Privacy", cookies: "Cookies" },
 };
@@ -953,6 +961,8 @@ const fr: VenderCopy = {
     error: "Envoi impossible. Réessayez ou écrivez-nous à ",
     okTitle: "Bien reçu. Merci.",
     okText: "Nous vous écrirons ou appellerons en moins de 24 h ouvrées. Sans engagement et sans pression : juste pour comprendre votre cas et vous dire comment nous pouvons vous aider.",
+    whatsappCta: "Prévenez-nous sur WhatsApp",
+    whatsappText: "Bonjour 👋 Je viens de remplir le formulaire sur votre site pour vendre ma maison. Voici aussi mon contact par WhatsApp.",
   },
   footer: { legal: "Mentions légales", privacy: "Confidentialité", cookies: "Cookies" },
 };
