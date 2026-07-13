@@ -5,7 +5,8 @@ import Image from "next/image";
 import Lenis from "lenis";
 import LeadFormSteps from "@/components/vender/LeadFormSteps";
 import { siteConfig } from "@/lib/config";
-import { COMO_COPY as C } from "@/lib/como-trabajamos-copy";
+import type { Lang } from "@/lib/i18n";
+import { COMO_COPY, type ComoCopy } from "@/lib/como-trabajamos-copy";
 
 /* ─────────────────────────────────────────────────────────────────────
    THE VILA HOME · /como-trabajamos — EL MÉTODO, EN 5 CAPÍTULOS.
@@ -101,7 +102,7 @@ function ChapterHead({ n, kicker, title, body, dark }: { n: string; kicker: stri
 }
 
 /* ── Antes/Después (arrastrar) — captura de puntero + pan-y ────────── */
-function BeforeAfter({ before, after, room }: { before: string; after: string; room: string }) {
+function BeforeAfter({ before, after, room, c }: { before: string; after: string; room: string; c: ComoCopy }) {
   const [pct, setPct] = useState(52);
   const ref = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
@@ -120,8 +121,8 @@ function BeforeAfter({ before, after, room }: { before: string; after: string; r
       className="relative w-full aspect-[4/3] sm:aspect-[16/10] overflow-hidden select-none cursor-ew-resize bg-[#0C0B09] rounded-xl lg:rounded-2xl">
       <Image src={after} alt={`${room}, presentada por The Vila Home`} fill sizes="100vw" draggable={false} onDragStart={(e) => e.preventDefault()} className="object-cover" />
       <Image src={before} alt={`${room}, sin cuidar`} fill sizes="100vw" draggable={false} onDragStart={(e) => e.preventDefault()} className="object-cover" style={{ clipPath: `inset(0 ${100 - pct}% 0 0)` }} />
-      <span className={`absolute bottom-4 left-4 sm:bottom-5 sm:left-5 ${EY} text-white/90`}>{C.foto.labelBefore}</span>
-      <span className={`absolute bottom-4 right-4 sm:bottom-5 sm:right-5 ${EY} text-white`}>{C.foto.labelAfter}</span>
+      <span className={`absolute bottom-4 left-4 sm:bottom-5 sm:left-5 ${EY} text-white/90`}>{c.foto.labelBefore}</span>
+      <span className={`absolute bottom-4 right-4 sm:bottom-5 sm:right-5 ${EY} text-white`}>{c.foto.labelAfter}</span>
       <div className="absolute inset-y-0 w-px bg-white/80" style={{ left: `${pct}%` }}>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white/95 flex items-center justify-center shadow-[0_10px_30px_-8px_rgba(0,0,0,0.6)]">
           <svg viewBox="0 0 24 24" fill="none" stroke="#16150F" strokeWidth="1.6" className="w-5 h-5"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -131,15 +132,15 @@ function BeforeAfter({ before, after, room }: { before: string; after: string; r
   );
 }
 
-function CompareRooms() {
+function CompareRooms({ c }: { c: ComoCopy }) {
   const [idx, setIdx] = useState(1); // el salón por defecto
-  const pair = C.foto.pairs[idx];
+  const pair = c.foto.pairs[idx];
   return (
     <div>
-      <BeforeAfter before={pair.mal} after={pair.bien} room={pair.room} />
+      <BeforeAfter before={pair.mal} after={pair.bien} room={pair.room} c={c} />
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
-          {C.foto.pairs.map((p, i) => (
+          {c.foto.pairs.map((p, i) => (
             <button key={p.room} type="button" data-cursor onClick={() => setIdx(i)}
               className={`rounded-full px-3.5 py-1.5 text-[12px] sm:text-[13px] tracking-[-0.01em] transition-colors duration-300 ring-1 ${i === idx ? "bg-[#EFEBE1] text-[#16150F] ring-transparent" : "text-[#9A958A] ring-[#3a382f] hover:text-[#EFEBE1]"}`}>
               {p.room}
@@ -148,7 +149,7 @@ function CompareRooms() {
         </div>
         <span className="hidden sm:flex items-center gap-2 text-[13px] text-[#9A958A] tracking-[-0.01em]">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-          {C.foto.hint}
+          {c.foto.hint}
         </span>
       </div>
     </div>
@@ -156,7 +157,7 @@ function CompareRooms() {
 }
 
 /* ── Reel vertical en marco de móvil (toca para reproducir) ────────── */
-function PhoneReel() {
+function PhoneReel({ c }: { c: ComoCopy }) {
   const v = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const toggle = () => {
@@ -169,32 +170,32 @@ function PhoneReel() {
     <div className="relative mx-auto w-[min(74vw,330px)] text-center">
       <div data-cursor className="relative aspect-[9/16] overflow-hidden rounded-[2.4rem] bg-[#0C0B09] ring-1 ring-[#16150F]/15 shadow-[0_70px_140px_-60px_rgba(22,21,15,0.65)]">
         <video
-          ref={v} src={C.video.src} poster={C.video.poster} preload="none" loop playsInline
+          ref={v} src={c.video.src} poster={c.video.poster} preload="none" loop playsInline
           onClick={toggle} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
           className="absolute inset-0 h-full w-full object-cover"
         />
         {!playing && (
-          <button type="button" onClick={toggle} aria-label={C.video.playCta} className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <button type="button" onClick={toggle} aria-label={c.video.playCta} className="absolute inset-0 flex items-center justify-center bg-black/30">
             <span className="flex items-center justify-center w-16 h-16 rounded-full bg-white/95 text-[#16150F] shadow-lg">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 translate-x-0.5"><path d="M8 5.5v13l11-6.5-11-6.5Z" /></svg>
             </span>
           </button>
         )}
       </div>
-      <p className="mt-4 text-[12px] text-[#8A8578]">{C.video.note}</p>
+      <p className="mt-4 text-[12px] text-[#8A8578]">{c.video.note}</p>
     </div>
   );
 }
 
 /* ── Plano 3D: tarjeta que envuelve el plano recortado (sin letterbox ni
      barrido). Halo suave detrás para dar profundidad sobre el fondo oscuro. */
-function PlanoView() {
+function PlanoView({ c }: { c: ComoCopy }) {
   return (
     <figure className="relative mx-auto max-w-3xl">
       <div aria-hidden className="pointer-events-none absolute -inset-8 sm:-inset-14 rounded-[3rem] bg-[radial-gradient(60%_55%_at_50%_42%,rgba(239,235,225,0.12),transparent_72%)]" />
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FCFBF8] to-[#EDE9DF] p-3 sm:p-5 ring-1 ring-white/10 shadow-[0_70px_130px_-55px_rgba(0,0,0,0.8)]">
         <Image
-          src={C.plano.img}
+          src={c.plano.img}
           alt="Plano 3D de distribución de una vivienda de The Vila Home"
           width={1641}
           height={1619}
@@ -202,13 +203,13 @@ function PlanoView() {
           className="w-full h-auto rounded-lg"
         />
       </div>
-      <figcaption className="mt-4 text-center text-[12px] text-[#9A958A]">{C.plano.note}</figcaption>
+      <figcaption className="mt-4 text-center text-[12px] text-[#9A958A]">{c.plano.note}</figcaption>
     </figure>
   );
 }
 
 /* ── Tour Matterport con activación al toque (evita scroll-trap) ───── */
-function TourFrame() {
+function TourFrame({ c }: { c: ComoCopy }) {
   const [active, setActive] = useState(false);
   return (
     <div className="relative aspect-[4/3] sm:aspect-video overflow-hidden rounded-xl lg:rounded-2xl bg-[#0C0B09] shadow-[0_50px_100px_-50px_rgba(22,21,15,0.5)]">
@@ -216,11 +217,11 @@ function TourFrame() {
           el visor de Matterport intenta navegar la página a matterport.com
           (te sacaba de la landing). Así esa navegación queda bloqueada y
           sus enlaces externos se abren en pestaña nueva como mucho. */}
-      <iframe src={C.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
+      <iframe src={c.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
       {!active && (
         <button type="button" data-cursor onClick={() => setActive(true)} aria-label="Explorar el tour 3D"
           className="absolute inset-0 flex items-end justify-center pb-5 bg-gradient-to-t from-black/35 to-transparent">
-          <span className="rounded-full bg-white/95 text-[#16150F] text-[13px] font-medium px-5 py-2.5 shadow-lg">{C.tour.activate}</span>
+          <span className="rounded-full bg-white/95 text-[#16150F] text-[13px] font-medium px-5 py-2.5 shadow-lg">{c.tour.activate}</span>
         </button>
       )}
     </div>
@@ -229,8 +230,8 @@ function TourFrame() {
 
 /* ── Carrusel de reseñas: una cada vez, autoavance, recorte a 3 líneas
      con «Leer más» si es larga. Texto normal (sin negrita). ─────────── */
-function ReviewsCarousel() {
-  const items = C.resenas.items;
+function ReviewsCarousel({ c }: { c: ComoCopy }) {
+  const items = c.resenas.items;
   const [idx, setIdx] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [truncated, setTruncated] = useState(false);
@@ -264,7 +265,7 @@ function ReviewsCarousel() {
         {truncated && (
           <button type="button" onClick={() => setExpanded((v) => !v)}
             className="mt-2 text-[14px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">
-            {expanded ? C.resenas.readLess : C.resenas.readMore}
+            {expanded ? c.resenas.readLess : c.resenas.readMore}
           </button>
         )}
         <footer className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -297,7 +298,8 @@ function ReviewsCarousel() {
 }
 
 /* ── Componente ────────────────────────────────────────────────────── */
-export default function ComoTrabajamos() {
+export default function ComoTrabajamos({ lang = "es" }: { lang?: Lang }) {
+  const C = COMO_COPY[lang];
   const lenis = useLenis();
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
@@ -385,7 +387,7 @@ export default function ComoTrabajamos() {
             <span className="flex items-center gap-2 text-[#EFEBE1]">
               <span className="text-xl sm:text-2xl font-medium tracking-tight">{rating}</span>
               <Stars />
-              <span className="text-[13px] text-[#9A958A]">en Google</span>
+              <span className="text-[13px] text-[#9A958A]">{C.hero.inGoogle}</span>
             </span>
           </div>
         </div>
@@ -441,7 +443,7 @@ export default function ComoTrabajamos() {
           <ChapterHead n={C.foto.n} kicker={C.foto.kicker} title={C.foto.title} body={C.foto.body} dark />
         </div>
         <div className="rv-slow mt-10 lg:mt-14 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-12">
-          <CompareRooms />
+          <CompareRooms c={C} />
         </div>
       </section>
 
@@ -450,7 +452,7 @@ export default function ComoTrabajamos() {
         <div className={`${WRAP} grid gap-12 lg:gap-16 lg:grid-cols-2 lg:items-center`}>
           <ChapterHead n={C.video.n} kicker={C.video.kicker} title={C.video.title} body={C.video.body} dark={false} />
           <div className="rv-slow">
-            <PhoneReel />
+            <PhoneReel c={C} />
           </div>
         </div>
       </section>
@@ -460,7 +462,7 @@ export default function ComoTrabajamos() {
         <div className={WRAP}>
           <ChapterHead n={C.plano.n} kicker={C.plano.kicker} title={C.plano.title} body={C.plano.body} dark />
           <div className="rv-slow mt-10 lg:mt-14">
-            <PlanoView />
+            <PlanoView c={C} />
           </div>
         </div>
       </section>
@@ -470,7 +472,7 @@ export default function ComoTrabajamos() {
         <div className={WRAP}>
           <ChapterHead n={C.tour.n} kicker={C.tour.kicker} title={C.tour.title} body={C.tour.body} dark={false} />
           <div className="rv-slow mt-10 lg:mt-14">
-            <TourFrame />
+            <TourFrame c={C} />
             <p className="mt-4 text-[13px] text-[#8A8578]">{C.tour.note}</p>
           </div>
         </div>
@@ -546,7 +548,7 @@ export default function ComoTrabajamos() {
             <div><Stars className="w-4 h-4" /><p className="text-[12px] text-[#A7A296] mt-1">{C.resenas.googleLabel}</p></div>
           </div>
           <div className="rv-slow mt-10 lg:mt-14 max-w-3xl">
-            <ReviewsCarousel />
+            <ReviewsCarousel c={C} />
           </div>
         </div>
       </section>

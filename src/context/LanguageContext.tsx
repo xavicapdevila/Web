@@ -56,9 +56,9 @@ const MYMEMORY_LANG: Record<Lang, string> = {
   fr: "fr",
 };
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
-  const [translations, setTranslations] = useState<Translations>(getTranslations(DEFAULT_LANG));
+export function LanguageProvider({ children, forceLang }: { children: React.ReactNode; forceLang?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(forceLang ?? DEFAULT_LANG);
+  const [translations, setTranslations] = useState<Translations>(getTranslations(forceLang ?? DEFAULT_LANG));
 
   // Translation cache: "lang:text" → translated string
   const cache = useRef<Map<string, string>>(new Map());
@@ -70,6 +70,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   // se respeta la elección previa (cookie) y, si tampoco hay, se detecta
   // por idioma del navegador y se fija para que persista.
   useEffect(() => {
+    // Landings con idioma fijo por ruta (/com-treballem, /how-we-work…):
+    // el idioma lo manda la ruta, no se detecta ni se guarda cookie.
+    if (forceLang) {
+      setLangState(forceLang);
+      setTranslations(getTranslations(forceLang));
+      return;
+    }
     const param = new URLSearchParams(window.location.search).get("lang") as Lang | null;
     const fromUrl = param && SUPPORTED.includes(param) ? param : null;
     const saved = readLangCookie();
@@ -79,7 +86,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (initial !== saved) {
       document.cookie = `${COOKIE_NAME}=${initial}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
     }
-  }, []);
+  }, [forceLang]);
 
   const setLang = useCallback((newLang: Lang) => {
     setLangState(newLang);
