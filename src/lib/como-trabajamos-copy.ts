@@ -166,7 +166,7 @@ export const COMO_COPY = {
     title: "Ahora ya sabes cómo trabajamos.",
     sub: "Solo falta tu casa.",
     body: "Cuéntanos tu caso y te explicaremos, con total transparencia, cómo enfocaríamos la venta de tu vivienda.",
-    submitLabel: "Hablemos de tu casa",
+    submitLabel: "Hablemos",
   },
 
   footer: { legal: "Aviso legal", privacy: "Privacidad", cookies: "Cookies" },
