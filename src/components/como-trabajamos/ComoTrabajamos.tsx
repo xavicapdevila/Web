@@ -431,6 +431,22 @@ export default function ComoTrabajamos() {
         </div>
       </section>
 
+      {/* ── DESPUÉS DEL ANUNCIO (coda compacta, no es un sexto paso) ── */}
+      <section className="relative bg-[#0C0B09] text-[#EFEBE1] py-14 sm:py-20 lg:py-28 border-t border-white/5">
+        <div className={WRAP}>
+          <p className={`rv ${EY} text-[#9A958A]`}>{C.coda.eyebrow}</p>
+          <h2 className="rv mt-4 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.02] text-[8.4vw] sm:text-[5.4vw] lg:text-[3.6rem] [text-wrap:balance]">{C.coda.title}</h2>
+          <div className="rv-slow mt-10 lg:mt-14 grid gap-8 sm:grid-cols-3 sm:gap-10">
+            {C.coda.items.map((it) => (
+              <div key={it.t} className="border-t border-white/10 pt-5">
+                <h3 className="text-[19px] lg:text-[22px] font-medium tracking-[-0.02em]">{it.t}</h3>
+                <p className="mt-2.5 text-left text-[14px] lg:text-[15px] leading-relaxed text-[#B7B2A6]">{it.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── LO HABITUAL / LO NUESTRO ────────────────────────────────── */}
       <section className={`relative bg-[#F4F2ED] text-[#16150F] ${PAD}`}>
         <div className={WRAP}>

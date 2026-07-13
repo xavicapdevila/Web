@@ -116,6 +116,18 @@ export const COMO_COPY = {
     ],
   },
 
+  /* Coda tras el paso 05 — NO es un sexto paso: responde «¿y después del
+     anuncio?» (documentación y acompañamiento) en media pantalla. */
+  coda: {
+    eyebrow: "Y después del anuncio",
+    title: "El anuncio es solo la mitad del trabajo.",
+    items: [
+      { t: "Documentación", d: "La revisamos y la dejamos al día antes de salir al mercado, para que nada frene la venta a mitad de camino." },
+      { t: "Negociación", d: "Cada oferta se analiza contigo, con calma y con números. Y se defiende con criterio." },
+      { t: "Hasta la firma", d: "Visitas, plazos, notaría. Te acompañamos hasta el día de entregar las llaves." },
+    ],
+  },
+
   diferencia: {
     eyebrow: "La diferencia",
     titleMuted: "Lo habitual,",
