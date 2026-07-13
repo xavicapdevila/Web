@@ -85,8 +85,9 @@ export const COMO_COPY = {
     kicker: "Tour virtual",
     title: "Tu casa, abierta 24 horas. Sin que entre nadie.",
     body: [
-      "Con el tour virtual, el comprador recorre la vivienda entera desde donde esté: cada habitación, a su ritmo, las veces que quiera.",
-      "Quien pide visita después de recorrerla no viene a curiosear. Viene a confirmar.",
+      "Tu casa está disponible las 24 horas, desde cualquier lugar.",
+      "El comprador puede recorrerla a su ritmo, volver atrás, detenerse en cada detalle y decidir si realmente encaja con lo que está buscando.",
+      "Cuando pide una visita, normalmente ya no viene a descubrirla. Viene a confirmar que es la vivienda que había imaginado.",
     ],
     note: "Tour real. Arrástralo y recórrelo tú mismo.",
     activate: "Toca para explorar",

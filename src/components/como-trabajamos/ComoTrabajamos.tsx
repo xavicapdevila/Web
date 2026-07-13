@@ -36,21 +36,6 @@ const STRIP = [
   "/images/vender/porche-bien-2.jpg",
 ];
 
-/* Barrido del plano 3D: la imagen se "escanea" de izquierda a derecha al
-   entrar en pantalla (CSS scroll-timeline). Sin soporte → plano visible
-   y barra oculta (progressive enhancement, igual que .rv). */
-const SCAN_CSS = `
-  .scan__bar{left:3%;opacity:0}
-  @media (prefers-reduced-motion: no-preference){
-    @supports (animation-timeline: view()){
-      .scan__img{animation:scan-clip linear both;animation-timeline:view();animation-range:entry 25% cover 60%}
-      .scan__bar{animation:scan-bar linear both;animation-timeline:view();animation-range:entry 25% cover 60%}
-    }
-  }
-  @keyframes scan-clip{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
-  @keyframes scan-bar{0%{left:3%;opacity:1}94%{opacity:1}100%{left:97%;opacity:0}}
-`;
-
 /* ── Scroll suave (Lenis) — enhancement ────────────────────────────── */
 function useLenis() {
   const ref = useRef<Lenis | null>(null);
@@ -201,19 +186,23 @@ function PhoneReel() {
   );
 }
 
-/* ── Plano 3D con barrido de "escáner" al hacer scroll ─────────────── */
-function PlanoScan() {
+/* ── Plano 3D: tarjeta que envuelve el plano recortado (sin letterbox ni
+     barrido). Halo suave detrás para dar profundidad sobre el fondo oscuro. */
+function PlanoView() {
   return (
-    <figure className="scan relative overflow-hidden rounded-xl lg:rounded-2xl bg-white p-4 sm:p-8 lg:p-12 shadow-[0_50px_100px_-50px_rgba(0,0,0,0.55)]">
-      <style>{SCAN_CSS}</style>
-      <div className="relative aspect-[16/10] sm:aspect-[16/9]">
-        <Image src={C.plano.img} alt="" aria-hidden fill sizes="(min-width:1024px) 1100px, 100vw" className="object-contain opacity-[0.14] grayscale" />
-        <div className="scan__img absolute inset-0">
-          <Image src={C.plano.img} alt="Plano 3D de una vivienda de The Vila Home" fill sizes="(min-width:1024px) 1100px, 100vw" className="object-contain" />
-        </div>
-        <span aria-hidden className="scan__bar absolute inset-y-0 w-px bg-[#16150F]/70 shadow-[0_0_26px_3px_rgba(22,21,15,0.3)]" />
+    <figure className="relative mx-auto max-w-3xl">
+      <div aria-hidden className="pointer-events-none absolute -inset-8 sm:-inset-14 rounded-[3rem] bg-[radial-gradient(60%_55%_at_50%_42%,rgba(239,235,225,0.12),transparent_72%)]" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FCFBF8] to-[#EDE9DF] p-3 sm:p-5 ring-1 ring-white/10 shadow-[0_70px_130px_-55px_rgba(0,0,0,0.8)]">
+        <Image
+          src={C.plano.img}
+          alt="Plano 3D de distribución de una vivienda de The Vila Home"
+          width={1641}
+          height={1619}
+          sizes="(min-width:1024px) 720px, 92vw"
+          className="w-full h-auto rounded-lg"
+        />
       </div>
-      <figcaption className="mt-3 text-[12px] text-[#8A8578]">{C.plano.note}</figcaption>
+      <figcaption className="mt-4 text-center text-[12px] text-[#9A958A]">{C.plano.note}</figcaption>
     </figure>
   );
 }
@@ -471,7 +460,7 @@ export default function ComoTrabajamos() {
         <div className={WRAP}>
           <ChapterHead n={C.plano.n} kicker={C.plano.kicker} title={C.plano.title} body={C.plano.body} dark />
           <div className="rv-slow mt-10 lg:mt-14">
-            <PlanoScan />
+            <PlanoView />
           </div>
         </div>
       </section>
