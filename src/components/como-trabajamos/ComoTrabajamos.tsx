@@ -238,6 +238,75 @@ function TourFrame() {
   );
 }
 
+/* ── Carrusel de reseñas: una cada vez, autoavance, recorte a 3 líneas
+     con «Leer más» si es larga. Texto normal (sin negrita). ─────────── */
+function ReviewsCarousel() {
+  const items = C.resenas.items;
+  const [idx, setIdx] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+  const [truncated, setTruncated] = useState(false);
+  const pRef = useRef<HTMLParagraphElement>(null);
+
+  // ¿la reseña actual se corta a 3 líneas? (se mide con el recorte aplicado)
+  useEffect(() => {
+    setExpanded(false);
+    const el = pRef.current;
+    if (!el) return;
+    const id = requestAnimationFrame(() => setTruncated(el.scrollHeight - el.clientHeight > 4));
+    return () => cancelAnimationFrame(id);
+  }, [idx]);
+
+  // Autoavance; en pausa mientras se lee una reseña expandida.
+  useEffect(() => {
+    if (expanded) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % items.length), 6500);
+    return () => clearInterval(t);
+  }, [expanded, items.length]);
+
+  const go = (n: number) => setIdx((n + items.length) % items.length);
+  const r = items[idx];
+
+  return (
+    <div>
+      <blockquote className="min-h-[10rem] sm:min-h-[8.5rem]">
+        <p ref={pRef} className={`tracking-[-0.01em] leading-relaxed text-[18px] sm:text-[20px] lg:text-[24px] text-[#16150F] ${expanded ? "" : "line-clamp-3"}`}>
+          “{r.quote}”
+        </p>
+        {truncated && (
+          <button type="button" onClick={() => setExpanded((v) => !v)}
+            className="mt-2 text-[14px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">
+            {expanded ? C.resenas.readLess : C.resenas.readMore}
+          </button>
+        )}
+        <footer className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <Stars />
+          <span className="text-[14px] font-medium text-[#16150F]">{r.name}</span>
+          <span className="text-[12px] text-[#A7A296]">{r.tag}</span>
+        </footer>
+      </blockquote>
+
+      <div className="mt-8 flex items-center gap-4">
+        <div className="flex gap-1.5">
+          {items.map((_, i) => (
+            <button key={i} type="button" aria-label={`Reseña ${i + 1}`} onClick={() => go(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === idx ? "w-6 bg-[#16150F]" : "w-1.5 bg-[#16150F]/25 hover:bg-[#16150F]/45"}`} />
+          ))}
+        </div>
+        <span className="ml-auto flex gap-2">
+          <button type="button" aria-label="Reseña anterior" onClick={() => go(idx - 1)}
+            className="flex items-center justify-center w-9 h-9 rounded-full ring-1 ring-[#16150F]/15 hover:bg-[#16150F] hover:text-[#F4F2ED] transition-colors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4"><path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+          <button type="button" aria-label="Reseña siguiente" onClick={() => go(idx + 1)}
+            className="flex items-center justify-center w-9 h-9 rounded-full ring-1 ring-[#16150F]/15 hover:bg-[#16150F] hover:text-[#F4F2ED] transition-colors">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-4 h-4"><path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+        </span>
+      </div>
+    </div>
+  );
+}
+
 /* ── Componente ────────────────────────────────────────────────────── */
 export default function ComoTrabajamos() {
   const lenis = useLenis();
@@ -301,7 +370,7 @@ export default function ComoTrabajamos() {
               pierdan el hilo si van a curiosear la web general. */}
           <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home (se abre en una pestaña nueva)">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="The Vila Home" className="nav-logo h-7 sm:h-8 w-auto transition-all duration-500" style={{ filter: scrolled ? "brightness(0)" : "none" }} />
+            <img src="/logo.svg" alt="The Vila Home" className="nav-logo h-9 sm:h-11 w-auto transition-all duration-500" style={{ filter: scrolled ? "brightness(0)" : "none" }} />
           </a>
           <a href="#contacto" onClick={goTo("contacto")} data-cursor className={`nav-cta text-[13px] font-medium tracking-tight rounded-full px-5 py-2.5 transition-all duration-500 ${scrolled ? "bg-[#16150F] text-[#F4F2ED] hover:bg-black" : "bg-white/10 text-[#F4F2ED] ring-1 ring-white/25 backdrop-blur hover:bg-white/20"}`}>{C.nav.cta}</a>
         </nav>
@@ -485,17 +554,8 @@ export default function ComoTrabajamos() {
             <span className="text-4xl lg:text-5xl font-medium tracking-tight">{rating}</span>
             <div><Stars className="w-4 h-4" /><p className="text-[12px] text-[#A7A296] mt-1">{C.resenas.googleLabel}</p></div>
           </div>
-          <div className="rv-slow mt-10 lg:mt-14 grid gap-10 lg:gap-16 lg:grid-cols-2">
-            {C.resenas.items.map((r) => (
-              <blockquote key={r.name}>
-                <p className="font-medium tracking-[-0.02em] leading-[1.25] text-[4.8vw] sm:text-[2.6vw] lg:text-[1.55rem] [text-wrap:balance]">“{r.quote}”</p>
-                <footer className="mt-5 flex items-center gap-3">
-                  <Stars />
-                  <span className="text-[14px] font-medium">{r.name}</span>
-                  <span className="text-[12px] text-[#A7A296]">{r.tag}</span>
-                </footer>
-              </blockquote>
-            ))}
+          <div className="rv-slow mt-10 lg:mt-14 max-w-3xl">
+            <ReviewsCarousel />
           </div>
         </div>
       </section>
@@ -508,7 +568,7 @@ export default function ComoTrabajamos() {
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="rv font-medium tracking-[-0.03em] leading-[1.02] text-[9vw] sm:text-[5.6vw] lg:text-[3.6rem] text-[#F4F2ED] [text-wrap:balance]">{C.cierre.title}</h2>
             <p className="rv mt-3 text-[5.4vw] sm:text-[3vw] lg:text-[1.7rem] font-medium tracking-[-0.02em] text-[#9A958A]">{C.cierre.sub}</p>
-            <p className="rv mt-6 text-center text-[15px] lg:text-[17px] leading-relaxed text-[#B7B2A6]">{C.cierre.body}</p>
+            <p className="rv mt-6 mx-auto max-w-[52ch] text-center text-[15px] lg:text-[17px] leading-relaxed text-[#B7B2A6] [text-wrap:balance]">{C.cierre.body}</p>
           </div>
           <div className="rv-slow max-w-xl mx-auto mt-8 lg:mt-12">
             <LeadFormSteps source="como-trabajamos" submitLabel={C.cierre.submitLabel} />
@@ -521,7 +581,7 @@ export default function ComoTrabajamos() {
         <div className={`${WRAP} py-9 flex flex-col sm:flex-row items-center justify-between gap-4`}>
           <a href="/" target="_blank" rel="noopener" aria-label="The Vila Home — inicio (se abre en una pestaña nueva)">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.svg" alt="The Vila Home" className="h-6 w-auto" style={{ filter: "brightness(0)" }} />
+            <img src="/logo.svg" alt="The Vila Home" className="h-8 sm:h-9 w-auto" style={{ filter: "brightness(0)" }} />
           </a>
           <nav className="flex items-center gap-6 text-[13px] text-[#7d786c]">
             <a href="/aviso-legal" className="hover:text-[#16150F] transition-colors">{C.footer.legal}</a>

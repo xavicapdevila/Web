@@ -73,10 +73,10 @@ export const COMO_COPY = {
     kicker: "Plano 3D",
     title: "Nadie compra lo que no entiende.",
     body: [
-      "Las fotos enseñan cómo es tu casa. El plano explica cómo se vive en ella: la distribución real, cada estancia en su sitio, lo que se podría cambiar.",
+      "Las fotos enseñan cómo es cada estancia. El plano las conecta: de un vistazo se entiende la distribución, por dónde se pasa y cómo encaja todo.",
       "Es la diferencia entre gustar y encajar.",
     ],
-    note: "Plano 3D real de una vivienda nuestra.",
+    note: "Plano 3D de distribución de una vivienda nuestra.",
     img: "/images/vender/plano-3d.jpg",
   },
 
@@ -135,9 +135,9 @@ export const COMO_COPY = {
     colHabitual: "Lo habitual",
     colNuestro: "Con nosotros",
     rows: [
-      { habitual: "Diez fotos hechas con un móvil", nuestro: "Un reportaje profesional de cada estancia" },
+      { habitual: "Fotos sin editar, subidas tal cual", nuestro: "Un reportaje editado de cada estancia" },
       { habitual: "Un texto copiado de otro anuncio", nuestro: "Un vídeo pensado para detener el dedo" },
-      { habitual: "Los metros, a ojo", nuestro: "Un plano 3D con la distribución real" },
+      { habitual: "La distribución, a ojo", nuestro: "Un plano 3D con la distribución real" },
       { habitual: "«Mejor venga a verlo»", nuestro: "Un tour virtual abierto las 24 horas" },
       { habitual: "Publicar y esperar", nuestro: "Campañas y redes para salir a buscar al comprador" },
     ],
@@ -147,9 +147,15 @@ export const COMO_COPY = {
   resenas: {
     eyebrow: "Lo que dicen quienes ya vendieron",
     googleLabel: "Opiniones reales en Google",
+    readMore: "Leer más",
+    readLess: "Leer menos",
     items: [
       { quote: "Desde el primer día se notó que no son una inmobiliaria más: trato súper cercano, comunicación clara y una forma de trabajar nada común hoy día. El reportaje de la vivienda fue espectacular y marcó la diferencia.", name: "Noelia Nieto", tag: "Reseña en Google" },
       { quote: "He lidiado con varias inmobiliarias a la vez y de verdad que la diferencia es abismal. Trabajan de forma honesta, con empatía y mucha profesionalidad. Nos hemos sentido acompañados en todo momento.", name: "Yolee Seth", tag: "Reseña en Google" },
+      { quote: "El trato fue muy profesional y cercano durante todo el proceso de venta de nuestro piso. Ari fue especialmente amable, siempre atenta y dispuesta a ayudarnos.", name: "Patricia Reyes", tag: "Reseña en Google" },
+      { quote: "Ha sido un privilegio contar con ellos para la venta de mi piso. Son súper profesionales y facilitan todo. Recomiendo al 100%: trato cercano y transparente.", name: "Laura Cano", tag: "Reseña en Google" },
+      { quote: "Ariadna es súper amable, rápida y conoce mucho todo el proceso. Me sentí súper tranquila de tener a alguien con su experiencia que me asesore. Recomiendo mucho el servicio.", name: "Carmela Castellanos", tag: "Reseña en Google" },
+      { quote: "Grans professionals i millors persones. La seva gestió ha estat impecable.", name: "Jordi Pons", tag: "Reseña en Google" },
     ],
   },
 
