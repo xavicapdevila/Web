@@ -154,16 +154,14 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
 
   if (status === "ok") {
     const firstName = sent.name.trim().split(/\s+/)[0] || "";
-    // Mensaje de WhatsApp con el contacto ya escrito (incluye su teléfono).
-    const waMsg =
-      `Hola 👋 Soy ${sent.name || "un propietario"}. Acabo de rellenar el formulario de vuestra web para vender mi casa.` +
-      (sent.phone ? ` Mi teléfono: ${sent.phone}.` : "");
+    // Mensaje de WhatsApp (idioma del formulario) con el contacto ya escrito.
+    const waMsg = c.waContact.replace("{name}", sent.name || "").replace("{phone}", sent.phone || "");
     return (
       <div className="bg-white rounded-2xl p-9 sm:p-12 text-center shadow-[0_40px_90px_-40px_rgba(0,0,0,0.5)]">
         <div className="mx-auto flex items-center justify-center w-14 h-14 rounded-full bg-[#ECE9E1] text-[#16150F]">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-7 h-7"><path d="M5 12.5l4 4 10-10" /></svg>
         </div>
-        <h3 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#16150F] mt-6">{firstName ? `¡Gracias, ${firstName}!` : c.okTitle}</h3>
+        <h3 className="text-2xl sm:text-3xl font-medium tracking-[-0.02em] text-[#16150F] mt-6">{firstName ? c.thanks.replace("{name}", firstName) : c.okTitle}</h3>
         <p className="text-[#5c584e] text-[15px] leading-relaxed mt-3 max-w-md mx-auto">{c.okText}</p>
         <a
           href={`${siteConfig.whatsappUrl}?text=${encodeURIComponent(waMsg)}`}
@@ -232,7 +230,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
           </div>
           <button type="button" disabled={!zone.trim()} onClick={next}
             className="mt-5 w-full rounded-full bg-[#16150F] text-white text-[15px] font-medium py-3.5 hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-            Siguiente
+            {c.next}
           </button>
         </div>
 
@@ -249,7 +247,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
               </button>
             ))}
           </div>
-          <button type="button" onClick={back} className="mt-4 text-[13px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">Atrás</button>
+          <button type="button" onClick={back} className="mt-4 text-[13px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">{c.back}</button>
         </div>
 
         {/* ── Paso 3: contacto ─────────────────────────────────────── */}
@@ -299,7 +297,7 @@ export default function LeadFormSteps({ source = "vender", submitLabel, askPrice
               {c.error}<a href="mailto:info@thevilahome.com" className="underline">info@thevilahome.com</a>.
             </p>
           )}
-          <button type="button" onClick={back} className="mt-3 text-[13px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">Atrás</button>
+          <button type="button" onClick={back} className="mt-3 text-[13px] text-[#8A8578] underline underline-offset-4 hover:text-[#16150F] transition-colors">{c.back}</button>
           <p className="text-[11px] text-[#A8A294] leading-relaxed mt-4">
             {c.consentAfter.replace(/^\.\s*/, "")}
           </p>
