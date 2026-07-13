@@ -15,6 +15,16 @@ import type { Lang } from "@/lib/i18n";
 
 const MATTERPORT = "https://my.matterport.com/show/?m=zeLdy8k2NEZ&play=1&qs=1&brand=0&mls=1";
 
+/* Ruta (relativa) de la landing en cada idioma — para el selector de idioma
+   del nav. El castellano conserva su URL; el resto tiene la suya. */
+export const COMO_PATHS: Record<Lang, string> = {
+  es: "/como-trabajamos",
+  ca: "/com-treballem",
+  en: "/how-we-work",
+  fr: "/notre-methode",
+};
+export const COMO_LANGS: Lang[] = ["es", "ca", "en", "fr"];
+
 const es = {
   nav: { cta: "Hablemos" },
 

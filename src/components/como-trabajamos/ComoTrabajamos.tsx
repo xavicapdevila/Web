@@ -6,7 +6,7 @@ import Lenis from "lenis";
 import LeadFormSteps from "@/components/vender/LeadFormSteps";
 import { siteConfig } from "@/lib/config";
 import type { Lang } from "@/lib/i18n";
-import { COMO_COPY, type ComoCopy } from "@/lib/como-trabajamos-copy";
+import { COMO_COPY, COMO_PATHS, COMO_LANGS, type ComoCopy } from "@/lib/como-trabajamos-copy";
 
 /* ─────────────────────────────────────────────────────────────────────
    THE VILA HOME · /como-trabajamos — EL MÉTODO, EN 5 CAPÍTULOS.
@@ -385,7 +385,21 @@ export default function ComoTrabajamos({ lang = "es" }: { lang?: Lang }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="The Vila Home" className="nav-logo h-9 sm:h-11 w-auto transition-all duration-500" style={{ filter: scrolled ? "brightness(0)" : "none" }} />
           </a>
-          <a href="#contacto" onClick={goTo("contacto")} data-cursor className={`nav-cta text-[13px] font-medium tracking-tight rounded-full px-5 py-2.5 transition-all duration-500 ${scrolled ? "bg-[#16150F] text-[#F4F2ED] hover:bg-black" : "bg-white/10 text-[#F4F2ED] ring-1 ring-white/25 backdrop-blur hover:bg-white/20"}`}>{C.nav.cta}</a>
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Selector de idioma: cada uno enlaza a su propia URL (idioma fijo
+                por ruta). Color que sigue al nav (claro en hero, tinta al hacer
+                scroll). */}
+            <nav aria-label="Idioma" className={`flex items-center gap-0.5 text-[11px] font-medium uppercase tracking-[0.06em] transition-colors duration-500 ${scrolled ? "text-[#16150F]" : "text-[#EFEBE1]"}`}>
+              {COMO_LANGS.map((l) => (
+                l === lang ? (
+                  <span key={l} aria-current="true" className="px-1.5 py-1 opacity-100 underline underline-offset-[5px] decoration-1">{l}</span>
+                ) : (
+                  <a key={l} href={COMO_PATHS[l]} hrefLang={l} data-cursor className="px-1.5 py-1 opacity-50 hover:opacity-100 transition-opacity">{l}</a>
+                )
+              ))}
+            </nav>
+            <a href="#contacto" onClick={goTo("contacto")} data-cursor className={`nav-cta text-[13px] font-medium tracking-tight rounded-full px-5 py-2.5 transition-all duration-500 ${scrolled ? "bg-[#16150F] text-[#F4F2ED] hover:bg-black" : "bg-white/10 text-[#F4F2ED] ring-1 ring-white/25 backdrop-blur hover:bg-white/20"}`}>{C.nav.cta}</a>
+          </div>
         </nav>
       </header>
 
