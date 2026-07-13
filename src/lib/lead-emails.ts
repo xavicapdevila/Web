@@ -1,10 +1,12 @@
 /**
- * Plantillas de correo para los leads de captación (/vender).
+ * Plantillas de correo para los leads de captación (/vender y /tu-precio).
  *
  *  1. Autorespuesta al vendedor  → confirmación inmediata, tono premium TVH,
  *     en su idioma. Responder rápido es lo que gana el encargo.
  *  2. Aviso interno al equipo     → todos los datos + atribución de campaña,
  *     para llamar en caliente y saber de qué anuncio viene.
+ *  3. Aviso interno «Tu precio»   → variante para la landing de Meta: el
+ *     precio esperado es el dato estrella y no hay email del lead.
  */
 
 import type { Lang } from "@/lib/i18n";
@@ -293,6 +295,104 @@ export function buildTeamEmail(lead: StoredLead): { subject: string; html: strin
 
   return {
     subject: `Nuevo lead (vender): ${lead.name} — ${situation}`,
+    html,
+  };
+}
+
+// ── Aviso interno «Tu precio» (landing Meta) ─────────────────────────────────
+
+/** Etiquetas legibles del «¿Cuándo te lo planteas?» (para el equipo, en ES). */
+export const TIMELINE_LABELS: Record<string, string> = {
+  vender_ya: "Quiere venderla ya",
+  venta_activa: "Ya está en venta",
+  proximos_meses: "Próximos meses",
+  solo_curiosidad: "Solo quiere saberlo",
+};
+
+const TIMELINE_URGENCY: Record<string, { bg: string; fg: string; tag: string }> = {
+  vender_ya: { bg: "#111111", fg: "#ffffff", tag: "🔥 Vender YA · llamar ahora" },
+  venta_activa: { bg: "#b0451e", fg: "#ffffff", tag: "Ya a la venta · llamar hoy" },
+  proximos_meses: { bg: "#5b6470", fg: "#ffffff", tag: "Seguimiento · próximos meses" },
+  solo_curiosidad: { bg: "#9a9a9a", fg: "#ffffff", tag: "Curiosidad · nutrir" },
+};
+
+/**
+ * Aviso al equipo de un lead de la landing «Tu precio». El asunto sigue el
+ * formato acordado: `💰 {precio} € · {municipio} · {cuándo}` con prefijo 🔥
+ * si quiere vender ya. El form no pide email (a propósito): contacto solo
+ * por teléfono/WhatsApp.
+ */
+export function buildTuPrecioTeamEmail(lead: StoredLead): { subject: string; html: string } {
+  const timeline = TIMELINE_LABELS[lead.situation] ?? lead.situation;
+  const urgency = TIMELINE_URGENCY[lead.situation] ?? TIMELINE_URGENCY.solo_curiosidad;
+  const langKey = (lead.lang || "es").toLowerCase();
+  const langName = LANG_NAMES[langKey] ?? (lead.lang || "—");
+
+  const precio = (lead.precio_esperado ?? 0).toLocaleString("es-ES");
+  const origin = escapeHtml(originLabel(lead));
+  const campaign = lead.utm_campaign ? escapeHtml(lead.utm_campaign) : "";
+  const adName = lead.utm_content ? escapeHtml(lead.utm_content) : "";
+
+  const phone = escapeHtml(lead.phone);
+  const wa = waNumber(lead.phone);
+  const body = "font-family:'Inter','Helvetica Neue',Arial,sans-serif";
+  const display = "font-family:'Inter Tight','Helvetica Neue',Arial,sans-serif";
+  const btn =
+    "display:inline-block;" + body + ";text-decoration:none;font-size:13px;font-weight:600;padding:11px 20px;border-radius:8px;margin:0 8px 8px 0";
+
+  const html = `
+  <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap');</style>
+  <div style="margin:0;padding:0;background:#ececec">
+    <div style="max-width:600px;margin:0 auto;padding:32px 18px;${body};color:#454545">
+
+      <p style="font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:#9a9a9a;margin:0 0 14px">The Vila Home · Campaña «Tu precio»</p>
+
+      <div style="background:#ffffff;border-radius:6px;overflow:hidden">
+        <div style="height:4px;background:#111111;font-size:0;line-height:0">&nbsp;</div>
+        <div style="padding:32px 30px">
+
+          <div style="margin-bottom:16px">
+            <span style="display:inline-block;background:${urgency.bg};color:${urgency.fg};font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:6px 14px;border-radius:999px">${urgency.tag}</span>
+          </div>
+
+          <h1 style="${display};margin:0 0 2px;font-size:34px;font-weight:700;letter-spacing:-0.02em;line-height:1.1;color:#111111">${precio}&nbsp;€</h1>
+          <p style="margin:0 0 14px;font-size:15px;font-weight:500;color:#454545">${escapeHtml(lead.zone)} · ${escapeHtml(lead.tipo ?? "—")}</p>
+
+          <p style="margin:0 0 22px;font-size:12px;color:#9a9a9a">
+            <span style="display:inline-block;background:#f4f4f3;border:1px solid #e6e6e4;border-radius:999px;padding:2px 10px;font-weight:600;color:#454545">${escapeHtml(langName)}</span>
+            &nbsp;·&nbsp;${escapeHtml(new Date(lead.ts).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" }))}
+          </p>
+
+          <div style="margin:0 0 20px">
+            <a href="tel:${phone}" style="${btn};background:#111111;color:#ffffff">Llamar</a>
+            ${wa ? `<a href="https://wa.me/${wa}" style="${btn};background:#12a150;color:#ffffff">WhatsApp</a>` : ""}
+          </div>
+
+          <div style="height:1px;background:#ececec;margin:0 0 18px;font-size:0;line-height:0">&nbsp;</div>
+
+          <table style="border-collapse:collapse;width:100%;font-size:14px">
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a;width:110px">Nombre</td><td style="padding:5px 0;color:#111111;font-weight:600">${escapeHtml(lead.name)}</td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Móvil</td><td style="padding:5px 0"><a href="tel:${phone}" style="color:#111111;font-weight:600;text-decoration:none">${phone}</a></td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Precio esperado</td><td style="padding:5px 0;color:#111111;font-weight:600">${precio} €</td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Municipio</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(lead.zone)}</td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Tipo</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(lead.tipo ?? "—")}</td></tr>
+            <tr><td style="padding:5px 14px 5px 0;color:#9a9a9a">Cuándo</td><td style="padding:5px 0;color:#222222;font-weight:600">${escapeHtml(timeline)}</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;padding:16px 20px;background:#e4e4e2;border-radius:6px">
+        <span style="color:#8a8a8a;font-size:11px;text-transform:uppercase;letter-spacing:0.14em;font-weight:600">Origen</span>
+        <span style="margin-left:12px;font-size:14px;font-weight:600;color:#222222">${origin}</span>${campaign ? `<span style="margin-left:8px;font-size:13px;color:#9a9a9a">· ${campaign}</span>` : ""}${adName ? `<span style="margin-left:8px;font-size:13px;color:#9a9a9a">· ${adName}</span>` : ""}
+      </div>
+
+      <p style="text-align:center;color:#b0b0b0;font-size:11px;margin:16px 0 0">Lead #${escapeHtml(lead.id)} · ${escapeHtml(lead.landing ?? "")}</p>
+    </div>
+  </div>`;
+
+  const hot = lead.situation === "vender_ya" ? "🔥 " : "";
+  return {
+    subject: `${hot}💰 ${precio} € · ${lead.zone} · ${timeline}`,
     html,
   };
 }

@@ -6,6 +6,7 @@ import { saveLead, type StoredLead } from '@/lib/leads-store'
 import { buildAutoReplyEmail, buildTeamEmail } from '@/lib/lead-emails'
 import { sendMetaLeadEvent } from '@/lib/meta-capi'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { forwardLeadToOra } from '@/lib/ora-leads'
 
 const MAX = 2000 // límite defensivo por campo
 const TEAM_INBOX = 'info@thevilahome.com'
@@ -18,25 +19,6 @@ function attrStr(v: unknown): string | undefined {
   if (typeof v !== 'string') return undefined
   const s = v.trim().slice(0, 300)
   return s || undefined
-}
-
-/**
- * Reenvía el lead al hub Ora (bandeja de gestión de leads), firmado con el
- * secreto compartido. Best-effort: si Ora no responde, el lead ya está a salvo
- * (email + Blob), así que nunca bloqueamos al usuario.
- */
-async function forwardLeadToOra(lead: StoredLead): Promise<void> {
-  const url = process.env.ORA_LEADS_INGEST_URL
-  const secret = process.env.LEADS_INGEST_SECRET
-  if (!url || !secret) return
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` },
-    body: JSON.stringify(lead),
-    // No queremos que un Ora lento retrase la respuesta al usuario.
-    signal: AbortSignal.timeout(4000),
-  })
-  if (!res.ok) throw new Error(`ora ingest ${res.status}`)
 }
 
 /**

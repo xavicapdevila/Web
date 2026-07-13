@@ -20,12 +20,18 @@ export interface StoredLead {
   id: string; // = eventId (permite cruzar con Meta)
   ts: string; // ISO
   lang: string;
-  situation: string; // clave (ahora | meses | explorando | en_venta)
+  /** /vender: ahora | meses | explorando | en_venta.
+      /tu-precio: vender_ya | venta_activa | proximos_meses | solo_curiosidad. */
+  situation: string;
   name: string;
   phone: string;
+  /** Vacío en los leads de /tu-precio (ese form no pide email a propósito). */
   email: string;
   zone: string;
   message?: string;
+  // Solo leads de la landing «Tu precio»
+  precio_esperado?: number;
+  tipo?: string;
   // Atribución
   utm_source?: string;
   utm_medium?: string;
