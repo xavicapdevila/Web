@@ -335,7 +335,8 @@ export default function ComoTrabajamos({ lang = "es" }: { lang?: Lang }) {
     else el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const rating = String(siteConfig.googleReviews.rating).replace(".", ",");
+  // Decimal según idioma: "4,9" en es/ca/fr, "4.9" en en.
+  const rating = siteConfig.googleReviews.rating.toLocaleString(lang);
 
   return (
     <div className="font-gs bg-[#0C0B09] text-[#EFEBE1] antialiased overflow-clip">
