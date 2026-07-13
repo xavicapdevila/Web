@@ -66,36 +66,6 @@ function useLenis() {
   return ref;
 }
 
-/* ── Cursor propio (puntero fino) — enhancement ────────────────────── */
-function Cursor() {
-  const dot = useRef<HTMLDivElement>(null);
-  const [hovering, setHovering] = useState(false);
-  /* Oculto hasta el primer mousemove (si no, nace clavado en el centro de
-     la pantalla) y también sobre iframes (el documento deja de recibir
-     mousemove dentro del Matterport y el punto se quedaba congelado
-     encima del tour, negro por el mix-blend-difference). */
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    if (!window.matchMedia("(pointer:fine)").matches) return;
-    const el = dot.current!;
-    let x = innerWidth / 2, y = innerHeight / 2, cx = x, cy = y, raf = 0;
-    const move = (e: MouseEvent) => { x = e.clientX; y = e.clientY; setVisible(true); };
-    const over = (e: MouseEvent) => {
-      const t = e.target as HTMLElement;
-      setHovering(!!t.closest("a,button,[data-cursor]"));
-      if (t.tagName === "IFRAME" || t.closest("iframe")) setVisible(false);
-    };
-    const loop = () => { cx += (x - cx) * 0.18; cy += (y - cy) * 0.18; el.style.transform = `translate3d(${cx}px,${cy}px,0) translate(-50%,-50%)`; raf = requestAnimationFrame(loop); };
-    addEventListener("mousemove", move); addEventListener("mouseover", over); raf = requestAnimationFrame(loop);
-    return () => { removeEventListener("mousemove", move); removeEventListener("mouseover", over); cancelAnimationFrame(raf); };
-  }, []);
-  return (
-    <div ref={dot} aria-hidden className={`pointer-events-none fixed left-0 top-0 z-[90] hidden lg:block mix-blend-difference transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"}`}>
-      <div className={`rounded-full bg-white transition-[width,height] duration-300 ease-out ${hovering ? "w-12 h-12" : "w-2.5 h-2.5"}`} />
-    </div>
-  );
-}
-
 function Stars({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <span className="inline-flex items-center gap-0.5" aria-label="5 de 5">
@@ -253,7 +223,11 @@ function TourFrame() {
   const [active, setActive] = useState(false);
   return (
     <div className="relative aspect-[4/3] sm:aspect-video overflow-hidden rounded-xl lg:rounded-2xl bg-[#0C0B09] shadow-[0_50px_100px_-50px_rgba(22,21,15,0.5)]">
-      <iframe src={C.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
+      {/* sandbox SIN allow-top-navigation: en iPhone no hay Fullscreen API y
+          el visor de Matterport intenta navegar la página a matterport.com
+          (te sacaba de la landing). Así esa navegación queda bloqueada y
+          sus enlaces externos se abren en pestaña nueva como mucho. */}
+      <iframe src={C.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
       {!active && (
         <button type="button" data-cursor onClick={() => setActive(true)} aria-label="Explorar el tour 3D"
           className="absolute inset-0 flex items-end justify-center pb-5 bg-gradient-to-t from-black/35 to-transparent">
@@ -305,7 +279,6 @@ export default function ComoTrabajamos() {
 
   return (
     <div className="font-gs bg-[#0C0B09] text-[#EFEBE1] antialiased overflow-clip">
-      <Cursor />
       <div aria-hidden className="pointer-events-none fixed inset-0 z-[80] opacity-[0.04] mix-blend-overlay" style={{ backgroundImage: `url("${GRAIN}")`, backgroundSize: "180px" }} />
 
       {/* ── Raíl de capítulos (desktop) ─────────────────────────────── */}

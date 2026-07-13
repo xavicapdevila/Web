@@ -14,7 +14,7 @@ export const COMO_COPY = {
     eyebrow: "Cómo trabajamos",
     titleLead: "Tu casa solo se vende una vez.",
     titleSub: "Esto es exactamente lo que haremos para que salga bien.",
-    cta: "Cuéntanos tu caso",
+    cta: "Hablemos",
     scrollHint: "Baja para verlo todo",
   },
 
@@ -90,7 +90,9 @@ export const COMO_COPY = {
     ],
     note: "Tour real. Arrástralo y recórrelo tú mismo.",
     activate: "Toca para explorar",
-    matterport: "https://my.matterport.com/show/?m=zeLdy8k2NEZ&play=1&qs=1",
+    /* brand=0 + mls=1: sin enlaces de marca de Matterport dentro del visor
+       (menos puertas de salida de la landing, sobre todo en móvil) */
+    matterport: "https://my.matterport.com/show/?m=zeLdy8k2NEZ&play=1&qs=1&brand=0&mls=1",
   },
 
   difusion: {

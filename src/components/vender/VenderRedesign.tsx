@@ -186,7 +186,10 @@ function TourFrame() {
   const [active, setActive] = useState(false);
   return (
     <div className="relative aspect-[4/3] sm:aspect-video overflow-hidden rounded-xl lg:rounded-2xl bg-[#0C0B09] shadow-[0_50px_100px_-50px_rgba(22,21,15,0.5)]">
-      <iframe src={C.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
+      {/* sandbox SIN allow-top-navigation: en iPhone no hay Fullscreen API y
+          el visor de Matterport intenta navegar la página a matterport.com
+          (te sacaba de la landing). Así esa navegación queda bloqueada. */}
+      <iframe src={C.tour.matterport} title="Tour virtual 3D — The Vila Home" loading="lazy" allow="fullscreen; xr-spatial-tracking" allowFullScreen sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" className={`absolute inset-0 h-full w-full ${active ? "" : "pointer-events-none"}`} />
       {!active && (
         <button type="button" data-cursor onClick={() => setActive(true)} aria-label="Explorar el tour 3D"
           className="absolute inset-0 flex items-end justify-center pb-5 bg-gradient-to-t from-black/35 to-transparent">
