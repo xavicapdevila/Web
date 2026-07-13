@@ -20,7 +20,7 @@ export const COMO_COPY = {
 
   indice: {
     eyebrow: "El método",
-    title: "Cinco capítulos. Los mismos para cada casa que trabajamos.",
+    title: "Cinco pasos. Un único objetivo: vender tu casa como se merece.",
     chapters: [
       { n: "01", id: "fotografia", label: "Fotografía", sub: "La primera impresión, cuidada al detalle", preview: "/images/vender/salon-bien-2.jpg" },
       { n: "02", id: "video", label: "Vídeo", sub: "Pensado para detener el dedo", preview: "/images/vender/jardin-2.jpg" },
