@@ -111,7 +111,11 @@ export const COMO_COPY = {
       { src: "/images/portales/habitaclia.svg", alt: "Habitaclia" },
       { src: "/images/portales/pisos.svg", alt: "Pisos.com" },
       { src: "/images/portales/jamesedition.svg", alt: "James Edition" },
-      { src: "/images/portales/luxuryestate.svg", alt: "Luxury Estate" },
+      // Variante solo-wordmark (sin el badge oscuro): aquí los logos van en
+      // blanco (brightness-0 invert) sobre fondo oscuro y con el original el
+      // badge se convertía en un bloque blanco. El .svg original se conserva
+      // para /vender y /vende-tu-casa (fondo claro).
+      { src: "/images/portales/luxuryestate-white.svg", alt: "Luxury Estate" },
       { src: "/images/portales/properstar.svg", alt: "Properstar" },
       { src: "/images/portales/instagram.svg", alt: "Instagram" },
       { src: "/images/portales/facebook.svg", alt: "Facebook" },
