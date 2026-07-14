@@ -16,6 +16,7 @@ const iconStyles: Record<string, { bg: string; color: string }> = {
   work:    { bg: '#e8eaf6', color: '#283593' },
   contact: { bg: '#fbe9e7', color: '#bf360c' },
   jobs:    { bg: '#f0fdf4', color: '#166534' },
+  method:  { bg: '#e0f2f1', color: '#00695c' },
 }
 
 // Used when an item references an icon key the web doesn't know yet
@@ -74,6 +75,14 @@ const iconSvgs: Record<string, React.ReactNode> = {
       <line x1="10" y1="14" x2="14" y2="14"/>
     </svg>
   ),
+  method: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3z"/>
+      <path d="m6.2 5.3 3.1 3.9"/>
+      <path d="m12.4 3.4 3.1 4"/>
+      <path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    </svg>
+  ),
 }
 
 const FallbackIcon = (
@@ -103,9 +112,17 @@ declare global {
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 
+const isLang = (v: string | null): v is Lang =>
+  v === 'ca' || v === 'es' || v === 'en' || v === 'fr'
+
 export default function LinksClient({ data, defaultJobsOpen = false }: { data: LinksDoc; defaultJobsOpen?: boolean }) {
-  const [lang, setLang] = useState<Lang>('ca')
   const params = useSearchParams()
+  // Idioma por defecto: catalán (todo el Instagram está en catalán). Si la URL
+  // trae ?lang=es|en|fr, entran directamente en ese idioma (una bio por idioma).
+  const [lang, setLang] = useState<Lang>(() => {
+    const q = params.get('lang')
+    return isLang(q) ? q : 'ca'
+  })
   const [jobsOpen, setJobsOpen] = useState(() => defaultJobsOpen || params.get('jobs') === '1')
 
   useEffect(() => {

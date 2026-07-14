@@ -75,6 +75,15 @@ export const DEFAULT_CONTENT: LinksDoc = {
           },
         },
         {
+          id: 'metodo', icon: 'method', href: '/como-trabajamos',
+          external: false, comingSoon: false, active: true,
+          label: { ca: 'Com treballem', es: 'Cómo trabajamos', en: 'How we work', fr: 'Comment nous travaillons' },
+          desc: {
+            ca: 'El nostre mètode, capítol a capítol', es: 'Nuestro método, capítulo a capítulo',
+            en: 'Our method, chapter by chapter', fr: 'Notre méthode, chapitre par chapitre',
+          },
+        },
+        {
           id: 'work', icon: 'work', href: '/quienes-somos',
           external: false, comingSoon: false, active: true,
           label: { ca: 'Com som', es: 'Cómo somos', en: 'Who we are', fr: 'Qui sommes-nous' },
