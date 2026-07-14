@@ -845,14 +845,16 @@ export default function DinosPrecio() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/logo.svg" alt="The Vila Home" className="h-8 sm:h-9 w-auto" style={{ filter: "brightness(0)" }} />
           </a>
+          {/* Enlaces legales en pestaña nueva: no queremos sacar al visitante
+              de la landing de campaña (evitar fugas). */}
           <nav className="flex items-center gap-6 text-[13px]">
-            <a href="/aviso-legal" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
+            <a href="/aviso-legal" target="_blank" rel="noopener" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
               {c.footer.legal}
             </a>
-            <a href="/privacidad" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
+            <a href="/privacidad" target="_blank" rel="noopener" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
               {c.footer.privacy}
             </a>
-            <a href="/cookies" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
+            <a href="/cookies" target="_blank" rel="noopener" className="text-[#7d786c] hover:text-[#16150F] transition-colors">
               {c.footer.cookies}
             </a>
           </nav>
