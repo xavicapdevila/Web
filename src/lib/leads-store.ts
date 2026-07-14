@@ -29,6 +29,10 @@ export interface StoredLead {
   consent?: boolean; // aceptación explícita de la política de privacidad (RGPD)
   message?: string;
   source?: string; // formulario de origen (vender | como-trabajamos | …)
+  // Solo leads de la landing «Dinos tu precio» (campaña de precio). Ese
+  // formulario no pide email (a propósito) y el precio es un número.
+  precio_esperado?: number;
+  tipo?: string;
   // Atribución
   utm_source?: string;
   utm_medium?: string;
