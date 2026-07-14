@@ -56,7 +56,7 @@ const MYMEMORY_LANG: Record<Lang, string> = {
   fr: "fr",
 };
 
-export function LanguageProvider({ children, forceLang }: { children: React.ReactNode; forceLang?: Lang }) {
+export function LanguageProvider({ children, forceLang, urlOnly }: { children: React.ReactNode; forceLang?: Lang; urlOnly?: boolean }) {
   const [lang, setLangState] = useState<Lang>(forceLang ?? DEFAULT_LANG);
   const [translations, setTranslations] = useState<Translations>(getTranslations(forceLang ?? DEFAULT_LANG));
 
@@ -79,6 +79,17 @@ export function LanguageProvider({ children, forceLang }: { children: React.Reac
     }
     const param = new URLSearchParams(window.location.search).get("lang") as Lang | null;
     const fromUrl = param && SUPPORTED.includes(param) ? param : null;
+    // Landings de campaña (urlOnly): la URL manda y punto. Sin `?lang=` →
+    // español (el idioma canónico). NO se lee cookie ni idioma del navegador,
+    // para que la URL a secas sea determinista (los anuncios fijan el idioma
+    // con `?lang=`). Tampoco se persiste cookie: no queremos que una visita a
+    // la landing contamine el idioma del resto del sitio.
+    if (urlOnly) {
+      const initial = fromUrl ?? DEFAULT_LANG;
+      setLangState(initial);
+      setTranslations(getTranslations(initial));
+      return;
+    }
     const saved = readLangCookie();
     const initial = fromUrl ?? saved ?? detectLang();
     setLangState(initial);
@@ -86,13 +97,16 @@ export function LanguageProvider({ children, forceLang }: { children: React.Reac
     if (initial !== saved) {
       document.cookie = `${COOKIE_NAME}=${initial}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
     }
-  }, [forceLang]);
+  }, [forceLang, urlOnly]);
 
   const setLang = useCallback((newLang: Lang) => {
     setLangState(newLang);
     setTranslations(getTranslations(newLang));
+    // En landings de campaña (urlOnly) el idioma es efímero: no persiste cookie
+    // global (el estado de la URL manda). En el resto del sitio, sí.
+    if (urlOnly) return;
     document.cookie = `${COOKIE_NAME}=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`;
-  }, []);
+  }, [urlOnly]);
 
   const t = useCallback((key: TKey): string => translations[key], [translations]);
 

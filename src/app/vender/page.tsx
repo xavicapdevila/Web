@@ -38,7 +38,7 @@ export default function VenderPage() {
   // /vender es "standalone" (el layout no la envuelve en LanguageProvider),
   // así que lo hacemos aquí para el selector de idioma y el copy 4 idiomas.
   return (
-    <LanguageProvider>
+    <LanguageProvider urlOnly>
       <CookieConsentProvider>
         <DinosPrecio />
         <CookieBanner />

@@ -384,6 +384,15 @@ export default function DinosPrecio() {
       if (i === f.tipo.length - 1) requestAnimationFrame(() => tipoOtroRef.current?.focus());
     } else setTime(i);
   }
+  // Cambia el idioma y refleja el estado en la URL (?lang=xx; «es» = URL a
+  // secas). Así la landing es determinista, compartible y estable al recargar.
+  function switchLang(l: Lang) {
+    setLang(l);
+    const u = new URL(window.location.href);
+    if (l === "es") u.searchParams.delete("lang");
+    else u.searchParams.set("lang", l);
+    window.history.replaceState(null, "", u.toString());
+  }
   function ctaToForm() {
     if (step === 4) return;
     scrollToCard();
@@ -506,7 +515,7 @@ export default function DinosPrecio() {
                     {l}
                   </span>
                 ) : (
-                  <button key={l} type="button" onClick={() => setLang(l as Lang)} className="px-1.5 py-1 opacity-50 hover:opacity-100 transition-opacity uppercase">
+                  <button key={l} type="button" onClick={() => switchLang(l as Lang)} className="px-1.5 py-1 opacity-50 hover:opacity-100 transition-opacity uppercase">
                     {l}
                   </button>
                 ),
