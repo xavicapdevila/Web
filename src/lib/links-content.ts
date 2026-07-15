@@ -19,6 +19,14 @@ export type LinkItem = {
   id: string
   icon: string
   href: string
+  /**
+   * URL propia por idioma, opcional. Para destinos que NO aceptan `?lang=`
+   * porque fijan el idioma por ruta (p. ej. la landing del método:
+   * /com-treballem · /como-trabajamos · /how-we-work · /notre-methode) o para
+   * enlaces externos distintos por idioma. Si falta el idioma activo, se cae a
+   * `href`. Editable desde Ora, sin tocar código.
+   */
+  hrefByLang?: Partial<Translated>
   external: boolean
   comingSoon: boolean
   active: boolean

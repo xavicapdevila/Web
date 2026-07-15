@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   getLinksContent,
   saveLinksContent,
+  LANGS,
   type LinksDoc,
   type Translated,
 } from '@/lib/links-content'
@@ -26,6 +27,22 @@ function translated(v: unknown): Translated {
   return { ca: str(o.ca), es: str(o.es), en: str(o.en), fr: str(o.fr) }
 }
 
+/**
+ * URL por idioma: opcional y PARCIAL — solo se guardan los idiomas con valor,
+ * y si no queda ninguno se omite el campo. Así un item sin overrides no arrastra
+ * cuatro cadenas vacías por el documento.
+ */
+function hrefByLang(v: unknown): Partial<Translated> | undefined {
+  if (!v || typeof v !== 'object') return undefined
+  const o = v as Record<string, unknown>
+  const out: Partial<Translated> = {}
+  for (const l of LANGS) {
+    const s = str(o[l]).trim()
+    if (s) out[l] = s
+  }
+  return Object.keys(out).length > 0 ? out : undefined
+}
+
 /** Coerce arbitrary input into a clean LinksDoc (fills langs, generates ids). */
 function normalizeDoc(body: unknown): LinksDoc | null {
   if (!body || typeof body !== 'object') return null
@@ -44,6 +61,7 @@ function normalizeDoc(body: unknown): LinksDoc | null {
             id: str(item.id) || crypto.randomUUID(),
             icon: str(item.icon) || 'props',
             href: str(item.href),
+            hrefByLang: hrefByLang(item.hrefByLang),
             external: Boolean(item.external),
             comingSoon: Boolean(item.comingSoon),
             active: item.active === undefined ? true : Boolean(item.active),

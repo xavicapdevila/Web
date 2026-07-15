@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Script from 'next/script'
 import JobsModal from './JobsModal'
-import type { Lang, LinksDoc } from '@/lib/links-content'
+import type { Lang, LinkItem, LinksDoc } from '@/lib/links-content'
 
 const iconStyles: Record<string, { bg: string; color: string }> = {
   ig:      { bg: '#fce4ec', color: '#c2185b' },
@@ -162,14 +162,19 @@ export default function LinksClient({ data, defaultJobsOpen = false }: { data: L
     setJobsOpen(true)
   }, [trackClick])
 
-  // Los enlaces internos arrastran el idioma elegido aquí: las páginas
-  // multiidioma (/vende-tu-casa, /vender) se abren en el mismo idioma.
+  // Resolución del destino, por orden:
+  //  1) hrefByLang del propio enlace — URL puesta a mano por idioma desde Ora
+  //     (vale también para externos: otra cuenta, otro formulario…).
+  //  2) ROUTE_GROUP — landings de la web con ruta por idioma; red de seguridad
+  //     para contenido antiguo que aún no tiene hrefByLang.
+  //  3) ?lang= — el resto del sitio, que sí lo respeta vía LanguageProvider.
   const withLang = useCallback(
-    (href: string, external: boolean) => {
+    (item: LinkItem) => {
+      const propio = item.hrefByLang?.[lang]?.trim()
+      if (propio) return propio
+      const { href, external } = item
       if (external || !href.startsWith('/')) return href
       const [path, query] = href.split('?')
-      // Si la landing tiene una ruta por idioma, la ruta ya fija el idioma
-      // (ignora ?lang=), así que enlazamos a la suya en vez de añadir el query.
       const localized = ROUTE_GROUP.get(path)?.[lang]
       if (localized) return query ? `${localized}?${query}` : localized
       return `${href}${href.includes('?') ? '&' : '?'}lang=${lang}`
@@ -257,7 +262,7 @@ export default function LinksClient({ data, defaultJobsOpen = false }: { data: L
                 return (
                   <a
                     key={item.id}
-                    href={withLang(item.href, item.external)}
+                    href={withLang(item)}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     onClick={() => trackClick(label, item.href, item.id)}
