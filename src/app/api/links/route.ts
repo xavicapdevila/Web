@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   getLinksContent,
   saveLinksContent,
+  listLinksHistory,
+  getLinksVersion,
   LANGS,
   type LinksDoc,
   type Translated,
@@ -74,12 +76,36 @@ function normalizeDoc(body: unknown): LinksDoc | null {
   }
 }
 
+/**
+ *   GET                  → documento vivo
+ *   GET ?historial=1     → versiones archivadas (fecha + url), recientes primero
+ *   GET ?version=<url>   → contenido de una versión archivada
+ * Para restaurar: leer la versión y volver a mandarla por PUT.
+ */
 export async function GET(req: NextRequest) {
   if (!authorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const noStore = { 'Cache-Control': 'no-store' }
+
+  if (req.nextUrl.searchParams.get('historial') === '1') {
+    return NextResponse.json({ versiones: await listLinksHistory() }, { headers: noStore })
+  }
+
+  const version = req.nextUrl.searchParams.get('version')
+  if (version) {
+    // Solo URLs del propio Blob: sin esto, esta ruta autenticada haría de
+    // proxy hacia cualquier host que le pidieran (SSRF).
+    if (!/^https:\/\/[a-z0-9-]+\.public\.blob\.vercel-storage\.com\//i.test(version)) {
+      return NextResponse.json({ error: 'Invalid version url' }, { status: 400 })
+    }
+    const doc = await getLinksVersion(version)
+    if (!doc) return NextResponse.json({ error: 'Version not found' }, { status: 404 })
+    return NextResponse.json(doc, { headers: noStore })
+  }
+
   const doc = await getLinksContent()
-  return NextResponse.json(doc, { headers: { 'Cache-Control': 'no-store' } })
+  return NextResponse.json(doc, { headers: noStore })
 }
 
 export async function PUT(req: NextRequest) {

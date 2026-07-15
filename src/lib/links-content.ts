@@ -10,6 +10,18 @@
 
 const BLOB_KEY = 'links-content.json'
 
+/**
+ * Histórico. Antes de pisar el documento vivo se archiva el anterior aquí, y se
+ * conservan los últimos HISTORY_KEEP. Sin esto, un guardado malo desde el panel
+ * de Ora era IRRECUPERABLE: `put` sobrescribe la misma clave y no queda copia.
+ *
+ * Prefijo propio a propósito: `list({ prefix })` hace match por prefijo de
+ * cadena, así que un `links-content...` cualquiera colisionaría con BLOB_KEY y
+ * el lector confundiría una copia con el documento vivo.
+ */
+const HISTORY_PREFIX = 'links-history/'
+const HISTORY_KEEP = 10
+
 export type Lang = 'ca' | 'es' | 'en' | 'fr'
 export const LANGS: Lang[] = ['ca', 'es', 'en', 'fr']
 
@@ -182,12 +194,62 @@ export async function getLinksContent(): Promise<LinksDoc> {
   return doc
 }
 
+export type LinksVersion = {
+  /** ISO del momento en que ESE documento dejó de ser el vivo. */
+  archivedAt: string
+  url: string
+  pathname: string
+}
+
+/** Versiones archivadas, de la más reciente a la más antigua. */
+export async function listLinksHistory(): Promise<LinksVersion[]> {
+  try {
+    const { list } = await import('@vercel/blob')
+    const { blobs } = await list({ prefix: HISTORY_PREFIX })
+    return blobs
+      .map(b => ({ archivedAt: b.uploadedAt.toISOString(), url: b.url, pathname: b.pathname }))
+      .sort((a, b) => b.archivedAt.localeCompare(a.archivedAt))
+  } catch {
+    return []
+  }
+}
+
+/** Contenido de una versión archivada (su `url` sale de listLinksHistory). */
+export async function getLinksVersion(url: string): Promise<LinksDoc | null> {
+  try {
+    const res = await fetch(url, { cache: 'no-store' })
+    if (!res.ok) return null
+    const doc = (await res.json()) as LinksDoc
+    return Array.isArray(doc?.sections) ? doc : null
+  } catch {
+    return null
+  }
+}
+
 /**
- * Persists the full content document and prunes older blob versions.
- * Requires BLOB_READ_WRITE_TOKEN (present in prod and in .env.local).
+ * Persists the full content document. Requires BLOB_READ_WRITE_TOKEN (present
+ * in prod and in .env.local).
+ *
+ * Archiva la versión anterior ANTES de pisarla y conserva las últimas
+ * HISTORY_KEEP, para que un guardado equivocado tenga vuelta atrás.
  */
 export async function saveLinksContent(doc: LinksDoc): Promise<void> {
   const { put, list, del } = await import('@vercel/blob')
+
+  // Archivar el anterior primero: si esto falla, NO se guarda, porque quedarse
+  // sin copia es justo lo que este histórico existe para evitar. Solo se sigue
+  // adelante si no había nada que archivar (primer guardado).
+  const previo = await readBlob()
+  if (previo) {
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    await put(`${HISTORY_PREFIX}${stamp}.json`, JSON.stringify(previo), {
+      access: 'public',
+      contentType: 'application/json',
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    })
+  }
+
   await put(BLOB_KEY, JSON.stringify(doc), {
     access: 'public',
     contentType: 'application/json',
@@ -195,13 +257,16 @@ export async function saveLinksContent(doc: LinksDoc): Promise<void> {
     allowOverwrite: true,
     cacheControlMaxAge: 0, // content changes on edit — keep reads fresh
   })
+
+  // Podar el histórico. Best-effort: que sobren copias no rompe nada, así que
+  // un fallo aquí no debe tumbar un guardado que ya se hizo bien.
   try {
-    const { blobs } = await list({ prefix: BLOB_KEY })
+    const { blobs } = await list({ prefix: HISTORY_PREFIX })
     const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     )
-    if (sorted.length > 1) {
-      await Promise.allSettled(sorted.slice(1).map(b => del(b.url)))
+    if (sorted.length > HISTORY_KEEP) {
+      await Promise.allSettled(sorted.slice(HISTORY_KEEP).map(b => del(b.url)))
     }
   } catch {}
 }
