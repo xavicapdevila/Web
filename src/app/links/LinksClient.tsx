@@ -115,6 +115,18 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID ?? ''
 const isLang = (v: string | null): v is Lang =>
   v === 'ca' || v === 'es' || v === 'en' || v === 'fr'
 
+// Landings con idioma fijo POR RUTA: ignoran ?lang=, así que el bio-link tiene
+// que apuntar a la ruta del idioma activo. Se indexa cada variante para que
+// valga cualquiera que se haya guardado en Ora.
+const LOCALIZED_ROUTES: Record<Lang, string>[] = [
+  { ca: '/com-treballem', es: '/como-trabajamos', en: '/how-we-work', fr: '/notre-methode' },
+]
+
+const ROUTE_GROUP = new Map<string, Record<Lang, string>>()
+for (const group of LOCALIZED_ROUTES) {
+  for (const path of Object.values(group)) ROUTE_GROUP.set(path, group)
+}
+
 export default function LinksClient({ data, defaultJobsOpen = false }: { data: LinksDoc; defaultJobsOpen?: boolean }) {
   const params = useSearchParams()
   // Idioma por defecto: catalán (todo el Instagram está en catalán). Si la URL
@@ -153,8 +165,15 @@ export default function LinksClient({ data, defaultJobsOpen = false }: { data: L
   // Los enlaces internos arrastran el idioma elegido aquí: las páginas
   // multiidioma (/vende-tu-casa, /vender) se abren en el mismo idioma.
   const withLang = useCallback(
-    (href: string, external: boolean) =>
-      external || !href.startsWith('/') ? href : `${href}${href.includes('?') ? '&' : '?'}lang=${lang}`,
+    (href: string, external: boolean) => {
+      if (external || !href.startsWith('/')) return href
+      const [path, query] = href.split('?')
+      // Si la landing tiene una ruta por idioma, la ruta ya fija el idioma
+      // (ignora ?lang=), así que enlazamos a la suya en vez de añadir el query.
+      const localized = ROUTE_GROUP.get(path)?.[lang]
+      if (localized) return query ? `${localized}?${query}` : localized
+      return `${href}${href.includes('?') ? '&' : '?'}lang=${lang}`
+    },
     [lang],
   )
 
