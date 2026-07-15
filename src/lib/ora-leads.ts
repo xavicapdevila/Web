@@ -10,7 +10,8 @@
  * valores nuevos sin migración).
  *
  * Best-effort SIEMPRE: si Ora no responde, el lead ya está a salvo por email
- * (+ Blob), así que nunca bloqueamos al usuario por esto.
+ * (el aviso al equipo es la tarea crítica), así que nunca bloqueamos al
+ * usuario por esto.
  */
 export async function forwardLeadToOra(payload: object): Promise<void> {
   const url = process.env.ORA_LEADS_INGEST_URL;

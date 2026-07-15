@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
-import { saveLead, type StoredLead } from '@/lib/leads-store'
+import type { Lead } from '@/lib/lead'
 import { buildTuPrecioTeamEmail } from '@/lib/lead-emails'
 import { sendMetaLeadEvent } from '@/lib/meta-capi'
 import { forwardLeadToOra } from '@/lib/ora-leads'
@@ -12,9 +12,8 @@ import { forwardLeadToOra } from '@/lib/ora-leads'
  * Mismo pipeline que /api/vender-lead pero con el payload de esta campaña
  * (precio esperado, municipio, tipo, «cuándo»; sin email del lead):
  *   1. Email de alerta al equipo (crítico — si falla, 500)
- *   2. Persistencia en Blob con la atribución
- *   3. Reenvío a Ora (best-effort) mapeado al esquema real del módulo Leads
- *   4. Meta Conversions API con dedup por eventId (solo con consentimiento)
+ *   2. Reenvío a Ora (best-effort) mapeado al esquema real del módulo Leads
+ *   3. Meta Conversions API con dedup por eventId (solo con consentimiento)
  *
  * Validación estricta a mano (patrón del repo; no hay Zod en el proyecto):
  * whitelist de timeline, teléfono normalizado, precio acotado, longitudes máx.
@@ -117,7 +116,7 @@ export async function POST(request: Request) {
     const sourceUrl = attrStr(body.sourceUrl)
     const userAgent = request.headers.get('user-agent') ?? undefined
 
-    const lead: StoredLead = {
+    const lead: Lead = {
       id: eventId,
       ts: new Date().toISOString(),
       lang: idioma,
@@ -137,8 +136,6 @@ export async function POST(request: Request) {
       fbclid: marketingOk ? attrStr(attribution.fbclid) : undefined,
       landing: attrStr(attribution.landing),
       referrer: attrStr(attribution.referrer),
-      ip,
-      userAgent,
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY)
@@ -169,9 +166,7 @@ export async function POST(request: Request) {
           if (r.error) throw new Error(r.error.message)
           return r
         }),
-      // 2) Persistir el lead con su atribución
-      saveLead(lead),
-      // 3) Reenviar a Ora (bandeja de leads). Best-effort.
+      // 2) Reenviar a Ora (bandeja de leads). Best-effort.
       forwardLeadToOra({
         id: eventId,
         nombre,
@@ -190,7 +185,7 @@ export async function POST(request: Request) {
         referrer: lead.referrer,
       }),
     ]
-    // 4) Conversions API server-side (dedup con el Pixel por eventId).
+    // 3) Conversions API server-side (dedup con el Pixel por eventId).
     //    RGPD: solo si el visitante consintió cookies de marketing.
     if (marketingOk) {
       const [firstName, ...rest] = nombre.split(/\s+/)

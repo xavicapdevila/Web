@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
 import type { Lang } from '@/lib/i18n'
-import { saveLead, type StoredLead } from '@/lib/leads-store'
+import type { Lead } from '@/lib/lead'
 import { buildAutoReplyEmail, buildTeamEmail } from '@/lib/lead-emails'
 import { sendMetaLeadEvent } from '@/lib/meta-capi'
+import { forwardLeadToOra } from '@/lib/ora-leads'
 import { verifyTurnstile } from '@/lib/turnstile'
 
 const MAX = 2000 // límite defensivo por campo
@@ -26,25 +27,6 @@ function attrStr(v: unknown): string | undefined {
   if (typeof v !== 'string') return undefined
   const s = v.trim().slice(0, 300)
   return s || undefined
-}
-
-/**
- * Reenvía el lead al hub Ora (bandeja de gestión de leads), firmado con el
- * secreto compartido. Best-effort: si Ora no responde, el lead ya está a salvo
- * (email + Blob), así que nunca bloqueamos al usuario.
- */
-async function forwardLeadToOra(lead: StoredLead): Promise<void> {
-  const url = process.env.ORA_LEADS_INGEST_URL
-  const secret = process.env.LEADS_INGEST_SECRET
-  if (!url || !secret) return
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${secret}` },
-    body: JSON.stringify(lead),
-    // No queremos que un Ora lento retrase la respuesta al usuario.
-    signal: AbortSignal.timeout(4000),
-  })
-  if (!res.ok) throw new Error(`ora ingest ${res.status}`)
 }
 
 /**
@@ -123,7 +105,7 @@ export async function POST(request: Request) {
     const sourceUrl = attrStr(body.sourceUrl)
     const userAgent = request.headers.get('user-agent') ?? undefined
 
-    const lead: StoredLead = {
+    const lead: Lead = {
       id: eventId,
       ts: new Date().toISOString(),
       lang,
@@ -133,7 +115,6 @@ export async function POST(request: Request) {
       email,
       zone,
       precio: precio || undefined,
-      consent: body.consent === true ? true : undefined, // traza RGPD
       message: message || undefined,
       source,
       utm_source: attrStr(attribution.utm_source),
@@ -145,8 +126,6 @@ export async function POST(request: Request) {
       gclid: marketingOk ? attrStr(attribution.gclid) : undefined,
       landing: attrStr(attribution.landing),
       referrer: attrStr(attribution.referrer),
-      ip,
-      userAgent,
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY)
@@ -175,12 +154,10 @@ export async function POST(request: Request) {
         subject: auto.subject,
         html: auto.html,
       }),
-      // 3) Persistir el lead con su atribución
-      saveLead(lead),
-      // 4) Reenviar a Ora (bandeja de gestión de leads). Best-effort.
+      // 3) Reenviar a Ora (bandeja de gestión de leads). Best-effort.
       forwardLeadToOra(lead),
     ]
-    // 5) Conversions API server-side (dedup con el Pixel por eventId).
+    // 4) Conversions API server-side (dedup con el Pixel por eventId).
     //    RGPD: solo si el visitante consintió cookies de marketing.
     if (marketingOk) {
       tasks.push(

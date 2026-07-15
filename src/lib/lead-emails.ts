@@ -8,7 +8,7 @@
  */
 
 import type { Lang } from "@/lib/i18n";
-import type { StoredLead } from "@/lib/leads-store";
+import type { Lead } from "@/lib/lead";
 
 function escapeHtml(s: string): string {
   return s
@@ -210,7 +210,7 @@ const SOURCE_LABELS: Record<string, string> = {
 };
 
 // Origen legible del lead (de dónde viene), a partir de UTMs / click ids.
-function originLabel(lead: StoredLead): string {
+function originLabel(lead: Lead): string {
   const s = (lead.utm_source || "").toLowerCase();
   if (s.includes("google")) return "Google";
   if (s.includes("insta")) return "Instagram";
@@ -225,7 +225,7 @@ function originLabel(lead: StoredLead): string {
 }
 
 /** HTML del aviso al equipo, con todos los datos y la atribución de campaña. */
-export function buildTeamEmail(lead: StoredLead): { subject: string; html: string } {
+export function buildTeamEmail(lead: Lead): { subject: string; html: string } {
   const situation = situationLabel(lead.situation, "es");
   const urgency = SITUATION_URGENCY[lead.situation] ?? SITUATION_URGENCY.explorando;
   const langKey = (lead.lang || "es").toLowerCase();
@@ -331,7 +331,7 @@ const TIMELINE_URGENCY: Record<string, { bg: string; fg: string; tag: string }> 
  * vender ya. El form no pide email (a propósito): contacto solo por
  * teléfono/WhatsApp.
  */
-export function buildTuPrecioTeamEmail(lead: StoredLead): { subject: string; html: string } {
+export function buildTuPrecioTeamEmail(lead: Lead): { subject: string; html: string } {
   const timeline = TIMELINE_LABELS[lead.situation] ?? lead.situation;
   const urgency = TIMELINE_URGENCY[lead.situation] ?? TIMELINE_URGENCY.solo_curiosidad;
   const langKey = (lead.lang || "es").toLowerCase();
