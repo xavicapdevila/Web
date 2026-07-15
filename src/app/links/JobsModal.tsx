@@ -178,6 +178,7 @@ export default function JobsModal({ open, onClose, lang }: Props) {
     fd.append('email',   email)
     fd.append('message', message)
     fd.append('cv',      file)
+    fd.append('lang',    lang) // el acuse de recibo se manda en su idioma
     if (turnstileToken) fd.append('turnstileToken', turnstileToken)
 
     try {

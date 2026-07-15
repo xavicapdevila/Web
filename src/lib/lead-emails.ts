@@ -132,49 +132,156 @@ const AUTO_REPLY: Record<Lang, AutoReplyCopy> = {
   },
 };
 
-/** HTML de la autorespuesta al vendedor, en su idioma. */
-export function buildAutoReplyEmail(name: string, lang: Lang): { subject: string; html: string } {
-  const c = AUTO_REPLY[lang] ?? AUTO_REPLY.es;
-  const firstName = escapeHtml((name.trim().split(/\s+/)[0] || name).trim());
+const BODY_FONT = "font-family:'Inter','Helvetica Neue',Arial,sans-serif";
+const DISPLAY_FONT = "font-family:'Inter Tight','Helvetica Neue',Arial,sans-serif";
 
-  const body = "font-family:'Inter','Helvetica Neue',Arial,sans-serif";
-  const display = "font-family:'Inter Tight','Helvetica Neue',Arial,sans-serif";
+const REGLA = `<div style="height:1px;background:#ececec;margin:34px 0;font-size:0;line-height:0">&nbsp;</div>`;
 
-  const html = `
+/**
+ * Maqueta compartida de las autorespuestas (logo, tipografía, regla, firma y
+ * pie legal). Cada correo aporta solo su `cuerpo`: así un retoque de marca se
+ * hace una vez y vale para todos.
+ */
+function shellAutoReply(o: {
+  headline: string;
+  cuerpo: string;
+  signoff: string;
+  team: string;
+  legal: string;
+}): string {
+  return `
   <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;600;700;800&display=swap');</style>
   <div style="margin:0;padding:0;background:#ececec">
     <div style="max-width:560px;margin:0 auto;padding:36px 18px">
       <div style="background:#ffffff;border-radius:6px;overflow:hidden">
         <div style="height:4px;background:#111111;font-size:0;line-height:0">&nbsp;</div>
-        <div style="padding:44px 42px 36px;${body};color:#454545">
+        <div style="padding:44px 42px 36px;${BODY_FONT};color:#454545">
 
           <img src="https://www.thevilahome.com/images/email/logo.png" alt="The Vila Home" width="150" style="display:block;width:150px;height:auto;border:0" />
 
           <div style="height:1px;background:#ececec;margin:28px 0 32px;font-size:0;line-height:0">&nbsp;</div>
 
-          <p style="${display};font-size:30px;font-weight:600;letter-spacing:-.025em;line-height:1.15;margin:0 0 22px;color:#111111">${c.headline(firstName)}</p>
-
-          <p style="font-size:15px;line-height:1.75;margin:0 0 15px;color:#454545">${c.intro}</p>
-          <p style="font-size:15px;line-height:1.75;margin:0;color:#454545">${c.next}</p>
-
-          <div style="height:1px;background:#ececec;margin:34px 0;font-size:0;line-height:0">&nbsp;</div>
-
-          <p style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#9a9a9a;margin:0 0 8px">${c.meanwhileLabel}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px;color:#454545">${c.meanwhile}</p>
-          <a href="${c.siteUrl}" style="display:inline-block;${display};background:#111111;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.01em;padding:15px 30px;border-radius:8px">${c.siteCta}&nbsp;&rarr;</a>
-          <p style="font-size:13px;line-height:1.6;margin:16px 0 0;color:#8f8f8f">${c.disclaimer}</p>
-
+          <p style="${DISPLAY_FONT};font-size:30px;font-weight:600;letter-spacing:-.025em;line-height:1.15;margin:0 0 22px;color:#111111">${o.headline}</p>
+${o.cuerpo}
           <div style="height:1px;background:#ececec;margin:34px 0 26px;font-size:0;line-height:0">&nbsp;</div>
 
-          <p style="font-size:15px;line-height:1.6;margin:0;color:#454545">${c.signoff}<br/><strong style="color:#111111;font-weight:600">${c.team}</strong></p>
+          <p style="font-size:15px;line-height:1.6;margin:0;color:#454545">${o.signoff}<br/><strong style="color:#111111;font-weight:600">${o.team}</strong></p>
 
         </div>
       </div>
-      <p style="${body};font-size:11px;line-height:1.6;color:#9a9a9a;text-align:center;margin:22px 12px 0">${c.legal}</p>
+      <p style="${BODY_FONT};font-size:11px;line-height:1.6;color:#9a9a9a;text-align:center;margin:22px 12px 0">${o.legal}</p>
     </div>
   </div>`;
+}
 
-  return { subject: c.subject, html };
+/** Nombre de pila, escapado. */
+function primerNombre(name: string): string {
+  return escapeHtml((name.trim().split(/\s+/)[0] || name).trim());
+}
+
+/** HTML de la autorespuesta al vendedor, en su idioma. */
+export function buildAutoReplyEmail(name: string, lang: Lang): { subject: string; html: string } {
+  const c = AUTO_REPLY[lang] ?? AUTO_REPLY.es;
+
+  const cuerpo = `
+          <p style="font-size:15px;line-height:1.75;margin:0 0 15px;color:#454545">${c.intro}</p>
+          <p style="font-size:15px;line-height:1.75;margin:0;color:#454545">${c.next}</p>
+
+          ${REGLA}
+
+          <p style="font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#9a9a9a;margin:0 0 8px">${c.meanwhileLabel}</p>
+          <p style="font-size:15px;line-height:1.6;margin:0 0 20px;color:#454545">${c.meanwhile}</p>
+          <a href="${c.siteUrl}" style="display:inline-block;${DISPLAY_FONT};background:#111111;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:.01em;padding:15px 30px;border-radius:8px">${c.siteCta}&nbsp;&rarr;</a>
+          <p style="font-size:13px;line-height:1.6;margin:16px 0 0;color:#8f8f8f">${c.disclaimer}</p>
+`;
+
+  return {
+    subject: c.subject,
+    html: shellAutoReply({
+      headline: c.headline(primerNombre(name)),
+      cuerpo,
+      signoff: c.signoff,
+      team: c.team,
+      legal: c.legal,
+    }),
+  };
+}
+
+// ── Acuse de recibo de una candidatura (/links → «Treballa amb nosaltres») ────
+
+type JobsReplyCopy = {
+  subject: string;
+  headline: (name: string) => string;
+  intro: string;
+  next: string;
+  signoff: string;
+  team: string;
+  legal: string;
+};
+
+/**
+ * A propósito NO promete responder a todo el mundo ni dar una negativa: solo
+ * dice que si encaja, se le escribe. Prometer lo que no se va a cumplir es peor
+ * que no prometer nada.
+ */
+const JOBS_REPLY: Record<Lang, JobsReplyCopy> = {
+  es: {
+    subject: "Hemos recibido tu CV — The Vila Home",
+    headline: (n) => `Recibido, ${n}.`,
+    intro: "Gracias por pensar en nosotros. Tu CV ya está en nuestras manos.",
+    next: "Lo leemos con calma, uno a uno. Si encaja con lo que buscamos, nos ponemos en contacto contigo.",
+    signoff: "Un saludo,",
+    team: "El equipo de The Vila Home",
+    legal: "Recibes este correo porque nos enviaste tu candidatura desde thevilahome.com.<br/>Conservamos tu CV un máximo de 12 meses para este proceso de selección.",
+  },
+  ca: {
+    subject: "Hem rebut el teu CV — The Vila Home",
+    headline: (n) => `Rebut, ${n}.`,
+    intro: "Gràcies per pensar en nosaltres. Ja tenim el teu CV.",
+    next: "El llegim amb calma, un a un. Si encaixa amb el que busquem, ens posem en contacte amb tu.",
+    signoff: "Una salutació,",
+    team: "L'equip de The Vila Home",
+    legal: "Reps aquest correu perquè ens vas enviar la teva candidatura des de thevilahome.com.<br/>Conservem el teu CV un màxim de 12 mesos per a aquest procés de selecció.",
+  },
+  en: {
+    subject: "We've received your CV — The Vila Home",
+    headline: (n) => `Got it, ${n}.`,
+    intro: "Thanks for thinking of us. Your CV is in our hands.",
+    next: "We read every one carefully. If it's a fit for what we're looking for, we'll get in touch.",
+    signoff: "Best,",
+    team: "The Vila Home team",
+    legal: "You're receiving this email because you sent us your application at thevilahome.com.<br/>We keep your CV for a maximum of 12 months for this selection process.",
+  },
+  fr: {
+    subject: "Nous avons bien reçu votre CV — The Vila Home",
+    headline: (n) => `Bien reçu, ${n}.`,
+    intro: "Merci d'avoir pensé à nous. Nous avons bien votre CV.",
+    next: "Nous le lisons attentivement, un par un. S'il correspond à ce que nous cherchons, nous vous contactons.",
+    signoff: "Cordialement,",
+    team: "L'équipe The Vila Home",
+    legal: "Vous recevez cet e-mail car vous nous avez envoyé votre candidature sur thevilahome.com.<br/>Nous conservons votre CV pendant 12 mois maximum pour ce processus de recrutement.",
+  },
+};
+
+/** Acuse de recibo al candidato, en su idioma. Sin CTA: no hay nada que venderle. */
+export function buildJobsReplyEmail(name: string, lang: Lang): { subject: string; html: string } {
+  const c = JOBS_REPLY[lang] ?? JOBS_REPLY.es;
+
+  const cuerpo = `
+          <p style="font-size:15px;line-height:1.75;margin:0 0 15px;color:#454545">${c.intro}</p>
+          <p style="font-size:15px;line-height:1.75;margin:0;color:#454545">${c.next}</p>
+`;
+
+  return {
+    subject: c.subject,
+    html: shellAutoReply({
+      headline: c.headline(primerNombre(name)),
+      cuerpo,
+      signoff: c.signoff,
+      team: c.team,
+      legal: c.legal,
+    }),
+  };
 }
 
 // ── Aviso interno al equipo ──────────────────────────────────────────────────

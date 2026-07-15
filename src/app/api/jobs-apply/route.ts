@@ -3,9 +3,16 @@ import { Resend } from 'resend'
 import Anthropic from '@anthropic-ai/sdk'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { buildJobsReplyEmail } from '@/lib/lead-emails'
+import type { Lang } from '@/lib/i18n'
 
 const MAX_SIZE = 2 * 1024 * 1024 // 2 MB
 const PDF_MAGIC = Buffer.from([0x25, 0x50, 0x44, 0x46]) // %PDF
+
+/** Idioma del formulario; cae a español si viene raro o no viene. */
+function langOf(v: FormDataEntryValue | null): Lang {
+  return v === 'ca' || v === 'es' || v === 'en' || v === 'fr' ? v : 'es'
+}
 
 function escapeHtml(s: string): string {
   return s
@@ -112,6 +119,23 @@ export async function POST(request: Request) {
       `,
       attachments: [{ filename, content: buffer }],
     })
+
+    // ── 4. Acuse de recibo al candidato ──────────────────────────────────────
+    // Best-effort y DESPUÉS del aviso interno: lo que no puede fallar es que
+    // nos llegue el CV. Si el acuse peta, la candidatura ya está recibida y
+    // devolver error haría que la persona lo reenviara por duplicado.
+    try {
+      const { subject, html } = buildJobsReplyEmail(name, langOf(formData.get('lang')))
+      await resend.emails.send({
+        from: 'The Vila Home <noreply@thevilahome.com>',
+        to: email,
+        replyTo: 'info@thevilahome.com', // si responde, que llegue a una persona
+        subject,
+        html,
+      })
+    } catch (err) {
+      console.error('[jobs-apply] acuse de recibo', err)
+    }
 
     return NextResponse.json({ ok: true })
   } catch (err) {
