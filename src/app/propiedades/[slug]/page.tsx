@@ -73,10 +73,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const canonicalUrl = `${BASE_URL}/propiedades/${slug}`;
 
-    // Imagen de la vista previa: la tarjeta 1200×630 generada en opengraph-image.tsx
-    // (foto + marca, SIN precio). Al no declarar `images` aquí, Next inyecta esa
-    // tarjeta con las dimensiones correctas (1.91:1), que WhatsApp muestra GRANDE.
-    // La foto cruda salía como miniatura pequeña por su formato 4:3.
+    // Imagen de la vista previa: /propiedades/<slug>/og.jpg (route handler con
+    // sharp) — la foto recortada a 1200×630 (1.91:1, WhatsApp la muestra GRANDE)
+    // en JPEG de ~100-250 KB, SIN precio. No usar ImageResponse/opengraph-image
+    // aquí: solo emite PNG y una foto así pesaba ~1,5 MB, por encima del límite
+    // (~600 KB) a partir del cual WhatsApp descarta la imagen del enlace.
+    const ogImageUrl = `${BASE_URL}/propiedades/${slug}/og.jpg`;
     return {
       title,
       description,
@@ -88,12 +90,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         locale: "es_ES",
         title: socialTitle,
         description: socialDescription,
+        images: [{ url: ogImageUrl, width: 1200, height: 630, type: "image/jpeg" }],
       },
       twitter: {
         card: "summary_large_image",
         site: "@thevilahome",
         title: socialTitle,
         description: socialDescription,
+        images: [ogImageUrl],
       },
     };
   } catch {
