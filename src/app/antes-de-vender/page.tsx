@@ -6,7 +6,7 @@ import LandingDiagnostico from "@/components/diagnostico/LandingDiagnostico";
 export const metadata: Metadata = {
   title: "Tu casa merece un análisis antes de un anuncio",
   description:
-    "Diagnóstico gratuito en 2 minutos: nota de salida, horquilla de precio orientativa de tu zona y plan de venta. No es una valoración automática.",
+    "Diagnóstico gratuito en 2 minutos: nota de salida, el rango real de precios de tu zona y el plan de venta. Tu precio exacto se fija viendo la casa, gratis y sin compromiso.",
   robots: { index: false, follow: false },
 };
 

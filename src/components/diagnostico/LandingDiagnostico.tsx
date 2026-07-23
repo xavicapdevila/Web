@@ -169,7 +169,9 @@ export default function LandingDiagnostico() {
               </p>
 
               <p className="mt-8 max-w-[52ch] border-l-2 border-[#34D399]/50 pl-4 text-[13.5px] leading-relaxed text-[#8FA39B]">
-                No es una valoración automática ni sustituye la revisión de un profesional.
+                Nada de números mágicos escupidos sin ver tu casa: te damos el rango real en
+                el que se vende lo comparable en tu zona. Tu precio exacto lo fijamos
+                viéndola, gratis y sin compromiso.
               </p>
             </div>
 
@@ -279,9 +281,9 @@ export default function LandingDiagnostico() {
                 </p>
                 <ul className="mt-5 space-y-3.5">
                   {[
-                    "Un diagnóstico inicial de cómo saldría tu vivienda hoy.",
-                    "Una lectura honesta de tu precio frente a la zona.",
-                    "El punto de partida para una conversación con criterio.",
+                    "Un diagnóstico de cómo saldría tu vivienda hoy, con su nota de salida.",
+                    "El rango real en el que se vende lo comparable en tu zona, y dónde cae tu precio.",
+                    "El plan que seguiríamos antes de publicarla, por escrito.",
                   ].map((texto) => (
                     <li key={texto} className="flex items-start gap-3 text-[14.5px] leading-relaxed text-[#D7E2DC]">
                       <Check className="mt-0.5 h-4.5 w-4.5 shrink-0 text-[#34D399]" strokeWidth={2.5} />
@@ -296,9 +298,9 @@ export default function LandingDiagnostico() {
                 </p>
                 <ul className="mt-5 space-y-3.5">
                   {[
-                    "Una valoración automática de tu vivienda.",
+                    "Una valoración automática que escupe un número sin ver tu casa.",
                     "Una promesa de precio o de plazo de venta.",
-                    "Un sustituto de la revisión de un profesional.",
+                    "Un sustituto de la visita: es la visita la que fija tu precio exacto.",
                   ].map((texto) => (
                     <li key={texto} className="flex items-start gap-3 text-[14.5px] leading-relaxed text-[#8FA39B]">
                       <X className="mt-0.5 h-4.5 w-4.5 shrink-0 text-[#FB7185]" strokeWidth={2.5} />
