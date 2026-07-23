@@ -7,6 +7,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTurnstile } from "@/hooks/useTurnstile";
 import type { DatosContacto } from "@/lib/diagnostico/tipos";
 import { BotonPrimario } from "./ui";
 
@@ -58,8 +59,9 @@ const CLASE_CAMPO =
 export default function FormularioContacto({
   onEnviar,
 }: {
-  onEnviar: (datos: DatosContacto) => void;
+  onEnviar: (datos: DatosContacto, turnstileToken: string | null) => void;
 }) {
+  const turnstile = useTurnstile();
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [email, setEmail] = useState("");
@@ -73,25 +75,31 @@ export default function FormularioContacto({
     setErrores(validar({ nombre, telefono, email, aceptaPrivacidad, aceptaContacto, ...parche }));
   }
 
-  function enviar(e: React.FormEvent) {
+  async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setIntentado(true);
     const nuevos = validar({ nombre, telefono, email, aceptaPrivacidad, aceptaContacto });
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) return;
-    onEnviar({
-      nombre: capitalizar(nombre.trim()),
-      telefono: telefono.trim(),
-      email: email.trim().toLowerCase(),
-      aceptaPrivacidad,
-      aceptaContacto,
-      quiereLlamada: false,
-      franjaLlamada: null,
-    });
+    // Captcha invisible (no-op y devuelve null hasta que Turnstile tenga claves)
+    const turnstileToken = await turnstile.getToken();
+    onEnviar(
+      {
+        nombre: capitalizar(nombre.trim()),
+        telefono: telefono.trim(),
+        email: email.trim().toLowerCase(),
+        aceptaPrivacidad,
+        aceptaContacto,
+        quiereLlamada: false,
+        franjaLlamada: null,
+      },
+      turnstileToken,
+    );
   }
 
   return (
     <form onSubmit={enviar} noValidate className="space-y-4">
+      <div ref={turnstile.containerRef} />
       <div>
         <label htmlFor="ct-nombre" className="mb-1.5 block text-[13px] font-medium text-[#8FA39B]">
           Nombre

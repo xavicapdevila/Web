@@ -135,6 +135,7 @@ export default function JobsModal({ open, onClose, lang }: Props) {
   const [errorMsg, setErrorMsg] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
+  const hpRef = useRef<HTMLInputElement>(null)
   const turnstile = useTurnstile()
 
   // Close on Escape
@@ -179,6 +180,7 @@ export default function JobsModal({ open, onClose, lang }: Props) {
     fd.append('message', message)
     fd.append('cv',      file)
     fd.append('lang',    lang) // el acuse de recibo se manda en su idioma
+    fd.append('website', hpRef.current?.value ?? '') // honeypot
     if (turnstileToken) fd.append('turnstileToken', turnstileToken)
 
     try {
@@ -253,6 +255,8 @@ export default function JobsModal({ open, onClose, lang }: Props) {
 
               {/* Turnstile invisible (no renderiza UI) */}
               <div ref={turnstile.containerRef} />
+              {/* Honeypot: invisible para humanos, los bots lo rellenan */}
+              <input ref={hpRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-0 w-0 opacity-0" />
 
               {/* Name */}
               <div>

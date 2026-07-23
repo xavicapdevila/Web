@@ -63,7 +63,7 @@ export default function FlujoDiagnostico({ abrirDemo = false }: { abrirDemo?: bo
     window.scrollTo({ top: 0 });
   }, [respuestas, esDemo]);
 
-  function enviarContacto(datos: DatosContacto) {
+  function enviarContacto(datos: DatosContacto, turnstileToken: string | null) {
     if (!resultado) return;
     adjuntarContacto(resultado.id, datos);
     setContacto(datos);
@@ -94,6 +94,7 @@ export default function FlujoDiagnostico({ abrirDemo = false }: { abrirDemo?: bo
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         eventId,
+        turnstileToken,
         attribution: getAttribution(),
         clickIds: getClickIds(),
         sourceUrl: window.location.href,

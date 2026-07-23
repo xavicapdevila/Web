@@ -1,7 +1,7 @@
 import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
-import { put, list } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
 
 /**
  * Resolve a writable directory for the SQLite DB.
@@ -229,7 +229,12 @@ function initSchema(db: Database.Database): void {
 // On Vercel, /tmp is ephemeral per container. We back up the SQLite DB to
 // Vercel Blob after every sync and restore it on cold container starts.
 
-const BLOB_DB_PATHNAME = "db/properties.db";
+// Nombre base del backup. Se sube con addRandomSuffix (URL impredecible) para
+// que la DB —con PII del equipo, direcciones exactas y propiedades ocultadas—
+// NO sea descargable adivinando la ruta en el store público. El restore la
+// localiza con list() autenticado por token, así que el sufijo no molesta.
+const BLOB_DB_BASENAME = "db/properties.db";
+const BLOB_DB_PREFIX = "db/properties";
 
 /**
  * In-flight restore promise — used to deduplicate concurrent cold-start
@@ -266,13 +271,17 @@ export async function initDbFromBlob(): Promise<void> {
 async function _restoreFromBlob(): Promise<void> {
   try {
     const { blobs } = await list({
-      prefix: BLOB_DB_PATHNAME,
-      limit: 1,
+      prefix: BLOB_DB_PREFIX,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
-    if (!blobs[0]) return; // No backup in Blob yet
+    if (blobs.length === 0) return; // No backup in Blob yet
 
-    const res = await fetch(blobs[0].url);
+    // Newest wins (put+del cycle may leave brief overlap of suffixed versions)
+    const latest = [...blobs].sort(
+      (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime(),
+    )[0];
+
+    const res = await fetch(latest.url);
     if (!res.ok) return;
 
     const data = Buffer.from(await res.arrayBuffer());
@@ -303,12 +312,22 @@ export async function persistDbToBlob(): Promise<void> {
     db.pragma("wal_checkpoint(TRUNCATE)");
 
     const data = fs.readFileSync(DB_PATH);
-    await put(BLOB_DB_PATHNAME, data, {
+    // URL impredecible (addRandomSuffix) en lugar de ruta fija adivinable.
+    const { url } = await put(BLOB_DB_BASENAME, data, {
       access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
+      addRandomSuffix: true,
       token: process.env.BLOB_READ_WRITE_TOKEN,
     });
+    // Limpia versiones anteriores (incluida la histórica de ruta fija) para no
+    // dejar la DB antigua accesible ni acumular blobs.
+    try {
+      const { blobs } = await list({
+        prefix: BLOB_DB_PREFIX,
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+      });
+      const viejos = blobs.filter((b) => b.url !== url).map((b) => b.url);
+      if (viejos.length > 0) await del(viejos, { token: process.env.BLOB_READ_WRITE_TOKEN });
+    } catch { /* cleanup non-fatal */ }
   } catch {
     // Non-fatal
   }

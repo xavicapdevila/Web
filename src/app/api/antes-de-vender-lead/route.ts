@@ -3,6 +3,8 @@ import { Resend } from 'resend'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
 import { sendMetaLeadEvent } from '@/lib/meta-capi'
 import { forwardLeadToOra } from '@/lib/ora-leads'
+import { verifyTurnstile } from '@/lib/turnstile'
+import { escapeHtml } from '@/lib/lead-emails'
 
 /**
  * Lead del diagnóstico /antes-de-vender.
@@ -88,6 +90,12 @@ export async function POST(request: Request) {
     // Honeypot anti-bots (campo `website`): si viene relleno, fingimos éxito.
     if (String(body.website ?? '').trim()) return NextResponse.json({ ok: true })
 
+    // Captcha invisible (fail-open: sin claves de Turnstile deja pasar;
+    // solo rechaza cuando Cloudflare responde que el token es inválido)
+    if (!(await verifyTurnstile(body.turnstileToken, ip))) {
+      return NextResponse.json({ error: 'captcha_failed' }, { status: 400 })
+    }
+
     const nombre = campo(body.nombre, 80)
     const telefono = String(body.telefono ?? '').replace(/\D/g, '').slice(0, 15)
     const email = campo(body.email, 120)
@@ -133,6 +141,11 @@ export async function POST(request: Request) {
     const viviendaTexto = `${tipo} · ${superficie} m² · ${zona}, ${municipio}${estado ? ` · ${estado}` : ''}`
 
     // ── 1) Email de alerta al equipo (crítico) ───────────────────────────────
+    // Todo campo de usuario se escapa: sin esto, marcado HTML en (p. ej.) la
+    // zona inyectaría enlaces de phishing en el correo que recibe el equipo.
+    const e = escapeHtml
+    const viviendaHtml = `${e(tipo)} · ${superficie} m² · ${e(zona)}, ${e(municipio)}${estado ? ` · ${e(estado)}` : ''}`
+    const telHref = telefono.replace(/[^\d+]/g, '')
     const fila = (etiqueta: string, valor: string) =>
       `<tr><td style="padding:6px 14px 6px 0;color:#777;white-space:nowrap;vertical-align:top">${etiqueta}</td><td style="padding:6px 0;color:#262626;font-weight:600">${valor}</td></tr>`
     const html = `
@@ -142,18 +155,18 @@ export async function POST(request: Request) {
         </div>
         <div style="border:1px solid #e5e5e5;border-top:none;border-radius:0 0 12px 12px;padding:22px">
           <p style="margin:0 0 4px;font-size:12px;color:#14b8a6;text-transform:uppercase;letter-spacing:1.5px;font-weight:700">Nuevo lead · Diagnóstico /antes-de-vender</p>
-          <p style="margin:0 0 16px;font-size:19px;font-weight:700">${nombre} — nota ${nota}/100</p>
+          <p style="margin:0 0 16px;font-size:19px;font-weight:700">${e(nombre)} — nota ${nota}/100</p>
           <table style="border-collapse:collapse;font-size:14px">
-            ${fila('Teléfono', `<a href="tel:${telefono}">${telefono}</a>`)}
-            ${fila('Email', `<a href="mailto:${email}">${email}</a>`)}
-            ${fila('Vivienda', viviendaTexto)}
+            ${fila('Teléfono', `<a href="tel:${telHref}">${e(telefono)}</a>`)}
+            ${fila('Email', `<a href="mailto:${e(email)}">${e(email)}</a>`)}
+            ${fila('Vivienda', viviendaHtml)}
             ${fila('Precio esperado', eur(precioEsperado))}
             ${fila('Horquilla orientativa', horquillaTexto)}
-            ${fila('Riesgo', riesgo || '—')}
-            ${fila('Precio vs. horquilla', posicionPrecio || '—')}
+            ${fila('Riesgo', e(riesgo) || '—')}
+            ${fila('Precio vs. horquilla', e(posicionPrecio) || '—')}
             ${fila('Situación', yaAnunciada ? 'Ya anunciada' : 'Sin anunciar')}
-            ${fila('Horizonte', horizonte)}
-            ${fila('Ref. diagnóstico', `${ref || '—'} · v${version || '—'}`)}
+            ${fila('Horizonte', e(horizonte))}
+            ${fila('Ref. diagnóstico', `${e(ref) || '—'} · v${e(version) || '—'}`)}
           </table>
           <p style="margin:18px 0 0;font-size:12px;color:#999">Ha aceptado ser contactado para revisar su diagnóstico. Siguiente paso: llamar y proponer visita sin compromiso.</p>
         </div>
@@ -176,7 +189,7 @@ export async function POST(request: Request) {
           from: FROM,
           to: TEAM_INBOX.split(','),
           cc: TEAM_CC,
-          subject: `Diagnóstico web: ${nombre} — ${tipo} en ${municipio} (${nota}/100)`,
+          subject: `Diagnóstico web: ${nombre} — ${tipo} en ${municipio} (${nota}/100)`.replace(/[\r\n]+/g, ' '),
           html,
         })
         .then((r) => {

@@ -5,6 +5,7 @@ import type { Lead } from '@/lib/lead'
 import { buildTuPrecioTeamEmail } from '@/lib/lead-emails'
 import { sendMetaLeadEvent } from '@/lib/meta-capi'
 import { forwardLeadToOra } from '@/lib/ora-leads'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 /**
  * Lead de la landing «Dinos tu precio» (/vender, campaña Meta de precio).
@@ -84,6 +85,12 @@ export async function POST(request: Request) {
 
     // Honeypot anti-bots (campo `website`): si viene relleno, fingimos éxito.
     if (String(body.website ?? '').trim()) return NextResponse.json({ ok: true })
+
+    // Captcha invisible (fail-open: sin claves de Turnstile deja pasar;
+    // solo rechaza cuando Cloudflare responde que el token es inválido)
+    if (!(await verifyTurnstile(body.turnstileToken, ip))) {
+      return NextResponse.json({ error: 'captcha_failed' }, { status: 400 })
+    }
 
     const nombre = String(body.nombre ?? '').trim().slice(0, 80)
     const telefono = String(body.telefono ?? '').replace(/\D/g, '').slice(0, 15)

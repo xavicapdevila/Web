@@ -7,8 +7,16 @@
 const VISITS_KEY = "blog-visits.json";
 const SHARES_KEY = "blog-shares.json";
 const REFS_KEY   = "blog-referrers.json";
+// Prefijos para list(): los blobs se suben con addRandomSuffix (URL
+// impredecible en el store público) y se localizan por prefijo.
+const VISITS_PREFIX = "blog-visits";
+const SHARES_PREFIX = "blog-shares";
+const REFS_PREFIX   = "blog-referrers";
 const USE_BLOB   = process.env.VERCEL === "1";
 const OWN_DOMAIN = "thevilahome.com";
+// Topes anti-abuso del almacén de referrers (clave `domain` es entrada pública)
+const MAX_SLUGS_REFS = 2000;
+const MAX_DOMAINS_PER_SLUG = 50;
 
 type VisitMap = Record<string, number>;
 /** { slug → { domain → count } } */
@@ -19,7 +27,7 @@ type RefMap = Record<string, Record<string, number>>;
 async function readBlobVisits(): Promise<VisitMap> {
   try {
     const { list } = await import("@vercel/blob");
-    const { blobs } = await list({ prefix: VISITS_KEY });
+    const { blobs } = await list({ prefix: VISITS_PREFIX });
     if (blobs.length === 0) return {};
     const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -40,11 +48,12 @@ async function writeBlobVisits(counts: VisitMap): Promise<void> {
   // Write new version FIRST — ensures reads never see 0 blobs and return {}
   await put(VISITS_KEY, JSON.stringify(counts), {
     access: "public",
+    addRandomSuffix: true,
     contentType: "application/json",
   });
   // Clean up old versions (non-fatal if it fails)
   try {
-    const { blobs } = await list({ prefix: VISITS_KEY });
+    const { blobs } = await list({ prefix: VISITS_PREFIX });
     if (blobs.length > 1) {
       const sorted = [...blobs].sort(
         (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -59,7 +68,7 @@ async function writeBlobVisits(counts: VisitMap): Promise<void> {
 async function readBlobShares(): Promise<VisitMap> {
   try {
     const { list } = await import("@vercel/blob");
-    const { blobs } = await list({ prefix: SHARES_KEY });
+    const { blobs } = await list({ prefix: SHARES_PREFIX });
     if (blobs.length === 0) return {};
     const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -78,10 +87,11 @@ async function writeBlobShares(counts: VisitMap): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
   await put(SHARES_KEY, JSON.stringify(counts), {
     access: "public",
+    addRandomSuffix: true,
     contentType: "application/json",
   });
   try {
-    const { blobs } = await list({ prefix: SHARES_KEY });
+    const { blobs } = await list({ prefix: SHARES_PREFIX });
     if (blobs.length > 1) {
       const sorted = [...blobs].sort(
         (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -96,7 +106,7 @@ async function writeBlobShares(counts: VisitMap): Promise<void> {
 async function readBlobRefs(): Promise<RefMap> {
   try {
     const { list } = await import("@vercel/blob");
-    const { blobs } = await list({ prefix: REFS_KEY });
+    const { blobs } = await list({ prefix: REFS_PREFIX });
     if (blobs.length === 0) return {};
     const sorted = [...blobs].sort(
       (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -115,10 +125,11 @@ async function writeBlobRefs(refs: RefMap): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
   await put(REFS_KEY, JSON.stringify(refs), {
     access: "public",
+    addRandomSuffix: true,
     contentType: "application/json",
   });
   try {
-    const { blobs } = await list({ prefix: REFS_KEY });
+    const { blobs } = await list({ prefix: REFS_PREFIX });
     if (blobs.length > 1) {
       const sorted = [...blobs].sort(
         (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
@@ -166,7 +177,14 @@ export async function trackReferrer(slug: string, rawReferrer: string): Promise<
 
   if (USE_BLOB) {
     const refs = await readBlobRefs();
+    // Topes: sin esto, rotar slug+hostname en peticiones públicas inflaría el
+    // JSON sin límite. Una vez alcanzado el tope solo se incrementan claves
+    // ya conocidas; no se crean nuevas.
+    const slugConocido = Object.prototype.hasOwnProperty.call(refs, slug);
+    if (!slugConocido && Object.keys(refs).length >= MAX_SLUGS_REFS) return;
     if (!refs[slug]) refs[slug] = {};
+    const dominioConocido = Object.prototype.hasOwnProperty.call(refs[slug], domain);
+    if (!dominioConocido && Object.keys(refs[slug]).length >= MAX_DOMAINS_PER_SLUG) return;
     refs[slug][domain] = (refs[slug][domain] ?? 0) + 1;
     await writeBlobRefs(refs);
     return;

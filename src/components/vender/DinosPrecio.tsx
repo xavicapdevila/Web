@@ -19,6 +19,7 @@ import Lenis from "lenis";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCookieConsent } from "@/context/CookieConsentContext";
 import { captureAttribution, getAttribution, type Attribution } from "@/lib/attribution";
+import { useTurnstile } from "@/hooks/useTurnstile";
 import { siteConfig } from "@/lib/config";
 import type { Lang } from "@/lib/i18n";
 import {
@@ -278,6 +279,7 @@ export default function DinosPrecio() {
   const muniOtroRef = useRef<HTMLInputElement>(null);
   const tipoOtroRef = useRef<HTMLInputElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
+  const turnstile = useTurnstile();
   const nombreId = "dp-nombre";
 
   /* ── Estado UI ── */
@@ -432,6 +434,8 @@ export default function DinosPrecio() {
     fbqTrack("Lead", { content_name: "tu_precio", content_category: timeline }, { eventID: eventId });
 
     setSending(true);
+    // Captcha invisible (no-op y devuelve null hasta que Turnstile tenga claves)
+    const turnstileToken = await turnstile.getToken();
     try {
       const res = await fetch("/api/lead-tu-precio", {
         method: "POST",
@@ -446,6 +450,7 @@ export default function DinosPrecio() {
           telefono: telDigits,
           idioma: lang,
           website: hpRef.current?.value ?? "",
+          turnstileToken,
           eventId,
           attribution,
           clickIds,
@@ -564,6 +569,7 @@ export default function DinosPrecio() {
             <div className="relative rounded-2xl lg:rounded-[1.6rem] bg-[#F4F2ED] text-[#16150F] p-6 sm:p-8 shadow-[0_60px_120px_-50px_rgba(0,0,0,0.85)]">
               {/* honeypot */}
               <input ref={hpRef} type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden className="absolute -left-[9999px] h-0 w-0 opacity-0" />
+              <div ref={turnstile.containerRef} />
 
               {/* Progreso */}
               {step !== 4 && (

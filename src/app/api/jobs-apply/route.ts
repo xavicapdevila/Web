@@ -37,6 +37,12 @@ export async function POST(request: Request) {
 
   try {
     const formData = await request.formData()
+
+    // Honeypot anti-bots (campo `website`): si viene relleno, fingimos éxito.
+    if (((formData.get('website') as string) ?? '').trim()) {
+      return NextResponse.json({ ok: true })
+    }
+
     const name    = (formData.get('name')    as string)?.trim()
     const email   = (formData.get('email')   as string)?.trim()
     const message = (formData.get('message') as string)?.trim() ?? ''

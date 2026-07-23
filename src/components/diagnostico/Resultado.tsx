@@ -67,7 +67,7 @@ export default function Resultado({
 }: {
   resultado: ResultadoDiagnostico;
   contacto: DatosContacto | null;
-  onEnviarContacto: (datos: DatosContacto) => void;
+  onEnviarContacto: (datos: DatosContacto, turnstileToken: string | null) => void;
   onSolicitarLlamada: (franja: "manana" | "tarde") => void;
 }) {
   const r = resultado.respuestas;

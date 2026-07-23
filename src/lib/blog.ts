@@ -61,12 +61,16 @@ function rowToPost(row: Record<string, unknown>): BlogPost {
 // all reads fetch from Blob. SQLite is used only in local development.
 
 const USE_BLOB = process.env.VERCEL === "1";
+// Nombre base + prefijo. Se sube con addRandomSuffix para que el JSON —que
+// incluye borradores sin publicar— no sea legible adivinando la URL en el
+// store público; se localiza con list() por prefijo.
 const BLOB_KEY = "blog-posts.json";
+const BLOB_PREFIX = "blog-posts";
 
 async function readBlobPosts(): Promise<BlogPost[]> {
   try {
     const { list } = await import("@vercel/blob");
-    const { blobs } = await list({ prefix: BLOB_KEY });
+    const { blobs } = await list({ prefix: BLOB_PREFIX });
     if (blobs.length === 0) return [];
 
     // Most recently uploaded wins (del+put cycle may leave brief overlap)
@@ -85,16 +89,16 @@ async function readBlobPosts(): Promise<BlogPost[]> {
 async function writeBlobPosts(posts: BlogPost[]): Promise<void> {
   const { put, list, del } = await import("@vercel/blob");
 
-  // Delete existing blobs at this key before writing the new one
-  const { blobs } = await list({ prefix: BLOB_KEY });
-  if (blobs.length > 0) {
-    await del(blobs.map((b) => b.url));
-  }
-
-  await put(BLOB_KEY, JSON.stringify(posts), {
+  // Write new (unguessable URL) FIRST so reads never see zero blobs
+  const { url } = await put(BLOB_KEY, JSON.stringify(posts), {
     access: "public",
+    addRandomSuffix: true,
     contentType: "application/json",
   });
+  // Then clean up older versions (incl. the legacy fixed-name blob)
+  const { blobs } = await list({ prefix: BLOB_PREFIX });
+  const viejos = blobs.filter((b) => b.url !== url).map((b) => b.url);
+  if (viejos.length > 0) await del(viejos);
 }
 
 // ── Public read functions ─────────────────────────────────────────────────────
