@@ -77,6 +77,7 @@ export interface ConfigScoring {
       jardin: number;
       parking: number;
       vistas: number;
+      piscina: number;
     };
     segundoBano: number;
   };
@@ -180,6 +181,7 @@ export const CONFIG_SCORING: ConfigScoring = {
       jardin: 8,
       parking: 6,
       vistas: 6,
+      piscina: 9,
     },
     segundoBano: 4,
   },

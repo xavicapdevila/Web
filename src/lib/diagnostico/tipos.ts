@@ -9,7 +9,7 @@ export type TipoVivienda = "piso" | "atico" | "planta-baja" | "casa" | "adosada"
 
 export type EstadoVivienda = "reformado" | "buen-estado" | "actualizar" | "reformar";
 
-export type Caracteristica = "terraza" | "balcon" | "jardin" | "parking" | "vistas";
+export type Caracteristica = "terraza" | "balcon" | "jardin" | "parking" | "vistas" | "piscina";
 
 export type TiempoAnunciado = "menos-1-mes" | "1-3-meses" | "3-6-meses" | "mas-6-meses";
 

@@ -27,12 +27,9 @@
   100% { transform: translateX(-50%); }
 }
 
-/* Diagnóstico (/diagnostico) — texto en bandera, no justificado. Sin @layer:
-   dentro de @layer utilities Tailwind v4 lo trataría como utilidad «a demanda»
-   y lo descartaría por no ser una clase generada. */
-.dx-root p { text-align: inherit; }
-
-/* Diagnóstico (/diagnostico) — animaciones del prototipo oscuro */
+/* Diagnóstico (/antes-de-vender) — animaciones del prototipo oscuro.
+   Los párrafos heredan el justificado global de la web (alineados a ambos
+   lados), como el resto del sitio. */
 @keyframes dx-float {
   0%, 100% { transform: translateY(0) rotate(2deg); }
   50%      { transform: translateY(-14px) rotate(2deg); }

@@ -295,7 +295,7 @@ export const CASOS_EJEMPLO: CasoEjemplo[] = [
   {
     id: "casa-adosada",
     nombre: "Casa adosada",
-    descripcion: "Adosada de 4 habitaciones con jardín y parking en La Collada.",
+    descripcion: "Adosada de 4 habitaciones con jardín, piscina y parking en La Collada.",
     respuestas: {
       municipio: "vilanova",
       municipioOtro: null,
@@ -305,7 +305,7 @@ export const CASOS_EJEMPLO: CasoEjemplo[] = [
       habitaciones: 4,
       banos: 2,
       ascensor: "no",
-      caracteristicas: ["jardin", "parking", "terraza"],
+      caracteristicas: ["jardin", "piscina", "parking", "terraza"],
       estado: "buen-estado",
       precioEsperado: 398000,
       yaAnunciado: "no",

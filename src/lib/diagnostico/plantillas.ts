@@ -83,6 +83,12 @@ export function construirFactores(
       texto: "El ascensor amplía el público: no descarta a compradores de más edad ni a familias con niños pequeños.",
     },
     {
+      id: "piscina",
+      peso: 64,
+      aplica: tiene("piscina"),
+      texto: "La piscina es uno de los filtros más usados por el comprador de la comarca: pone tu vivienda en una lista corta.",
+    },
+    {
       id: "jardin",
       peso: 60,
       aplica: tiene("jardin"),
@@ -643,7 +649,9 @@ export function construirPerfilComprador(ctx: ContextoCalculo): string {
     );
   }
 
-  const exterior = r.caracteristicas.filter((c) => ["terraza", "jardin", "vistas"].includes(c));
+  const exterior = r.caracteristicas.filter((c) =>
+    ["terraza", "jardin", "vistas", "piscina"].includes(c),
+  );
   if (exterior.length > 0) {
     frases.push(
       "El exterior será el argumento emocional de la visita: es lo que se recuerda al día siguiente",

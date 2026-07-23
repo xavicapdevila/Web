@@ -45,6 +45,7 @@ export const ETIQUETA_CARACTERISTICA: Record<Caracteristica, string> = {
   jardin: "Jardín",
   parking: "Parking",
   vistas: "Vistas",
+  piscina: "Piscina",
 };
 
 export const ETIQUETA_TIEMPO_ANUNCIADO: Record<TiempoAnunciado, string> = {
