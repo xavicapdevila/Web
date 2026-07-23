@@ -33,6 +33,12 @@ const nextConfig: NextConfig = {
 
  async redirects() {
    return [
+     // El diagnóstico de venta vivió en /diagnostico antes de su URL definitiva
+     {
+       source: "/diagnostico/:path*",
+       destination: "/antes-de-vender/:path*",
+       permanent: false,
+     },
      // Canonicalización de host: sin www y dominios propios antiguos → dominio
      // canónico. Vive AQUÍ (capa de routing de Vercel, gratis) y no en un
      // middleware: un middleware con matcher global corre en CADA asset de CADA

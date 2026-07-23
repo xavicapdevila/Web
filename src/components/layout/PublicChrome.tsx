@@ -30,6 +30,8 @@ export default function PublicChrome({ children }: { children: React.ReactNode }
     pathname.startsWith("/how-we-work") ||
     pathname.startsWith("/notre-methode") ||
     pathname.startsWith("/vende-tu-casa") ||
+    pathname.startsWith("/antes-de-vender") ||
+    pathname.startsWith("/diagnostico") ||
     pathname.startsWith("/resena");
 
   if (bare) return <>{children}</>;

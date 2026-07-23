@@ -27,6 +27,27 @@
   100% { transform: translateX(-50%); }
 }
 
+/* Diagnóstico (/diagnostico) — texto en bandera, no justificado. Sin @layer:
+   dentro de @layer utilities Tailwind v4 lo trataría como utilidad «a demanda»
+   y lo descartaría por no ser una clase generada. */
+.dx-root p { text-align: inherit; }
+
+/* Diagnóstico (/diagnostico) — animaciones del prototipo oscuro */
+@keyframes dx-float {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+@keyframes dx-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes dx-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
 @layer base {
   :root {
     --background: #0a0a0a;
