@@ -8,6 +8,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { captureAttribution, getAttribution, getClickIds } from "@/lib/attribution";
 import { adjuntarContacto, configVigente, guardarRegistro } from "@/lib/diagnostico/almacen";
 import {
   ETIQUETA_ESTADO,
@@ -72,10 +73,30 @@ export default function FlujoDiagnostico({ abrirDemo = false }: { abrirDemo?: bo
     // informe se desbloquea igual aunque la red falle — lo crítico es avisar.
     const r = resultado.respuestas;
     const nombres = nombresUbicacion(r);
+
+    // Evento Lead en el Pixel del navegador con el mismo eventId que enviará
+    // el servidor por la Conversions API → Meta deduplica (patrón de /vender).
+    const eventId = `advl_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    try {
+      const w = window as unknown as { fbq?: (...a: unknown[]) => void };
+      if (w.fbq) {
+        w.fbq(
+          "track",
+          "Lead",
+          { content_name: "antes-de-vender", content_category: r.yaAnunciado === "si" ? "en_venta" : r.horizonte },
+          { eventID: eventId },
+        );
+      }
+    } catch {}
+
     void fetch("/api/antes-de-vender-lead", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
+        eventId,
+        attribution: getAttribution(),
+        clickIds: getClickIds(),
+        sourceUrl: window.location.href,
         nombre: datos.nombre,
         telefono: datos.telefono,
         email: datos.email,
@@ -104,6 +125,12 @@ export default function FlujoDiagnostico({ abrirDemo = false }: { abrirDemo?: bo
     adjuntarContacto(resultado.id, actualizado);
     setContacto(actualizado);
   }
+
+  // Atribución de primer contacto (por si se aterriza directo en /analisis
+  // con parámetros de campaña; en la landing la captura CapturaAtribucion)
+  useEffect(() => {
+    captureAttribution();
+  }, []);
 
   // Cerrar el selector de demo con Escape
   useEffect(() => {

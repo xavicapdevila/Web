@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Check, X } from "lucide-react";
+import CapturaAtribucion from "./CapturaAtribucion";
 import { fuenteDisplay } from "./fuente";
 import { CLASE_PAGINA, DISPLAY, Distintivo, GRADIENTE, Halos, Logo, Tarjeta } from "./ui";
 
@@ -105,6 +106,7 @@ function MiniInforme() {
 export default function LandingDiagnostico() {
   return (
     <div className={`${fuenteDisplay.variable} ${CLASE_PAGINA}`}>
+      <CapturaAtribucion />
       <Halos />
       {/* Retícula de puntos sutil bajo el hero */}
       <div

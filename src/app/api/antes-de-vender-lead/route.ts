@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
+import { sendMetaLeadEvent } from '@/lib/meta-capi'
 import { forwardLeadToOra } from '@/lib/ora-leads'
 
 /**
@@ -27,6 +28,29 @@ function situacionOra(horizonte: Horizonte, yaAnunciada: boolean): string {
   if (horizonte === 'cuanto-antes') return 'ahora'
   if (horizonte === 'explorando') return 'explorando'
   return 'meses'
+}
+
+function attrStr(v: unknown): string | undefined {
+  if (typeof v !== 'string') return undefined
+  const s = v.trim().slice(0, 300)
+  return s || undefined
+}
+
+/**
+ * RGPD: el envío de PII a Meta (Conversions API) y el uso de identificadores
+ * de click (fbclid/fbp/fbc) requieren consentimiento de marketing. Se lee la
+ * cookie del banner (tvh_consent) que llega con la petición.
+ */
+function hasMarketingConsent(request: Request): boolean {
+  const cookie = request.headers.get('cookie') ?? ''
+  const match = cookie.match(/(?:^|;\s*)tvh_consent=([^;]+)/)
+  if (!match) return false
+  try {
+    const parsed = JSON.parse(decodeURIComponent(match[1])) as { marketing?: boolean }
+    return parsed?.marketing === true
+  } catch {
+    return false
+  }
 }
 
 const TEAM_INBOX = process.env.ANTES_DE_VENDER_ALERT_TO || 'info@thevilahome.com'
@@ -98,7 +122,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'invalid_fields' }, { status: 400 })
     }
 
-    const eventId = `advl_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
+    // Mismo eventId que disparó el Pixel en el navegador → Meta deduplica.
+    const eventId =
+      attrStr(body.eventId) ?? `advl_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
     const eur = (n: number) => `${n.toLocaleString('es-ES')} €`
     const horquillaTexto =
       horquillaInferior && horquillaSuperior
@@ -169,6 +195,35 @@ export async function POST(request: Request) {
         landing: '/antes-de-vender',
       }),
     ]
+
+    // ── 3) Conversions API server-side (dedup con el Pixel por eventId) ──────
+    //    RGPD: solo si el visitante consintió cookies de marketing.
+    if (hasMarketingConsent(request)) {
+      const attribution = (body.attribution ?? {}) as Record<string, unknown>
+      const clickIds = (body.clickIds ?? {}) as Record<string, unknown>
+      const [firstName, ...rest] = nombre.split(/\s+/)
+      tasks.push(
+        sendMetaLeadEvent({
+          eventId,
+          eventSourceUrl: attrStr(body.sourceUrl),
+          email,
+          phone: telefono,
+          firstName,
+          lastName: rest.join(' ') || undefined,
+          clientIp: ip !== 'unknown' ? ip : undefined,
+          userAgent: request.headers.get('user-agent') ?? undefined,
+          fbp: attrStr(clickIds.fbp),
+          fbc: attrStr(clickIds.fbc),
+          fbclid: attrStr(attribution.fbclid),
+          custom: {
+            content_name: 'antes-de-vender',
+            content_category: situacionOra(horizonte, yaAnunciada),
+            utm_campaign: attrStr(attribution.utm_campaign),
+            utm_source: attrStr(attribution.utm_source),
+          },
+        }),
+      )
+    }
 
     const [teamResult] = await Promise.allSettled(tasks)
     if (teamResult.status === 'rejected') {
