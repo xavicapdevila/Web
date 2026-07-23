@@ -12,6 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL,                                        lastModified: new Date(), priority: 1,   changeFrequency: "weekly"  },
     { url: `${BASE_URL}/propiedades`,                       lastModified: new Date(), priority: 0.9, changeFrequency: "daily"   },
     { url: `${BASE_URL}/valoracion`,                        lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/antes-de-vender`,                   lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/vender`,                            lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/blog`,                              lastModified: new Date(), priority: 0.7, changeFrequency: "weekly"  },
     { url: `${BASE_URL}/quienes-somos`,                     lastModified: new Date(), priority: 0.7, changeFrequency: "monthly" },

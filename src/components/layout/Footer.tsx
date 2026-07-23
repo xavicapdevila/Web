@@ -14,6 +14,7 @@ export default function Footer() {
     { href: "/propiedades", label: t("navProperties") },
     { href: "/quienes-somos", label: t("navAbout") },
     { href: "/valoracion", label: t("footerValuationFree") },
+    { href: "/antes-de-vender", label: t("footerPreSaleAnalysis") },
     { href: "/blog", label: t("navBlog") },
     { href: "/contacto", label: t("navContact") },
   ];
