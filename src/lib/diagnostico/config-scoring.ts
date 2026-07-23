@@ -13,7 +13,7 @@
 
 import type { EstadoVivienda, HorizonteVenta, TipoVivienda, TiempoAnunciado } from "./tipos";
 
-export const ALGORITMO_VERSION = "1.0.0";
+export const ALGORITMO_VERSION = "1.1.0";
 
 /** Tramo de ratio precio esperado / precio de referencia → puntos */
 export interface TramoRatio {
@@ -41,6 +41,15 @@ export interface ConfigScoring {
     factorTipo: Record<TipoVivienda, number>;
     /** Tramos de ratio (precio esperado / referencia) → puntos de competitividad */
     tramos: TramoRatio[];
+    /**
+     * Los metros por encima de `plena` cuentan a `factorExtra`: una casa de
+     * 275 m² no vale el doble que una de 137 — el €/m² real cae con el
+     * tamaño. Sin esto, las viviendas grandes salían con horquillas infladas.
+     */
+    superficieEquivalente: {
+      plena: number;
+      factorExtra: number;
+    };
     /** Horquilla orientativa de salida alrededor del precio de referencia */
     horquilla: {
       /** Multiplicador del límite inferior (p. ej. 0.95) */
@@ -141,6 +150,10 @@ export const CONFIG_SCORING: ConfigScoring = {
       { hasta: 1.35, puntos: 28 },
       { hasta: Infinity, puntos: 15 },
     ],
+    superficieEquivalente: {
+      plena: 130,
+      factorExtra: 0.6,
+    },
     horquilla: {
       inferior: 0.95,
       superior: 1.05,

@@ -148,6 +148,20 @@ test("la horquilla de salida es coherente, redondeada y nunca invita a pedir má
   ok(texto.includes("prudente"), "el precio prudente se enmarca en positivo");
 });
 
+test("los metros extra valen menos: doblar superficie no dobla la horquilla", () => {
+  const base = CASOS_EJEMPLO.find((c) => c.id === "casa-adosada")!.respuestas;
+  const pequena = calcularDiagnostico({ ...base, superficie: 130 });
+  const doble = calcularDiagnostico({ ...base, superficie: 260 });
+  ok(
+    doble.horquillaSalida.inferior > pequena.horquillaSalida.inferior,
+    "más superficie debe subir la horquilla",
+  );
+  ok(
+    doble.horquillaSalida.inferior < 2 * pequena.horquillaSalida.inferior,
+    "pero mucho menos que linealmente",
+  );
+});
+
 test("el calendario de los primeros 30 días trae 4 semanas con contenido", () => {
   for (const caso of CASOS_EJEMPLO) {
     const semanas = construirPrimerosTreintaDias(calcularDiagnostico(caso.respuestas));

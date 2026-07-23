@@ -103,7 +103,14 @@ export function construirContexto(
     precioM2Base *
     config.precio.factorTipo[respuestas.tipo] *
     config.precio.factorEstado[respuestas.estado];
-  const precioReferencia = Math.round(precioM2 * respuestas.superficie);
+  // Superficie equivalente: los metros por encima del umbral valen menos por
+  // m² (el €/m² real cae con el tamaño — sin esto las casas grandes salían
+  // con referencias infladas)
+  const { plena, factorExtra } = config.precio.superficieEquivalente;
+  const superficieEquivalente =
+    Math.min(respuestas.superficie, plena) +
+    Math.max(0, respuestas.superficie - plena) * factorExtra;
+  const precioReferencia = Math.round(precioM2 * superficieEquivalente);
 
   return {
     respuestas,
