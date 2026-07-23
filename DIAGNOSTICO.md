@@ -6,8 +6,9 @@ inicial sobre cómo saldría hoy una vivienda al mercado, y convierte esa lectur
 en una conversación con el equipo.
 
 Prototipo navegable dentro de la web (Next.js + TypeScript + Tailwind),
-desplegable en Vercel con el resto del proyecto. Sin APIs de pago y con
-**datos simulados** marcados como mock.
+desplegable en Vercel con el resto del proyecto. Sin APIs de pago; las
+referencias de mercado están **calibradas con fuentes públicas** (jul 2026,
+ver «Referencias de mercado»).
 
 ## Rutas
 
@@ -62,7 +63,7 @@ puntuación, halos) viven en `src/components/diagnostico/ui.tsx`.
 src/lib/diagnostico/
   tipos.ts             Tipos compartidos (respuestas, resultado, registro, lead)
   config-scoring.ts    ⚙️ REGLAS EDITABLES: pesos, umbrales, ajustes + versión
-  referencias-mock.ts  Referencias simuladas por municipio/zona/tipología + 5 casos de ejemplo
+  referencias-mock.ts  Referencias de mercado calibradas (fuentes públicas jul 2026) + 5 casos de ejemplo
   motor.ts             Motor determinista (puro, sin aleatoriedad ni fechas)
   plantillas.ts        Fortalezas, aspectos a revisar y explicación por reglas
   etiquetas.ts         Textos castellanos compartidos UI/CSV/plantillas
@@ -91,10 +92,19 @@ src/components/diagnostico/
 - La UI nunca muestra precios exactos ni porcentajes de probabilidad de venta:
   solo bandas relativas («dentro de la banda», «por encima…»).
 
-### Datos simulados
+### Referencias de mercado
 
-`referencias-mock.ts` contiene €/m² y demanda **inventados** (plausibles para el
-Garraf) por municipio/zona/tipología. Nunca se muestran como cifra al usuario.
+`referencias-mock.ts` contiene los €/m² de referencia por municipio/zona,
+**calibrados en jul 2026 con fuentes públicas** (mix): informes de precios de
+Idealista por distrito (oferta, jun 2026), compravendes registradas de la
+Generalitat/Registradores (cierre, 1T2026 + anual 2025) y valor tasado del
+MITMA (1T2026). Cada zona lleva un comentario `dato` (respaldada por distrito
+publicado) o `est.` (estimada por estructura relativa — revisar con criterio
+local). La demanda por zona sigue siendo estimación propia. Nada de esto se
+muestra como cifra al usuario ni se citan fuentes en la interfaz.
+Actualización: repetir el mix cada trimestre cuando la Generalitat publique el
+nuevo dato (los ficheros y URLs están en el propio archivo y en la memoria del
+proyecto) y subir `ALGORITMO_VERSION`.
 Las zonas de cada municipio replican la división oficial de Idealista
 (consultada en idealista.com en jul 2026), para que el propietario reconozca su
 zona con los mismos nombres que ve en los portales; Canyelles no tiene

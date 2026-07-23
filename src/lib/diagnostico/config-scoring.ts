@@ -13,7 +13,7 @@
 
 import type { EstadoVivienda, HorizonteVenta, TipoVivienda, TiempoAnunciado } from "./tipos";
 
-export const ALGORITMO_VERSION = "1.1.0";
+export const ALGORITMO_VERSION = "1.2.0";
 
 /** Tramo de ratio precio esperado / precio de referencia → puntos */
 export interface TramoRatio {
