@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="The Vila Home">
-  <rect width="100" height="100" rx="23" fill="#0a0a0a"/>
-  <g transform="translate(2.4 34.8) scale(0.29)" fill="#ffffff">
+  <rect width="100" height="100" fill="#0a0a0a"/>
+  <g transform="translate(11.1 37.6) scale(0.2378)" fill="#ffffff">
     <path d="M24.72,39h19.1v2.11H35.51V65.2H33V41.06H24.72Z"/>
     <path d="M47.32,65.2V39H49.8V50.21H65.33V39h2.48V65.2H65.33V52.33H49.8V65.2Z"/>
     <path d="M73.68,65.2V39H91.14v2.11h-15v9.48H89.68v2.12H76.16V63.08H91.51V65.2Z"/>
