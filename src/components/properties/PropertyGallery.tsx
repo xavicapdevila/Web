@@ -252,7 +252,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={goPrev}
-                className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="hidden [@media(hover:hover)]:block absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto anterior"
               >
                 <ChevronLeft size={22} />
@@ -261,7 +261,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={goNext}
-                className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="hidden [@media(hover:hover)]:block absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto siguiente"
               >
                 <ChevronRight size={22} />
@@ -330,8 +330,8 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
           aria-label={`Galería de fotos — ${lightboxIndex + 1} de ${images.length}`}
         >
 
-          {/* Top bar */}
-          <div className="flex items-center justify-between px-5 h-12 shrink-0">
+          {/* Top bar — floats over the photo in phone landscape so it can fill the screen */}
+          <div className="flex items-center justify-between px-5 h-12 shrink-0 landscape-phone:absolute landscape-phone:inset-x-0 landscape-phone:top-0 landscape-phone:z-20 landscape-phone:bg-gradient-to-b landscape-phone:from-black/60 landscape-phone:to-transparent">
             <span className="text-white/50 text-sm tabular-nums">
               {lightboxIndex + 1} / {images.length}
             </span>
@@ -369,7 +369,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={prevImage}
-                className="hidden md:block absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                className="hidden [@media(hover:hover)]:block absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
                 aria-label="Foto anterior"
               >
                 <ChevronLeft size={30} />
@@ -378,7 +378,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={nextImage}
-                className="hidden md:block absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                className="hidden [@media(hover:hover)]:block absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
                 aria-label="Foto siguiente"
               >
                 <ChevronRight size={30} />
@@ -386,30 +386,14 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             )}
           </div>
 
-          {/* Bottom: media icons + thumbnails */}
-          <div className="shrink-0 bg-black">
-            {/* Media icons */}
-            {(hasPlano || has360 || hasVideo || hasTour) && (
-              <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+          {/* Bottom: media icons — hidden in phone landscape */}
+          {(hasPlano || has360 || hasVideo || hasTour) && (
+            <div className="shrink-0 bg-black landscape-phone:hidden">
+              <div className="flex items-center gap-2 px-4 py-3">
                 <MediaIcons />
               </div>
-            )}
-
-            {/* Thumbnail strip */}
-            {images.length > 1 && (
-              <div className="flex gap-1 px-3 py-2 overflow-x-auto">
-                {images.map((img, i) => (
-                  <button
-                    key={img.url}
-                    onClick={() => lbGoTo(i)}
-                    className={`relative w-16 h-11 shrink-0 overflow-hidden transition-opacity ${lightboxIndex === i ? "ring-1 ring-[#C9B99A] opacity-100" : "opacity-45 hover:opacity-80"}`}
-                  >
-                    <Image src={img.url} alt={`${altBase} — miniatura ${i + 1}`} fill className="object-cover" sizes="64px" />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 

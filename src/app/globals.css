@@ -7,6 +7,14 @@
    un mp4 en public/images/vender). public/ nunca contiene clases: fuera. */
 @source not "../../public";
 
+/* Móvil en apaisado (poca altura): la galería a pantalla completa
+   esconde su tira de miniaturas para que la foto ocupe todo */
+@custom-variant landscape-phone {
+  @media (orientation: landscape) and (max-height: 500px) {
+    @slot;
+  }
+}
+
 @theme {
   --color-background: #0a0a0a;
   --color-foreground: #f5f0e8;
