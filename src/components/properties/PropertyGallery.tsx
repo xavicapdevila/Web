@@ -299,25 +299,6 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             )}
           </div>
 
-          {/* Thumbnail strip */}
-          {images.length > 1 && (
-            <div className="hidden lg:flex gap-1 p-1 bg-black">
-              {images.slice(0, 6).map((img, i) => (
-                <button
-                  key={img.url}
-                  onClick={() => goTo(i)}
-                  className={`relative flex-1 aspect-[4/3] overflow-hidden transition-opacity ${currentIndex === i ? "ring-2 ring-[#C9B99A] opacity-100" : "opacity-60 hover:opacity-90"}`}
-                >
-                  <Image src={img.url} alt={`${altBase} — foto ${i + 1}`} fill className="object-cover" sizes="200px" />
-                  {i === 5 && images.length > 6 && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                      <span className="text-white text-sm font-body">+{images.length - 6}</span>
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
