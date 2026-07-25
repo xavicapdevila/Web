@@ -200,7 +200,10 @@ const nextConfig: NextConfig = {
          // El widget usa por dentro Google Maps (dirección) y reCAPTCHA (envío final):
          // www.google.com + www.gstatic.com + maps.googleapis.com son IMPRESCINDIBLES
          // o el botón «valorar» se queda colgado.
-         "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com https://idealista.com https://*.idealista.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com",
+         // 'unsafe-eval' SOLO en dev: React en desarrollo necesita eval() y sin
+         // esto la hidratación muere en silencio (los prototipos parecían rotos
+         // en Chrome sin estarlo). En producción no entra en la cabecera.
+         `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://*.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://challenges.cloudflare.com https://idealista.com https://*.idealista.com https://www.google.com https://www.gstatic.com https://maps.googleapis.com`,
          "style-src 'self' 'unsafe-inline' https://*.idealista.com https://fonts.googleapis.com",
          "img-src 'self' data: blob: https:",
          "font-src 'self' data: https://*.idealista.com https://fonts.gstatic.com",
