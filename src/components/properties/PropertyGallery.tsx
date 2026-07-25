@@ -35,45 +35,67 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const [showPinPlano, setShowPinPlano] = useState(false);
   const [activePinId, setActivePinId] = useState<string | null>(null);
   const [pinLightboxUrl, setPinLightboxUrl] = useState<string | null>(null);
-  const touchStartX = useRef<number | null>(null);
   const { t } = useLanguage();
 
-  // Cross-fade state: keep old image in bg while new image fades in
-  const [prevSrc, setPrevSrc] = useState<string | null>(null);
-  const [crossfading, setCrossfading] = useState(false);
-  const crossfadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ── Main carousel: native scroll-snap track (the finger drags the photo) ──
+  const trackRef = useRef<HTMLDivElement>(null);
+  const trackRaf = useRef<number | null>(null);
 
-  const goTo = useCallback((newIdx: number) => {
-    if (crossfadeTimer.current) clearTimeout(crossfadeTimer.current);
-    const oldSrc = images[currentIndex]?.url ?? null;
-    setPrevSrc(oldSrc);
-    setCrossfading(false);
-    setCurrentIndex(newIdx);
-    // Two rAFs: first renders new src at opacity-0, second starts the CSS transition
-    requestAnimationFrame(() => requestAnimationFrame(() => setCrossfading(true)));
-    crossfadeTimer.current = setTimeout(() => {
-      setPrevSrc(null);
-      setCrossfading(false);
-    }, 320);
-  }, [currentIndex, images]);
+  const goTo = useCallback((idx: number, smooth = true) => {
+    const el = trackRef.current;
+    if (!el || !el.clientWidth) return;
+    el.scrollTo({ left: idx * el.clientWidth, behavior: smooth ? "smooth" : "auto" });
+  }, []);
 
   const goPrev = useCallback(() => {
-    goTo((currentIndex - 1 + images.length) % images.length);
+    // Wrap-around jumps instantly; adjacent steps animate
+    if (currentIndex === 0) goTo(images.length - 1, false);
+    else goTo(currentIndex - 1);
   }, [currentIndex, images.length, goTo]);
 
   const goNext = useCallback(() => {
-    goTo((currentIndex + 1) % images.length);
+    if (currentIndex === images.length - 1) goTo(0, false);
+    else goTo(currentIndex + 1);
   }, [currentIndex, images.length, goTo]);
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
-    const delta = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 40) delta > 0 ? goNext() : goPrev();
-    touchStartX.current = null;
-  };
+  const onTrackScroll = useCallback(() => {
+    if (trackRaf.current !== null) return;
+    trackRaf.current = requestAnimationFrame(() => {
+      trackRaf.current = null;
+      const el = trackRef.current;
+      if (!el || !el.clientWidth) return;
+      const idx = Math.max(0, Math.min(images.length - 1, Math.round(el.scrollLeft / el.clientWidth)));
+      setCurrentIndex((prev) => (prev === idx ? prev : idx));
+    });
+  }, [images.length]);
+
+  // ── Lightbox: same mechanism on its own track ──
+  const lbTrackRef = useRef<HTMLDivElement>(null);
+  const lbRaf = useRef<number | null>(null);
+  const lbOpenIndex = useRef(0);
+
+  const onLbScroll = useCallback(() => {
+    if (lbRaf.current !== null) return;
+    lbRaf.current = requestAnimationFrame(() => {
+      lbRaf.current = null;
+      const el = lbTrackRef.current;
+      if (!el || !el.clientWidth) return;
+      const idx = Math.max(0, Math.min(images.length - 1, Math.round(el.scrollLeft / el.clientWidth)));
+      setLightboxIndex((prev) => (prev === null || prev === idx ? prev : idx));
+    });
+  }, [images.length]);
+
+  const lbGoTo = useCallback((target: number) => {
+    const el = lbTrackRef.current;
+    if (!el || !el.clientWidth) return;
+    const current = Math.round(el.scrollLeft / el.clientWidth);
+    el.scrollTo({ left: target * el.clientWidth, behavior: Math.abs(target - current) === 1 ? "smooth" : "auto" });
+  }, []);
+
+  useEffect(() => () => {
+    if (trackRaf.current !== null) cancelAnimationFrame(trackRaf.current);
+    if (lbRaf.current !== null) cancelAnimationFrame(lbRaf.current);
+  }, []);
 
   const hasPlano = images.some((img) => img.eti === "plano");
   const hasPinPlano = planoPins.length > 0 && hasPlano;
@@ -82,19 +104,42 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
   const hasTour = Boolean(tour);
   const totalMedia = images.length + (hasVideo ? 1 : 0);
 
-  const mainImage = images[currentIndex] ?? images[0];
   const ytId = video ? getYouTubeId(video) : null;
 
-  const openLightbox = (index: number) => setLightboxIndex(index);
-  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const openLightbox = (index: number) => {
+    lbOpenIndex.current = index;
+    setLightboxIndex(index);
+  };
+
+  const closeLightbox = useCallback(() => {
+    // Leave the main carousel on the photo the user was viewing
+    const lb = lbTrackRef.current;
+    const main = trackRef.current;
+    if (lb && main && lb.clientWidth && main.clientWidth) {
+      main.scrollLeft = Math.round(lb.scrollLeft / lb.clientWidth) * main.clientWidth;
+    }
+    setLightboxIndex(null);
+  }, []);
+
+  // Ref callback: positions the lightbox track on the tapped photo at mount, before paint
+  const setLbTrack = useCallback((el: HTMLDivElement | null) => {
+    lbTrackRef.current = el;
+    if (el && el.clientWidth) el.scrollLeft = lbOpenIndex.current * el.clientWidth;
+  }, []);
 
   const prevImage = useCallback(() => {
-    setLightboxIndex((i) => (i === null ? 0 : (i - 1 + images.length) % images.length));
-  }, [images.length]);
+    const el = lbTrackRef.current;
+    if (!el || !el.clientWidth) return;
+    const current = Math.round(el.scrollLeft / el.clientWidth);
+    lbGoTo((current - 1 + images.length) % images.length);
+  }, [images.length, lbGoTo]);
 
   const nextImage = useCallback(() => {
-    setLightboxIndex((i) => (i === null ? 0 : (i + 1) % images.length));
-  }, [images.length]);
+    const el = lbTrackRef.current;
+    if (!el || !el.clientWidth) return;
+    const current = Math.round(el.scrollLeft / el.clientWidth);
+    lbGoTo((current + 1) % images.length);
+  }, [images.length, lbGoTo]);
 
   // Keyboard navigation for lightbox
   useEffect(() => {
@@ -172,71 +217,42 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
       {/* ── Main gallery ── */}
       <div className="relative bg-black">
         <div className="max-w-7xl mx-auto">
-          {/* Primary image — carousel */}
-          <div
-            className="relative aspect-[16/9] lg:aspect-[21/9] max-h-[80vh] overflow-hidden select-none"
-            onTouchStart={onTouchStart}
-            onTouchEnd={onTouchEnd}
-          >
-            {/* ── Cross-fade image layers ── */}
-            {/* Layer 0: preload the adjacent images (next two + previous), invisible,
-                so paging in either direction feels instant. Uses loading="eager"
-                (not priority) so they never compete with the visible image. */}
-            {images.length > 1 && (() => {
-              const n = images.length;
-              const preloadIdx = [...new Set([
-                (currentIndex + 1) % n,
-                (currentIndex + 2) % n,
-                (currentIndex - 1 + n) % n,
-              ])].filter((i) => i !== currentIndex);
-              return (
-                <div className="absolute inset-0 pointer-events-none opacity-0" style={{ zIndex: 0 }} aria-hidden="true">
-                  {preloadIdx.map((i) => (
-                    <Image key={images[i].url} src={images[i].url} alt="" fill sizes={GALLERY_SIZES} loading="eager" />
-                  ))}
-                </div>
-              );
-            })()}
-
-            {/* Layer 1: previous image (bg, fades out) */}
-            {prevSrc && (
+          {/* Primary image — native swipe carousel */}
+          <div className="relative aspect-[16/9] lg:aspect-[21/9] max-h-[80vh] overflow-hidden select-none">
+            {images.length > 0 ? (
               <div
-                className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${crossfading ? "opacity-0" : "opacity-100"}`}
-                style={{ zIndex: 1 }}
-                aria-hidden="true"
+                ref={trackRef}
+                onScroll={onTrackScroll}
+                className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-hide overscroll-x-contain"
               >
-                <Image src={prevSrc} alt="" fill className="object-cover" sizes={GALLERY_SIZES} priority />
-              </div>
-            )}
-
-            {/* Layer 2: current image (fg, fades in) */}
-            {mainImage ? (
-              <div
-                className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${crossfading || !prevSrc ? "opacity-100" : "opacity-0"}`}
-                style={{ zIndex: 2 }}
-              >
-                <Image
-                  src={mainImage.url}
-                  alt={`${altBase} — foto ${currentIndex + 1} de ${images.length}`}
-                  fill
-                  className="object-cover cursor-pointer"
-                  priority
-                  sizes={GALLERY_SIZES}
-                  onClick={() => openLightbox(currentIndex)}
-                />
+                {images.map((img, i) => (
+                  <div key={img.url} className="relative w-full h-full flex-none snap-center">
+                    <Image
+                      src={img.url}
+                      alt={`${altBase} — foto ${i + 1} de ${images.length}`}
+                      fill
+                      className="object-cover cursor-pointer"
+                      priority={i === 0}
+                      loading={i <= 2 || Math.abs(i - currentIndex) <= 2 ? "eager" : "lazy"}
+                      sizes={GALLERY_SIZES}
+                      onClick={() => openLightbox(i)}
+                    />
+                  </div>
+                ))}
               </div>
             ) : (
-              <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center" style={{ zIndex: 2 }}>
+              <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
                 <span className="text-[#333]">{t("cardNoImage")}</span>
               </div>
             )}
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none z-10" />
 
+            {/* Arrows — desktop only; on touch you just swipe */}
             {images.length > 1 && (
               <button
                 onClick={goPrev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="hidden md:block absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto anterior"
               >
                 <ChevronLeft size={22} />
@@ -245,7 +261,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             {images.length > 1 && (
               <button
                 onClick={goNext}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
+                className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/50 hover:bg-black/80 text-white p-2 transition-colors"
                 aria-label="Foto siguiente"
               >
                 <ChevronRight size={22} />
@@ -328,33 +344,41 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
             </button>
           </div>
 
-          {/* Image — fills all remaining vertical space */}
+          {/* Image track — fills all remaining vertical space, fluid swipe */}
           <div className="relative flex-1 min-h-0">
-            <Image
-              src={images[lightboxIndex].url}
-              alt={`${altBase} — foto ${lightboxIndex + 1} de ${images.length}`}
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
+            <div
+              ref={setLbTrack}
+              onScroll={onLbScroll}
+              className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-hide overscroll-x-contain select-none"
+            >
+              {images.map((img, i) => (
+                <div key={img.url} className="relative w-full h-full flex-none snap-center">
+                  <Image
+                    src={img.url}
+                    alt={`${altBase} — foto ${i + 1} de ${images.length}`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    loading={Math.abs(i - lightboxIndex) <= 1 ? "eager" : "lazy"}
+                  />
+                </div>
+              ))}
+            </div>
 
-            {/* Prev arrow */}
+            {/* Arrows — desktop only; on touch you just swipe */}
             {images.length > 1 && (
               <button
                 onClick={prevImage}
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                className="hidden md:block absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
                 aria-label="Foto anterior"
               >
                 <ChevronLeft size={30} />
               </button>
             )}
-
-            {/* Next arrow */}
             {images.length > 1 && (
               <button
                 onClick={nextImage}
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
+                className="hidden md:block absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white hover:text-[#C9B99A] transition-colors bg-black/40 hover:bg-black/70 p-2 z-10"
                 aria-label="Foto siguiente"
               >
                 <ChevronRight size={30} />
@@ -377,7 +401,7 @@ export default function PropertyGallery({ images, video, tour, title, ciudad, ti
                 {images.map((img, i) => (
                   <button
                     key={img.url}
-                    onClick={() => setLightboxIndex(i)}
+                    onClick={() => lbGoTo(i)}
                     className={`relative w-16 h-11 shrink-0 overflow-hidden transition-opacity ${lightboxIndex === i ? "ring-1 ring-[#C9B99A] opacity-100" : "opacity-45 hover:opacity-80"}`}
                   >
                     <Image src={img.url} alt={`${altBase} — miniatura ${i + 1}`} fill className="object-cover" sizes="64px" />

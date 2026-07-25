@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { memo, useState, useCallback, useEffect } from "react";
+import { memo, useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X, RotateCcw, Rotate3d } from "lucide-react";
+import { BedDouble, Bath, Maximize2, Phone, Mail, Play, Globe, Camera, Share2, X, RotateCcw, Rotate3d, ChevronLeft, ChevronRight } from "lucide-react";
 import { FloorPlanIcon } from "./icons";
 import { formatPrice, formatM2, getYouTubeId } from "@/lib/utils";
 import { getTipoLabel, fillTemplate } from "@/lib/i18n";
@@ -22,7 +22,6 @@ function PropertyCard({ property, priority = false }: Props) {
   const { t, lang } = useLanguage();
   const router = useRouter();
   const titulo = useAutoTranslate(property.titulo);
-  const mainImage = property.imagenes[0]?.url;
   const [showShareModal,    setShowShareModal]    = useState(false);
   const [showVideo,         setShowVideo]         = useState(false);
   const [showTour,          setShowTour]          = useState(false);
@@ -31,6 +30,40 @@ function PropertyCard({ property, priority = false }: Props) {
   const [showReservedAlert, setShowReservedAlert] = useState(false);
 
   const ytId = property.video1 ? getYouTubeId(property.video1) : null;
+
+  // Swipeable image track — first photos only; the full set lives in the gallery modal
+  const slides = property.imagenes.slice(0, 10);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const trackRaf = useRef<number | null>(null);
+  const [slideIndex, setSlideIndex] = useState(0);
+
+  const onTrackScroll = useCallback(() => {
+    if (trackRaf.current !== null) return;
+    trackRaf.current = requestAnimationFrame(() => {
+      trackRaf.current = null;
+      const el = trackRef.current;
+      if (!el || !el.clientWidth) return;
+      const idx = Math.max(0, Math.min(slides.length - 1, Math.round(el.scrollLeft / el.clientWidth)));
+      setSlideIndex((prev) => (prev === idx ? prev : idx));
+    });
+  }, [slides.length]);
+
+  useEffect(() => () => {
+    if (trackRaf.current !== null) cancelAnimationFrame(trackRaf.current);
+  }, []);
+
+  const slidePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = trackRef.current;
+    if (el) el.scrollBy({ left: -el.clientWidth, behavior: "smooth" });
+  };
+  const slideNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = trackRef.current;
+    if (el) el.scrollBy({ left: el.clientWidth, behavior: "smooth" });
+  };
 
   // Close any modal on Escape (stay on grid)
   const closeAll = useCallback(() => {
@@ -136,40 +169,88 @@ function PropertyCard({ property, priority = false }: Props) {
       {/* Image area — outer div is the positioning root so media buttons
           can sit outside the <Link> (no nested anchors) but still overlay the image */}
       <div className="relative aspect-[4/3]">
-        <Link href={`/propiedades/${property.slug}`} className="absolute inset-0 overflow-hidden">
-          {mainImage ? (
-            <Image
-              src={mainImage}
-              alt={`${property.tipo} en ${property.ciudad} — ${titulo}`}
-              fill
-              priority={priority}
-              loading={priority ? "eager" : "lazy"}
-              quality={65}
-              className="object-cover group-hover:scale-105 transition-transform duration-700"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          ) : (
+        {slides.length > 0 ? (
+          // Swipe navigates photos; a tap (no scroll) still opens the property page
+          <div
+            ref={trackRef}
+            onScroll={onTrackScroll}
+            className="absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scrollbar-hide overscroll-x-contain"
+          >
+            {slides.map((img, i) => (
+              <Link
+                key={img.url}
+                href={`/propiedades/${property.slug}`}
+                tabIndex={i === 0 ? undefined : -1}
+                className="relative w-full h-full flex-none snap-center overflow-hidden"
+              >
+                <Image
+                  src={img.url}
+                  alt={i === 0 ? `${property.tipo} en ${property.ciudad} — ${titulo}` : `${titulo} — foto ${i + 1}`}
+                  fill
+                  priority={priority && i === 0}
+                  loading={(priority && i === 0) || (slideIndex > 0 && Math.abs(i - slideIndex) <= 1) ? "eager" : "lazy"}
+                  quality={65}
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Link href={`/propiedades/${property.slug}`} className="absolute inset-0 overflow-hidden">
             <div className="w-full h-full bg-[#1a1a1a] flex items-center justify-center">
               <span className="text-[#333] text-sm">{t("cardNoImage")}</span>
             </div>
-          )}
+          </Link>
+        )}
 
-          {/* Reserved overlay */}
-          {isReserved && (
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-              <span className="text-[#C9B99A] font-display text-2xl tracking-[0.3em] uppercase border border-[#C9B99A] px-6 py-2">
-                {t("cardReserved")}
-              </span>
-            </div>
-          )}
-
-          {/* Tipo badge */}
-          <div className="absolute top-3 left-3">
-            <span className="bg-[#0a0a0a]/90 text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
-              {getTipoLabel(property.tipo, lang, property.subtipo)}
+        {/* Reserved overlay */}
+        {isReserved && (
+          <div className="absolute inset-0 bg-black/60 flex items-center justify-center pointer-events-none z-10">
+            <span className="text-[#C9B99A] font-display text-2xl tracking-[0.3em] uppercase border border-[#C9B99A] px-6 py-2">
+              {t("cardReserved")}
             </span>
           </div>
-        </Link>
+        )}
+
+        {/* Tipo badge */}
+        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+          <span className="bg-[#0a0a0a]/90 text-[#C9B99A] text-xs font-body tracking-widest uppercase px-3 py-1">
+            {getTipoLabel(property.tipo, lang, property.subtipo)}
+          </span>
+        </div>
+
+        {/* Position dots */}
+        {slides.length > 1 && (
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 pointer-events-none">
+            {slides.map((_, i) => (
+              <span
+                key={i}
+                className={`rounded-full transition-all duration-300 ${i === slideIndex ? "w-1.5 h-1.5 bg-white" : "w-1 h-1 bg-white/50"}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Prev/next — only on hover-capable devices; on touch you just swipe */}
+        {slides.length > 1 && (
+          <>
+            <button
+              onClick={slidePrev}
+              aria-label="Foto anterior"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/60 text-white items-center justify-center hover:bg-black/85 transition-colors hidden md:[@media(hover:hover)]:group-hover:flex"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={slideNext}
+              aria-label="Foto siguiente"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-black/60 text-white items-center justify-center hover:bg-black/85 transition-colors hidden md:[@media(hover:hover)]:group-hover:flex"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </>
+        )}
 
         {/* Media badges — outside Link so each has its own click action */}
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 z-10 pointer-events-none">
