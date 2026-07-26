@@ -263,30 +263,18 @@
   .hw-cine-runway { height: var(--cine-h, 300vh); view-timeline-name: --hwcine; }
   .hw-cut { clip-path: inset(0 0 0 100%); }
   .hw-cut-r { clip-path: inset(0 100% 0 0); }
-  .hw-caption { opacity: 0; }
 
+  /* Los rótulos viven DENTRO de su plano: el barrido que corta la foto
+     corta el texto. Nada de ranges propios por rótulo — en navegadores
+     donde el range inline no aplica, se pintaban varios a la vez. */
   @media (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: view()) {
       .hw-cut { animation: hw-cut linear both; animation-timeline: --hwcine; }
       .hw-cut-r { animation: hw-cut-r linear both; animation-timeline: --hwcine; }
-      .hw-caption { animation: hw-caption linear both; animation-timeline: --hwcine; }
-      .hw-caption0 { animation: hw-caption0 linear both; animation-timeline: --hwcine; }
     }
   }
   @keyframes hw-cut { to { clip-path: inset(0 0 0 0); } }
   @keyframes hw-cut-r { to { clip-path: inset(0 0 0 0); } }
-  @keyframes hw-caption {
-    0%   { opacity: 0; transform: translateY(26px); }
-    14%  { opacity: 1; transform: none; }
-    86%  { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-18px); }
-  }
-  /* El primer rótulo nace visible (y así el fallback estático tiene texto). */
-  @keyframes hw-caption0 {
-    0%   { opacity: 1; }
-    86%  { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-18px); }
-  }
 
   /* Grano de película y viñeteado, para que la foto a sangre huela a cine. */
   .hw-grain::after {
@@ -318,7 +306,7 @@
     .hw-line { transform: none; animation: none; }
     .hw-marquee, .hw-marquee-slow { animation: none; }
     .hw-shrink, .hw-kb, .hw-heroout, .hw-heroin { animation: none; }
-    .hw-cut, .hw-cut-r, .hw-caption, .hw-caption0 { animation: none; }
+    .hw-cut, .hw-cut-r { animation: none; }
     .hw-word { animation: none; }
   }
 

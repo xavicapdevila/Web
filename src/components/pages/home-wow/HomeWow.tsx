@@ -185,6 +185,9 @@ export default function HomeWow({
         style={{ "--cine-h": `${(estrellas.length + 1) * 100}vh` } as React.CSSProperties}
       >
         <div className="hw-stage hw-grain hw-vignette" style={{ background: INK }}>
+          {/* Cada plano lleva DENTRO su rótulo: el barrido que corta la foto
+              corta también el texto. Así es imposible que dos rótulos se
+              pinten a la vez, pase lo que pase con los ranges. */}
           {estrellas.map((p, i) => (
             <div
               key={p.ref}
@@ -201,38 +204,31 @@ export default function HomeWow({
                 className="object-cover"
               />
               <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.3) 0%, rgba(21,20,15,0.05) 40%, rgba(21,20,15,0.55) 100%)" }} />
-            </div>
-          ))}
 
-          {/* Los rótulos, como créditos de película. */}
-          {estrellas.map((p, i) => (
-            <div
-              key={`rotulo-${p.ref}`}
-              className={`absolute inset-x-0 bottom-0 z-10 ${i === 0 ? "hw-caption0" : "hw-caption"}`}
-              style={{ animationRange: i === 0 ? "contain 0% contain 21%" : `contain ${i * 25 - 6}% contain ${Math.min(i * 25 + 21, 100)}%` } as React.CSSProperties}
-            >
-              <div className={`${WRAP} pb-10 lg:pb-14 flex flex-wrap items-end justify-between gap-6 text-white`}>
-                <div>
-                  <p className={`${EY} text-white/60`}>
-                    Ahora mismo, en venta · {String(i + 1).padStart(2, "0")}/{String(estrellas.length).padStart(2, "0")}
-                  </p>
-                  <p className="mt-3 font-medium tracking-[-0.03em] leading-[1.02] text-[10vw] sm:text-[6vw] lg:text-[4.2rem]">
-                    {tipologia(p)}
-                    {p.ciudad ? <span className="text-white/60"> · {p.ciudad}</span> : null}
-                  </p>
-                  {p.zona && <p className="mt-2 text-[15px] text-white/70">{p.zona}</p>}
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-medium tracking-[-0.02em] text-[8vw] sm:text-[4vw] lg:text-[2.6rem]">
-                    {p.precio?.toLocaleString("es-ES")} €
-                  </span>
-                  <Link
-                    href={`/propiedades/${p.slug}`}
-                    className="pointer-events-auto inline-flex items-center rounded-full text-[14px] font-medium px-6 py-3 transition-opacity hover:opacity-85"
-                    style={{ background: "#FFF", color: INK }}
-                  >
-                    Ver esta casa
-                  </Link>
+              <div className="absolute inset-x-0 bottom-0 z-10">
+                <div className={`${WRAP} pb-10 lg:pb-14 flex flex-wrap items-end justify-between gap-6 text-white`}>
+                  <div>
+                    <p className={`${EY} text-white/60`}>
+                      Ahora mismo, en venta · {String(i + 1).padStart(2, "0")}/{String(estrellas.length).padStart(2, "0")}
+                    </p>
+                    <p className="mt-3 font-medium tracking-[-0.03em] leading-[1.02] text-[10vw] sm:text-[6vw] lg:text-[4.2rem]">
+                      {tipologia(p)}
+                      {p.ciudad ? <span className="text-white/60"> · {p.ciudad}</span> : null}
+                    </p>
+                    {p.zona && <p className="mt-2 text-[15px] text-white/70">{p.zona}</p>}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="font-medium tracking-[-0.02em] text-[8vw] sm:text-[4vw] lg:text-[2.6rem]">
+                      {p.precio?.toLocaleString("es-ES")} €
+                    </span>
+                    <Link
+                      href={`/propiedades/${p.slug}`}
+                      className="inline-flex items-center rounded-full text-[14px] font-medium px-6 py-3 transition-opacity hover:opacity-85"
+                      style={{ background: "#FFF", color: INK }}
+                    >
+                      Ver esta casa
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -252,30 +248,29 @@ export default function HomeWow({
 
       <section className="hw-cine-runway relative" style={{ "--cine-h": "300vh" } as React.CSSProperties}>
         <div className="hw-stage hw-grain hw-vignette" style={{ background: INK }}>
-          {/* Plano 1: la foto de móvil, a sangre. */}
+          {/* Plano 1: la foto de móvil, a sangre — con su rótulo dentro. */}
           <div className="absolute inset-0">
             <Image src="/images/vender/salon-mal.png" alt="El salón, con foto de móvil" fill sizes="100vw" className="object-cover" />
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.35) 0%, rgba(21,20,15,0.1) 40%, rgba(21,20,15,0.6) 100%)" }} />
+            <div className="absolute inset-x-0 bottom-0 z-10">
+              <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
+                <p className={`${EY} text-white/60`}>{W.metodo.pasos[0].chip}</p>
+                <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[0].titulo}</p>
+                <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[0].cuerpo}</p>
+              </div>
+            </div>
           </div>
-          {/* Plano 2: el MISMO salón, producido — entra con barrido. */}
+          {/* Plano 2: el MISMO salón, producido — entra con barrido y se
+              trae su rótulo dentro del corte. */}
           <div className="hw-cut absolute inset-0" style={{ animationRange: "contain 35% contain 55%" } as React.CSSProperties}>
             <Image src="/images/vender/salon-bien.jpg" alt="El mismo salón, producido" fill sizes="100vw" className="object-cover" />
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.3) 0%, rgba(21,20,15,0.05) 40%, rgba(21,20,15,0.5) 100%)" }} />
-          </div>
-
-          {/* Rótulos de los dos planos. */}
-          <div className="hw-caption0 absolute inset-x-0 bottom-0 z-10" style={{ animationRange: "contain 0% contain 42%" } as React.CSSProperties}>
-            <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
-              <p className={`${EY} text-white/60`}>{W.metodo.pasos[0].chip}</p>
-              <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[0].titulo}</p>
-              <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[0].cuerpo}</p>
-            </div>
-          </div>
-          <div className="hw-caption absolute inset-x-0 bottom-0 z-10" style={{ animationRange: "contain 38% contain 100%" } as React.CSSProperties}>
-            <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
-              <p className={`${EY} text-white/60`}>Producción The Vila Home</p>
-              <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[1].titulo}</p>
-              <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[1].cuerpo}</p>
+            <div className="absolute inset-x-0 bottom-0 z-10">
+              <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
+                <p className={`${EY} text-white/60`}>Producción The Vila Home</p>
+                <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[1].titulo}</p>
+                <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[1].cuerpo}</p>
+              </div>
             </div>
           </div>
         </div>
