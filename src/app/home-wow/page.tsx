@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
 import HomeWowShell from "@/components/pages/home-wow/Shell";
 import { getGooglePlaceData } from "@/lib/googlePlaces";
 import { getCachedPropertiesList } from "@/lib/sync";
-
-/* Space Grotesk — la display del prototipo v7 (la letra del diagnóstico
-   que a Xavi le pareció espectacular). Self-hosted por next/font. */
-const grotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-grotesk",
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
 
 /* PROTOTIPO — no indexar. Tercera previa de la home, junto a /home-claro
    (la actual en claro, contenida) y /home-preview (el fondo que camina).
@@ -35,13 +25,11 @@ export default async function HomeWowPage() {
   ]);
 
   return (
-    <div className={grotesk.variable}>
-      <HomeWowShell
-        rating={place.rating}
-        totalReviews={place.totalReviews}
-        reviews={place.reviews}
-        properties={list.properties}
-      />
-    </div>
+    <HomeWowShell
+      rating={place.rating}
+      totalReviews={place.totalReviews}
+      reviews={place.reviews}
+      properties={list.properties}
+    />
   );
 }
