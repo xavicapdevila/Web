@@ -93,13 +93,21 @@ export default function HomeWow({
     <div className="font-gs antialiased" style={{ background: PAPEL, color: TINTA }}>
       <NavWow overHero />
 
-      {/* ── HERO: inmobiliaria al primer segundo ───────────────────────── */}
+      {/* ── HERO: inmobiliaria al primer segundo ─────────────────────────
+          La portada es EL EQUIPO (decisión de Xavi, 26 jul): la misma foto
+          de los tres que abre la home publicada — el único activo que la
+          competencia no puede copiar. Y «Human Real Estate» va como MARCA
+          visible, no como letra pequeña: es el eslogan de la casa. */}
       <section className="relative min-h-[92svh] flex items-end overflow-hidden">
-        <Image src="/images/vender/vista.jpg" alt="Vivienda en el Garraf" fill priority sizes="100vw" quality={78} className="object-cover" />
-        <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,18,16,0.3) 0%, rgba(20,18,16,0.05) 40%, rgba(20,18,16,0.62) 100%)" }} />
+        <Image src="/hero.jpg" alt="El equipo de The Vila Home" fill priority sizes="100vw" quality={78} className="object-cover object-center" />
+        <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(20,18,16,0.35) 0%, rgba(20,18,16,0.12) 40%, rgba(20,18,16,0.66) 100%)" }} />
 
         <div className={`${WRAP} relative pb-14 lg:pb-20 text-white`}>
-          <p className={`hero-in ${EY} text-white/70`}>Human Real Estate · Vilanova i la Geltrú · Sitges · el Garraf</p>
+          <p className="hero-in flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <span className="text-[15px] sm:text-[17px] font-medium uppercase tracking-[0.3em]">Human Real Estate</span>
+            <span aria-hidden className="hidden sm:inline-block w-10 h-px bg-white/40 translate-y-[-4px]" />
+            <span className="text-[11px] uppercase tracking-[0.24em] text-white/65">Vilanova i la Geltrú · Sitges · el Garraf</span>
+          </p>
           <h1 className="mt-6 max-w-[17ch] font-medium tracking-[-0.035em] leading-[1.0] text-[11.5vw] sm:text-[7.5vw] lg:text-[5.4rem]">
             <span className="hw-mask"><span className="hw-line">Vender bien casi nunca</span></span>
             <span className="hw-mask"><span className="hw-line" style={{ animationDelay: "0.12s" }}>es vender <span className="hw-outline-w">rápido</span>.</span></span>
