@@ -255,16 +255,71 @@
   @keyframes hw-heroout { to { opacity: 0; transform: translateY(-8vh) scale(0.95); } }
   @keyframes hw-heroin { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
+  /* ── Escenas de cine (v4): un pasillo con su línea de tiempo y capas de
+     foto a sangre que entran con BARRIDO horizontal, como cortes de
+     película. Cada capa/rótulo lleva su animation-range inline. El mismo
+     nombre de timeline se puede repetir entre escenas hermanas: cada
+     descendiente resuelve al ancestro más cercano. */
+  .hw-cine-runway { height: var(--cine-h, 300vh); view-timeline-name: --hwcine; }
+  .hw-cut { clip-path: inset(0 0 0 100%); }
+  .hw-cut-r { clip-path: inset(0 100% 0 0); }
+  .hw-caption { opacity: 0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .hw-cut { animation: hw-cut linear both; animation-timeline: --hwcine; }
+      .hw-cut-r { animation: hw-cut-r linear both; animation-timeline: --hwcine; }
+      .hw-caption { animation: hw-caption linear both; animation-timeline: --hwcine; }
+      .hw-caption0 { animation: hw-caption0 linear both; animation-timeline: --hwcine; }
+    }
+  }
+  @keyframes hw-cut { to { clip-path: inset(0 0 0 0); } }
+  @keyframes hw-cut-r { to { clip-path: inset(0 0 0 0); } }
+  @keyframes hw-caption {
+    0%   { opacity: 0; transform: translateY(26px); }
+    14%  { opacity: 1; transform: none; }
+    86%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-18px); }
+  }
+  /* El primer rótulo nace visible (y así el fallback estático tiene texto). */
+  @keyframes hw-caption0 {
+    0%   { opacity: 1; }
+    86%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-18px); }
+  }
+
+  /* Grano de película y viñeteado, para que la foto a sangre huela a cine. */
+  .hw-grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.09;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .hw-vignette::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: inset 0 0 16vw rgba(0, 0, 0, 0.4);
+  }
+
   @supports not (animation-timeline: view()) {
     .hw-runway { height: auto; }
     .hw-stage { position: relative; }
+    .hw-cine-runway { height: 100svh; }
   }
   @media (prefers-reduced-motion: reduce) {
     .hw-runway { height: auto; }
     .hw-stage { position: relative; }
+    .hw-cine-runway { height: 100svh; }
     .hw-line { transform: none; animation: none; }
     .hw-marquee, .hw-marquee-slow { animation: none; }
     .hw-shrink, .hw-kb, .hw-heroout, .hw-heroin { animation: none; }
+    .hw-cut, .hw-cut-r, .hw-caption, .hw-caption0 { animation: none; }
+    .hw-word { animation: none; }
   }
 
   /* La landing /vender usa tipografía display: anula el justify global. */

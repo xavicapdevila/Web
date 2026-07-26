@@ -1,34 +1,38 @@
 "use client";
 
 /* ─────────────────────────────────────────────────────────────────────
-   THE VILA HOME · /home-wow — LA HOME ESPECTACULAR (prototipo, desde cero)
+   THE VILA HOME · /home-wow — LA HOME COMO CINE (prototipo v4)
 
-   PROTOTIPO, noindex. Encargo de Xavi (jul 2026): «desde cero, espectacular,
-   moderno, fondo claro». Navegable con /propiedades-wow.
+   PROTOTIPO, noindex. Tras dos pasadas «no es wow», Xavi eligió dirección:
+   CINE INMOBILIARIO — cada sección es una escena a pantalla completa, las
+   casas son las protagonistas, el texto flota encima y entre escena y
+   escena hay cortes de película (barridos horizontales, scroll-driven).
 
-   FEEDBACK APLICADO (25 jul):
-   - SIN VERDE: el verde es de uso interno (Ora). Y sin dorados. La página
-     es monocroma — crema, tinta y blanco. El acento es el CONTRASTE.
-   - Tipos un punto más contenidos: había títulos desproporcionados.
-   - El contorno («Real Estate») va en Inter con espaciado 0: con General
-     Sans apretada los trazos de letras vecinas se entrelazaban.
-   - EL EQUIPO FUERA de la home: para eso está /quienes-somos. (La foto del
-     hero se queda: es la misma que la home publicada.)
-   - Los «tres puntos» reformulados para convencer (home-wow-copy.ts).
+   LA SECUENCIA:
+     1. APERTURA — el hero de siempre (INTOCABLE por orden de Xavi): la
+        foto del equipo a sangre que se pliega en tarjeta.
+     2. Declaración que se enciende palabra a palabra (respiro en crema).
+     3. Marquesina de municipios — la cartela de título.
+     4. EL TRÁILER — la cartera a pantalla completa: fotos reales de las
+        casas a sangre, con barridos de cine entre una y otra, rótulo
+        flotante (tipología, zona, precio) y contador de escena.
+     5. EL MÉTODO, EN DOS PLANOS — el salón con foto de móvil a sangre;
+        barrido; el MISMO salón producido. Y de remate, el comparador
+        arrastrable sobre tinta.
+     6. LA PRUEBA — escena en tinta: la nota de Google gigante, las
+        cifras y las reseñas reales en cinta.
+     7. La cartera completa (carril) + «Hablemos.» + footer real.
 
-   LAS PIEZAS DEL ESPECTÁCULO:
-     1. Hero coreografiado: la foto a sangre se pliega en tarjeta al hacer
-        scroll (CSS scroll-driven, clases hw-*; sin soporte → hero clásico).
-     2. Marquesina de municipios, relleno y contorno alternados.
-     3. Método en tarjetas que se apilan (sticky): blanca, crema y tinta.
-     4. Propiedades en carril horizontal (la tarjeta del recorrido).
-     5. Cifras que cuentan al entrar + reseñas reales en cinta.
-     6. «Hablemos.» grande, pero ya no descomunal.
+   Todo el movimiento es CSS scroll-driven (hw-cine-*): sin soporte o con
+   reduced-motion cada escena colapsa a un fotograma fijo con su rótulo.
+   Grano de película y viñeteado en las escenas fotográficas (hw-grain,
+   hw-vignette). Monocromo crema/tinta — sin verde ni dorados.
 
-   DATOS: nada inventado — Google Places real, XML real, i18n real.
+   DATOS: nada inventado — las fotos del tráiler son la cartera del XML,
+   la nota es la de Google Places, el copy vive en home-wow-copy.ts.
    ───────────────────────────────────────────────────────────────────── */
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowDown } from "lucide-react";
@@ -38,30 +42,23 @@ import { HOME_CLARO_COPY as C } from "@/lib/home-claro-copy";
 import { HOME_WOW_COPY as W } from "@/lib/home-wow-copy";
 import Footer from "@/components/layout/Footer";
 import NavWow from "@/components/pages/home-wow/NavWow";
-import TarjetaPropiedad from "@/components/pages/propiedades-claro/TarjetaPropiedad";
+import TarjetaPropiedad, { tipologia } from "@/components/pages/propiedades-claro/TarjetaPropiedad";
 import type { Property } from "@/types/property";
 import type { GoogleReview } from "@/lib/googlePlaces";
 
 const PAPER = "#F7F5EF";
-const CARD = "#FFFFFF";
-const CARD_CALIDA = "#ECE8DF";
 const INK = "#15140F";
 const INK_SOFT = "#57534A";
 const LINE = "rgba(21,20,15,0.1)";
 
 const EY = "text-[11px] font-medium uppercase tracking-[0.28em]";
 const WRAP = "mx-auto w-full max-w-[1480px] px-6 lg:px-12";
-const PAD = "py-20 sm:py-24 lg:py-32";
 
 /* Nombres propios: no se traducen. */
 const MUNICIPIOS = ["Vilanova i la Geltrú", "Sitges", "Cubelles", "Sant Pere de Ribes", "Canyelles", "El Garraf"];
 
-/* Piel de cada tarjeta del método: blanca, crema cálida y tinta. */
-const PIEL = [
-  { bg: CARD, fg: INK, soft: INK_SOFT, stroke: INK },
-  { bg: CARD_CALIDA, fg: INK, soft: INK_SOFT, stroke: INK },
-  { bg: INK, fg: PAPER, soft: "rgba(247,245,239,0.65)", stroke: "#F7F5EF" },
-] as const;
+/* Cuántas casas salen en el tráiler. */
+const ESCENAS = 4;
 
 export default function HomeWow({
   rating,
@@ -77,6 +74,9 @@ export default function HomeWow({
   const { t } = useLanguage();
   const ratingTxt = rating.toLocaleString("es-ES", { minimumFractionDigits: 1 });
 
+  /* Las protagonistas del tráiler: las primeras con foto. */
+  const estrellas = properties.filter((p) => p.imagenes?.[0]?.url).slice(0, ESCENAS);
+
   const railRef = useRef<HTMLDivElement>(null);
   const rail = (dir: -1 | 1) => {
     const el = railRef.current;
@@ -88,7 +88,7 @@ export default function HomeWow({
     <div className="font-gs antialiased" style={{ background: PAPER, color: INK }}>
       <NavWow overHero />
 
-      {/* ── 1 · HERO coreografiado ─────────────────────────────────────── */}
+      {/* ── ESCENA 1 · Apertura (el hero intocable) ────────────────────── */}
       <section className="hw-runway relative">
         <div className="hw-stage">
           <div className="hw-shrink absolute inset-0 overflow-hidden" style={{ background: INK }}>
@@ -97,8 +97,6 @@ export default function HomeWow({
             </div>
             <div aria-hidden className="absolute inset-0" style={{ background: "rgba(30,22,16,0.36)" }} />
             <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(30,22,16,0.25) 0%, rgba(30,22,16,0) 35%, rgba(30,22,16,0.5) 100%)" }} />
-
-            {/* La nota de Google, dentro de la foto (se pliega con ella). */}
             <div
               className="absolute left-[7%] bottom-[10%] flex items-center gap-3 rounded-full px-4 py-2.5"
               style={{ background: "rgba(255,255,255,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", color: INK }}
@@ -111,7 +109,6 @@ export default function HomeWow({
             </div>
           </div>
 
-          {/* El titular: entra por líneas al cargar, sale al hacer scroll. */}
           <div className="hw-heroout absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
             <p className={`hero-in ${EY} text-white/75`}>{t("heroLocation")}</p>
             <h1 className="mt-6 font-medium tracking-[-0.04em] leading-[0.92] text-[15vw] sm:text-[11vw] lg:text-[9.5rem] text-white">
@@ -123,7 +120,6 @@ export default function HomeWow({
             </p>
           </div>
 
-          {/* Los CTA entran cuando la foto ya es tarjeta. */}
           <div className="hw-heroin absolute inset-x-0 bottom-[11%] z-10 flex justify-center gap-3 px-6">
             <Link
               href="/valoracion"
@@ -143,9 +139,7 @@ export default function HomeWow({
         </div>
       </section>
 
-      {/* ── 2 · Declaración + marquesina ─────────────────────────────────
-          La frase se ENCIENDE palabra a palabra al hacer scroll: cada
-          palabra lleva su animation-range escalonado (CSS puro). */}
+      {/* ── ESCENA 2 · Declaración palabra a palabra ───────────────────── */}
       <section className="pt-20 sm:pt-24 lg:pt-28">
         <div className={WRAP}>
           <p className="max-w-[26ch] font-medium tracking-[-0.03em] leading-[1.14] text-[7vw] sm:text-[4.2vw] lg:text-[2.8rem]">
@@ -160,7 +154,9 @@ export default function HomeWow({
             ))}
           </p>
         </div>
-        <div aria-hidden className="mt-12 lg:mt-16 overflow-hidden select-none hw-marquee-pause">
+
+        {/* ── ESCENA 3 · Cartela: la marquesina de municipios ──────────── */}
+        <div aria-hidden className="mt-12 lg:mt-16 pb-16 lg:pb-20 overflow-hidden select-none hw-marquee-pause">
           <div className="hw-marquee flex whitespace-nowrap will-change-transform">
             {[0, 1].map((copia) => (
               <div key={copia} className="flex shrink-0 items-center">
@@ -181,90 +177,170 @@ export default function HomeWow({
         </div>
       </section>
 
-      {/* ── 3 · POR QUÉ NOSOTROS: tarjetas que se apilan ───────────────── */}
-      <section className={PAD}>
+      {/* ── ESCENA 4 · EL TRÁILER: la cartera a pantalla completa ────────
+          Un fotograma por casa; entre casa y casa, barrido horizontal.
+          El rótulo (tipología, zona, precio) entra y sale con su plano. */}
+      <section
+        className="hw-cine-runway relative"
+        style={{ "--cine-h": `${(estrellas.length + 1) * 100}vh` } as React.CSSProperties}
+      >
+        <div className="hw-stage hw-grain hw-vignette" style={{ background: INK }}>
+          {estrellas.map((p, i) => (
+            <div
+              key={p.ref}
+              className={`absolute inset-0 ${i === 0 ? "" : i % 2 ? "hw-cut-r" : "hw-cut"}`}
+              style={i === 0 ? undefined : ({ animationRange: `contain ${i * 25 - 10}% contain ${i * 25}%` } as React.CSSProperties)}
+            >
+              <Image
+                src={p.imagenes[0].url}
+                alt={`${tipologia(p)} en ${p.ciudad ?? ""}`}
+                fill
+                sizes="100vw"
+                quality={78}
+                loading={i === 0 ? "eager" : "lazy"}
+                className="object-cover"
+              />
+              <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.3) 0%, rgba(21,20,15,0.05) 40%, rgba(21,20,15,0.55) 100%)" }} />
+            </div>
+          ))}
+
+          {/* Los rótulos, como créditos de película. */}
+          {estrellas.map((p, i) => (
+            <div
+              key={`rotulo-${p.ref}`}
+              className={`absolute inset-x-0 bottom-0 z-10 ${i === 0 ? "hw-caption0" : "hw-caption"}`}
+              style={{ animationRange: i === 0 ? "contain 0% contain 21%" : `contain ${i * 25 - 6}% contain ${Math.min(i * 25 + 21, 100)}%` } as React.CSSProperties}
+            >
+              <div className={`${WRAP} pb-10 lg:pb-14 flex flex-wrap items-end justify-between gap-6 text-white`}>
+                <div>
+                  <p className={`${EY} text-white/60`}>
+                    Ahora mismo, en venta · {String(i + 1).padStart(2, "0")}/{String(estrellas.length).padStart(2, "0")}
+                  </p>
+                  <p className="mt-3 font-medium tracking-[-0.03em] leading-[1.02] text-[10vw] sm:text-[6vw] lg:text-[4.2rem]">
+                    {tipologia(p)}
+                    {p.ciudad ? <span className="text-white/60"> · {p.ciudad}</span> : null}
+                  </p>
+                  {p.zona && <p className="mt-2 text-[15px] text-white/70">{p.zona}</p>}
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="font-medium tracking-[-0.02em] text-[8vw] sm:text-[4vw] lg:text-[2.6rem]">
+                    {p.precio?.toLocaleString("es-ES")} €
+                  </span>
+                  <Link
+                    href={`/propiedades/${p.slug}`}
+                    className="pointer-events-auto inline-flex items-center rounded-full text-[14px] font-medium px-6 py-3 transition-opacity hover:opacity-85"
+                    style={{ background: "#FFF", color: INK }}
+                  >
+                    Ver esta casa
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── ESCENA 5 · EL MÉTODO, EN DOS PLANOS ────────────────────────── */}
+      <section className="py-20 sm:py-24 lg:py-28">
         <div className={WRAP}>
-          <div className="max-w-[46rem]">
-            <p className={`rv ${EY}`} style={{ color: INK_SOFT }}>{W.metodo.label}</p>
-            <h2 className="rv mt-5 font-medium tracking-[-0.035em] leading-[0.96] text-[11vw] sm:text-[6vw] lg:text-[3.8rem]">
-              {W.metodo.titulo1} <span style={{ color: INK_SOFT }}>{W.metodo.titulo2}</span>
-            </h2>
+          <p className={`rv ${EY}`} style={{ color: INK_SOFT }}>{W.metodo.label}</p>
+          <h2 className="rv mt-5 max-w-[24ch] font-medium tracking-[-0.035em] leading-[0.96] text-[11vw] sm:text-[6vw] lg:text-[3.8rem]">
+            {W.metodo.titulo1} <span style={{ color: INK_SOFT }}>{W.metodo.titulo2}</span>
+          </h2>
+        </div>
+      </section>
+
+      <section className="hw-cine-runway relative" style={{ "--cine-h": "300vh" } as React.CSSProperties}>
+        <div className="hw-stage hw-grain hw-vignette" style={{ background: INK }}>
+          {/* Plano 1: la foto de móvil, a sangre. */}
+          <div className="absolute inset-0">
+            <Image src="/images/vender/salon-mal.png" alt="El salón, con foto de móvil" fill sizes="100vw" className="object-cover" />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.35) 0%, rgba(21,20,15,0.1) 40%, rgba(21,20,15,0.6) 100%)" }} />
+          </div>
+          {/* Plano 2: el MISMO salón, producido — entra con barrido. */}
+          <div className="hw-cut absolute inset-0" style={{ animationRange: "contain 35% contain 55%" } as React.CSSProperties}>
+            <Image src="/images/vender/salon-bien.jpg" alt="El mismo salón, producido" fill sizes="100vw" className="object-cover" />
+            <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(21,20,15,0.3) 0%, rgba(21,20,15,0.05) 40%, rgba(21,20,15,0.5) 100%)" }} />
           </div>
 
-          <div className="mt-14 flex flex-col gap-6">
-            {W.metodo.pasos.map((paso, i) => {
-              const piel = PIEL[i % PIEL.length];
-              const cuerpo = fillTemplate(paso.cuerpo, { rating: ratingTxt, reviews: String(totalReviews) });
-              return (
-                <article
-                  key={paso.n}
-                  className="sticky rounded-[1.75rem] lg:rounded-[2.25rem] p-8 sm:p-12 lg:p-14 min-h-[52vh] overflow-hidden"
-                  style={{
-                    top: `calc(6rem + ${i * 1.25}rem)`,
-                    background: piel.bg,
-                    color: piel.fg,
-                    boxShadow: piel.bg === CARD ? `inset 0 0 0 1px ${LINE}, 0 -12px 40px rgba(21,20,15,0.08)` : "0 -12px 40px rgba(21,20,15,0.12)",
-                  }}
-                >
-                  <span
-                    aria-hidden
-                    className="absolute -top-5 right-4 lg:right-10 font-medium leading-none tracking-[-0.04em] text-[6.5rem] lg:text-[10rem] opacity-60"
-                    style={{ color: "transparent", WebkitTextStroke: `1.5px ${piel.stroke}` }}
-                  >
-                    {paso.n}
-                  </span>
-
-                  {/* Texto a la izquierda, PRUEBA VISUAL a la derecha: la
-                      imagen hace el trabajo que antes hacía el adjetivo. */}
-                  <div className="relative grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-12 items-center h-full min-h-[inherit]">
-                    <div className="flex flex-col justify-center py-2">
-                      <h3 className="max-w-[20ch] font-medium tracking-[-0.03em] leading-[1.08] text-[6.5vw] sm:text-[3.6vw] lg:text-[2.5rem]">{paso.titulo}</h3>
-                      <p className="mt-6 max-w-[46ch] text-[16px] lg:text-[18px] leading-[1.6]" style={{ color: piel.soft }}>
-                        {cuerpo}
-                      </p>
-                    </div>
-
-                    {i === 0 && (
-                      /* La foto "de móvil" torcida, como pegada en el portal. */
-                      <div className="relative mx-auto w-full max-w-[420px] -rotate-2">
-                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl shadow-black/25">
-                          <Image src="/images/vender/salon-mal.png" alt="Foto de anuncio hecha con el móvil" fill sizes="(max-width:1024px) 90vw, 420px" className="object-cover" />
-                        </div>
-                        <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: INK, color: PAPER }}>
-                          {paso.chip}
-                        </span>
-                      </div>
-                    )}
-
-                    {i === 1 && (
-                      /* El comparador: el MISMO salón, móvil vs producción. */
-                      <AntesDespues
-                        mal="/images/vender/salon-mal.png"
-                        bien="/images/vender/salon-bien.jpg"
-                        chip={paso.chip}
-                      />
-                    )}
-
-                    {i === 2 && (
-                      /* La nota, gigante: el dato real como imagen. */
-                      <div className="flex flex-col items-center justify-center text-center py-4">
-                        <span className="font-medium tracking-[-0.05em] leading-none text-[22vw] sm:text-[12vw] lg:text-[9rem]">{ratingTxt}</span>
-                        <span className="mt-4 flex [&_svg]:w-5 [&_svg]:h-5 [&_svg]:fill-[#F7F5EF]"><Stars /></span>
-                        <span className="mt-4 text-[13px]" style={{ color: piel.soft }}>
-                          {totalReviews} {t("heroReviews")}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
+          {/* Rótulos de los dos planos. */}
+          <div className="hw-caption0 absolute inset-x-0 bottom-0 z-10" style={{ animationRange: "contain 0% contain 42%" } as React.CSSProperties}>
+            <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
+              <p className={`${EY} text-white/60`}>{W.metodo.pasos[0].chip}</p>
+              <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[0].titulo}</p>
+              <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[0].cuerpo}</p>
+            </div>
+          </div>
+          <div className="hw-caption absolute inset-x-0 bottom-0 z-10" style={{ animationRange: "contain 38% contain 100%" } as React.CSSProperties}>
+            <div className={`${WRAP} pb-10 lg:pb-14 max-w-none text-white`}>
+              <p className={`${EY} text-white/60`}>Producción The Vila Home</p>
+              <p className="mt-3 max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.6rem]">{W.metodo.pasos[1].titulo}</p>
+              <p className="mt-4 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6] text-white/75">{W.metodo.pasos[1].cuerpo}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── 4 · PROPIEDADES: carril deslizable ─────────────────────────── */}
-      <section className="pb-8">
+      {/* Remate del método: tócalo tú — el comparador sobre tinta. */}
+      <section className="py-20 sm:py-24 lg:py-28" style={{ background: INK, color: PAPER }}>
+        <div className={`${WRAP} grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] gap-10 lg:gap-16 items-center`}>
+          <div>
+            <p className={`rv ${EY}`} style={{ color: "rgba(247,245,239,0.55)" }}>Compruébalo tú</p>
+            <h3 className="rv mt-5 max-w-[16ch] font-medium tracking-[-0.03em] leading-[1.05] text-[9vw] sm:text-[5vw] lg:text-[3.2rem]">
+              La diferencia no se cuenta. Se arrastra.
+            </h3>
+            <p className="rv mt-6 max-w-[44ch] text-[15px] lg:text-[17px] leading-[1.6]" style={{ color: "rgba(247,245,239,0.65)" }}>
+              Fotografía profesional, vídeo, plano 3D y tour virtual. Para que quien mira desde el sofá llegue a la visita medio convencido.
+            </p>
+          </div>
+          <div className="rv">
+            <AntesDespues mal="/images/vender/salon-mal.png" bien="/images/vender/salon-bien.jpg" chip={W.metodo.pasos[1].chip} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── ESCENA 6 · LA PRUEBA: la nota gigante + reseñas ────────────── */}
+      <section className="py-24 sm:py-28 lg:py-36" style={{ background: "#100F0B", color: PAPER }}>
+        <div className={`${WRAP} text-center`}>
+          <p className={`rv ${EY}`} style={{ color: "rgba(247,245,239,0.55)" }}>{W.metodo.pasos[2].chip}</p>
+          <h2 className="rv mt-6 max-w-[20ch] mx-auto font-medium tracking-[-0.035em] leading-[1.0] text-[10vw] sm:text-[6vw] lg:text-[3.8rem]">
+            {W.metodo.pasos[2].titulo}
+          </h2>
+          <div className="rv mt-10 flex items-baseline justify-center gap-4">
+            <span className="font-medium tracking-[-0.05em] leading-none text-[34vw] sm:text-[20vw] lg:text-[14rem]">{ratingTxt}</span>
+            <span className="text-[18px]" style={{ color: "rgba(247,245,239,0.55)" }}>/ 5</span>
+          </div>
+          <div className="rv mt-6 flex justify-center [&_svg]:w-5 [&_svg]:h-5 [&_svg]:fill-[#F7F5EF]"><Stars /></div>
+          <p className="rv mt-5 text-[15px]" style={{ color: "rgba(247,245,239,0.65)" }}>
+            {fillTemplate(W.metodo.pasos[2].cuerpo, { rating: ratingTxt, reviews: String(totalReviews) })}
+          </p>
+        </div>
+
+        <div className="mt-14 overflow-hidden hw-marquee-pause" style={{ maskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)" }}>
+          <div className="hw-marquee-slow flex gap-4 whitespace-normal will-change-transform">
+            {[0, 1].map((copia) => (
+              <div key={copia} className="flex gap-4 shrink-0 pr-4">
+                {reviews.slice(0, 6).map((r, i) => (
+                  <figure
+                    key={`${copia}-${i}`}
+                    className="w-[320px] sm:w-[360px] shrink-0 rounded-2xl p-6 flex flex-col gap-4"
+                    style={{ background: "rgba(247,245,239,0.06)", boxShadow: "inset 0 0 0 1px rgba(247,245,239,0.12)" }}
+                  >
+                    <span className="[&_svg]:fill-[#F7F5EF]"><Stars /></span>
+                    <blockquote className="text-[14px] leading-[1.65] flex-1" style={{ color: "rgba(247,245,239,0.85)" }}>
+                      <span className="line-clamp-[5]">{r.text}</span>
+                    </blockquote>
+                    <figcaption className="text-[13px] font-medium" style={{ color: "rgba(247,245,239,0.55)" }}>{r.author}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── ESCENA 7 · La cartera completa (carril) ────────────────────── */}
+      <section className="pt-20 sm:pt-24 lg:pt-28 pb-8">
         <div className={WRAP}>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
@@ -278,7 +354,6 @@ export default function HomeWow({
                 {t("featuredSeeAll")}
                 <span className="transition-transform duration-500 group-hover:translate-x-1">→</span>
               </Link>
-              {/* Flechas solo con ratón — en táctil se desliza, como en toda la web. */}
               <div className="hidden [@media(hover:hover)]:flex items-center gap-2 pl-2">
                 <button onClick={() => rail(-1)} aria-label="Anterior" className="w-10 h-10 rounded-full flex items-center justify-center transition-colors hover:bg-black/5" style={{ boxShadow: `inset 0 0 0 1px ${LINE}` }}>
                   <ChevronLeft size={17} />
@@ -291,7 +366,6 @@ export default function HomeWow({
           </div>
         </div>
 
-        {/* El carril sangra hasta el borde de la pantalla. */}
         <div
           ref={railRef}
           className="mt-10 flex gap-4 lg:gap-5 overflow-x-auto snap-x snap-mandatory scrollbar-hide overscroll-x-contain px-6 lg:px-[max(3rem,calc((100vw-1480px)/2+3rem))]"
@@ -304,39 +378,8 @@ export default function HomeWow({
         </div>
       </section>
 
-      {/* ── 5 · CONFIANZA: cifras + cinta de reseñas ───────────────────── */}
-      <section className={PAD}>
-        <div className={WRAP}>
-          <p className={`rv ${EY}`} style={{ color: INK_SOFT }}>{t("testimonialsLabel")}</p>
-          <div className="rv mt-8 grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
-            <Cifra to={450} prefix="+" label={t("heroFamilies")} />
-            <Cifra to={15} prefix="+" label={t("heroYears")} />
-            <Cifra to={rating} decimals={1} label={t("testimonialsTitle")} stars />
-            <Cifra to={totalReviews} label={t("testimonialsReviews")} />
-          </div>
-        </div>
-
-        <div className="mt-14 overflow-hidden hw-marquee-pause" style={{ maskImage: "linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent)" }}>
-          <div className="hw-marquee-slow flex gap-4 whitespace-normal will-change-transform">
-            {[0, 1].map((copia) => (
-              <div key={copia} className="flex gap-4 shrink-0 pr-4">
-                {reviews.slice(0, 6).map((r, i) => (
-                  <figure key={`${copia}-${i}`} className="w-[320px] sm:w-[360px] shrink-0 rounded-2xl p-6 flex flex-col gap-4" style={{ background: CARD, boxShadow: `inset 0 0 0 1px ${LINE}` }}>
-                    <Stars />
-                    <blockquote className="text-[14px] leading-[1.65] flex-1">
-                      <span className="line-clamp-[5]">{r.text}</span>
-                    </blockquote>
-                    <figcaption className="text-[13px] font-medium" style={{ color: INK_SOFT }}>{r.author}</figcaption>
-                  </figure>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 6 · CTA final ──────────────────────────────────────────────── */}
-      <section className="pb-24 sm:pb-32 lg:pb-40">
+      {/* ── CTA final ──────────────────────────────────────────────────── */}
+      <section className="py-24 sm:py-32 lg:py-40">
         <div className={`${WRAP} text-center`}>
           <p className={`rv ${EY}`} style={{ color: INK_SOFT }}>{t("ctaLabel")}</p>
           <h2 className="rv mt-6 font-medium tracking-[-0.04em] leading-[0.9] text-[14vw] sm:text-[10vw] lg:text-[7rem]">
@@ -363,56 +406,17 @@ export default function HomeWow({
 
 /* ── Piezas ───────────────────────────────────────────────────────────── */
 
-/* Cifra que cuenta al entrar en pantalla. El servidor renderiza el valor
-   FINAL: sin JS no se pierde nada — la animación es cortesía. */
-function Cifra({ to, decimals = 0, prefix = "", label, stars }: {
-  to: number; decimals?: number; prefix?: string; label: string; stars?: boolean;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const fmt = (n: number) => prefix + n.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-    const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      io.disconnect();
-      const t0 = performance.now();
-      const paso = (now: number) => {
-        const p = Math.min((now - t0) / 1300, 1);
-        el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
-        if (p < 1) requestAnimationFrame(paso);
-      };
-      requestAnimationFrame(paso);
-    }, { threshold: 0.4 });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [to, decimals, prefix]);
-
-  return (
-    <div>
-      <div className="flex items-center gap-3">
-        <span ref={ref} className="font-medium tracking-[-0.04em] leading-none text-[10vw] sm:text-[5.5vw] lg:text-[3.4rem] tabular-nums">
-          {prefix + to.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}
-        </span>
-        {stars && <Stars />}
-      </div>
-      <p className="mt-3 text-[13px] lg:text-[14px]" style={{ color: INK_SOFT }}>{label}</p>
-    </div>
-  );
-}
-
 /* Antes/después arrastrable: el MISMO salón con móvil y producido. El
    control es un <input range> invisible a pantalla completa — funciona
    con dedo y con ratón, y sin JS queda la foto buena medio revelada. */
 function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: string }) {
   const [v, setV] = useState(58);
   return (
-    <div className="relative w-full max-w-[480px] mx-auto">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-black/15 select-none">
-        <Image src={mal} alt="El salón, con foto de móvil" fill sizes="(max-width:1024px) 90vw, 480px" className="object-cover" />
+    <div className="relative w-full max-w-[560px] mx-auto">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-black/30 select-none">
+        <Image src={mal} alt="El salón, con foto de móvil" fill sizes="(max-width:1024px) 90vw, 560px" className="object-cover" />
         <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - v}% 0 0)` }}>
-          <Image src={bien} alt="El mismo salón, producido" fill sizes="(max-width:1024px) 90vw, 480px" className="object-cover" />
+          <Image src={bien} alt="El mismo salón, producido" fill sizes="(max-width:1024px) 90vw, 560px" className="object-cover" />
         </div>
         <div aria-hidden className="absolute top-0 bottom-0 w-[2px] bg-white shadow" style={{ left: `${v}%` }} />
         <div
@@ -438,7 +442,7 @@ function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: st
           className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
         />
       </div>
-      <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: INK, color: PAPER }}>
+      <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: PAPER, color: INK }}>
         {chip}
       </span>
     </div>
