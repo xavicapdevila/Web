@@ -276,6 +276,15 @@
   @keyframes hw-cut { to { clip-path: inset(0 0 0 0); } }
   @keyframes hw-cut-r { to { clip-path: inset(0 0 0 0); } }
 
+  /* Titular con la foto DENTRO de las letras (hero /home-wow v7). */
+  .hw-cliptext {
+    background-size: cover;
+    background-position: center 30%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* Sello circular giratorio (hero /home-wow): texto en círculo que rota
      despacio. Detalle de acabado, no interacción — reduce-motion lo para. */
   .hw-spin { animation: hw-spin 18s linear infinite; }

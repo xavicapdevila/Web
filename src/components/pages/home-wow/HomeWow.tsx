@@ -1,24 +1,29 @@
 "use client";
 
 /* ─────────────────────────────────────────────────────────────────────
-   THE VILA HOME · /home-wow — EL DOSSIER (prototipo v6)
+   THE VILA HOME · /home-wow — LA GALERÍA NOCTURNA (prototipo v7)
 
-   PROTOTIPO, noindex. Sexta pasada. Las reglas que han quedado grabadas
-   del proceso con Xavi:
-   - CURSIVAS PROHIBIDAS («las odio»). Nada de serif itálica.
-   - La letra buena es la de antes: General Sans + «Real Estate» en
-     contorno (Inter, tracking 0 — hw-outline).
-   - Sin scrolljacking: el movimiento no persigue el dedo. Lo que se
-     mueve, se mueve solo y despacio (marquesina, sello giratorio).
-   - «Dale una vuelta a los colores»: entra el TEJA (#BC5233) — el color
-     de los tejados mediterráneos. Ni verde (interno) ni dorado (cliché).
-     Ritmo de fondos: crema → blanco → chocolate → teja.
-   - «Que se diga: guau, qué web más trabajada»: densidad de OFICIO.
-     Números de sección, esquinas marcadas, chips, tarjetas flotantes,
-     sello circular giratorio, bento de fotos. Capas, no minimalismo.
+   PROTOTIPO, noindex. Séptima pasada, y un giro de premisa razonado:
+   seis versiones CLARAS no han arrancado el «guau»; lo único que Xavi ha
+   calificado de espectacular (diagnóstico v2) era OSCURO, y su web actual
+   es oscura. La fotografía inmobiliaria explota sobre negro. Así que:
+   NEGRO PROFUNDO + hueso + UN acento fuego + Space Grotesk de display.
 
-   El titular "Human Real Estate" es INTOCABLE (el texto).
-   DATOS: cartera XML real, Google Places real, copy de Xavi.
+   Las dos piezas «fuera de lo común» que sostienen la página:
+   1. El titular con LA FOTO DENTRO DE LAS LETRAS (background-clip: text):
+      «Human» lleva la foto del equipo en el relleno de los glifos.
+   2. LA CARTERA COMO ÍNDICE: filas tipográficas enormes (01 · Casa ·
+      Sitges · precio) que al pasar el ratón revelan la foto en un marco
+      lateral fijo. En móvil, cada fila es una tarjeta con su foto.
+
+   REGLAS VIGENTES (vetos acumulados de Xavi — no romper):
+   - Cero cursivas. Cero scrolljacking (solo fundidos de entrada y
+     marquesina/sello autónomos). Ni verde ni dorado.
+   - «Cambia lo que pone»: el copy es nuevo (esta pasada lo autorizó);
+     «Human Real Estate» se conserva como marca — es el claim de la casa.
+
+   DATOS: cartera XML real, Google Places real. El comparador se queda:
+   no es adorno, es la demo del negocio.
    ───────────────────────────────────────────────────────────────────── */
 
 import { useState } from "react";
@@ -26,23 +31,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Camera } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { HOME_CLARO_COPY as C } from "@/lib/home-claro-copy";
 import Footer from "@/components/layout/Footer";
-import NavWow from "@/components/pages/home-wow/NavWow";
+import { siteConfig } from "@/lib/config";
+import { LANGS } from "@/lib/i18n";
 import { tipologia } from "@/components/pages/propiedades-claro/TarjetaPropiedad";
 import type { Property } from "@/types/property";
 import type { GoogleReview } from "@/lib/googlePlaces";
+import { Phone } from "lucide-react";
 
-const CREMA = "#F5F0E7";
-const BLANCO = "#FFFFFF";
-const TINTA = "#16120E";
-const TINTA_SUAVE = "#5A5348";
-const CHOCO = "#221A14";
-const TEJA = "#BC5233";
-const FILO = "rgba(22,18,14,0.12)";
+const NOCHE = "#0B0A08";
+const NOCHE_2 = "#12100C";
+const HUESO = "#EDE6DA";
+const HUESO_SUAVE = "rgba(237,230,218,0.55)";
+const FUEGO = "#FF4A1F";
+const HUMO = "rgba(237,230,218,0.14)";
 
-const EY = "text-[11px] font-medium uppercase tracking-[0.28em]";
+const EY = "text-[11px] font-medium uppercase tracking-[0.3em]";
 const WRAP = "mx-auto w-full max-w-[1480px] px-6 lg:px-12";
+const DISPLAY: React.CSSProperties = { fontFamily: "var(--font-grotesk), var(--font-general-sans), sans-serif" };
 
 /* Nombres propios: no se traducen. */
 const MUNICIPIOS = ["Vilanova i la Geltrú", "Sitges", "Cubelles", "Sant Pere de Ribes", "Canyelles", "El Garraf"];
@@ -53,22 +59,6 @@ const METODO = [
   { n: "03", nombre: "Plano 3D", detalle: "Que se entienda la casa antes de pisarla." },
   { n: "04", nombre: "Tour virtual", detalle: "La primera visita, desde el sofá del comprador." },
 ];
-
-/* Cabecera de sección numerada — el detalle de dossier que se repite. */
-function Rotulo({ n, children, claro = false }: { n: string; children: React.ReactNode; claro?: boolean }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span
-        className="text-[11px] font-medium tabular-nums px-2.5 py-1 rounded-full"
-        style={{ color: claro ? CREMA : TEJA, boxShadow: `inset 0 0 0 1px ${claro ? "rgba(245,240,231,0.35)" : TEJA}` }}
-      >
-        {n}
-      </span>
-      <span className={EY} style={{ color: claro ? "rgba(245,240,231,0.6)" : TINTA_SUAVE }}>{children}</span>
-      <span aria-hidden className="flex-1 h-px" style={{ background: claro ? "rgba(245,240,231,0.2)" : FILO }} />
-    </div>
-  );
-}
 
 export default function HomeWow({
   rating,
@@ -81,118 +71,110 @@ export default function HomeWow({
   reviews: GoogleReview[];
   properties: Property[];
 }) {
-  const { t } = useLanguage();
+  const { t, lang, setLang } = useLanguage();
   const ratingTxt = rating.toLocaleString("es-ES", { minimumFractionDigits: 1 });
 
-  const conFoto = properties.filter((p) => p.imagenes?.[0]?.url);
-  const flotantes = conFoto.slice(0, 2);
-  const bento = conFoto.slice(0, 6);
+  const cartera = properties.filter((p) => p.imagenes?.[0]?.url).slice(0, 7);
+  const [enfoque, setEnfoque] = useState(0);
+  const cita = [...reviews.slice(0, 4)].sort((a, b) => b.text.length - a.text.length)[0];
 
   return (
-    <div className="font-gs antialiased" style={{ background: CREMA, color: TINTA }}>
-      <NavWow />
+    <div className="font-gs antialiased" style={{ background: NOCHE, color: HUESO }}>
+      {/* ── Menú propio de la galería (oscuro, mínimo) ─────────────────── */}
+      <header className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl" style={{ background: "rgba(11,10,8,0.72)", borderBottom: `1px solid ${HUMO}` }}>
+        <nav className={`${WRAP} h-[72px] flex items-center justify-between gap-6`}>
+          <Link href="/home-wow" aria-label="The Vila Home" className="shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.svg" alt="The Vila Home" className="h-8 sm:h-9 w-auto" />
+          </Link>
+          <div className="hidden lg:flex items-center gap-8 text-[13px] font-medium" style={{ color: HUESO }}>
+            <Link href="/propiedades-wow" className="hover:opacity-60 transition-opacity">{t("navProperties")}</Link>
+            <Link href="/quienes-somos" className="hover:opacity-60 transition-opacity">{t("navAbout")}</Link>
+            <Link href="/valoracion" className="hover:opacity-60 transition-opacity">{t("navValuation")}</Link>
+            <Link href="/blog" className="hover:opacity-60 transition-opacity">{t("navBlog")}</Link>
+            <Link href="/contacto" className="hover:opacity-60 transition-opacity">{t("navContact")}</Link>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <div className="hidden sm:flex items-center gap-1 pr-4" style={{ borderRight: `1px solid ${HUMO}` }}>
+              {LANGS.map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => setLang(code)}
+                  className={`text-[10px] tracking-widest px-1.5 py-0.5 cursor-pointer transition-opacity ${
+                    lang === code ? "opacity-100 underline underline-offset-4" : "opacity-45 hover:opacity-80"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <a href="tel:936061800" className="hidden md:flex items-center gap-2 text-[13px] hover:opacity-60 transition-opacity">
+              <Phone size={13} />
+              {siteConfig.phoneDisplay}
+            </a>
+            <Link href="/valoracion" className="text-[13px] font-medium rounded-full px-5 py-2.5 whitespace-nowrap transition-opacity hover:opacity-90" style={{ background: FUEGO, color: "#FFF" }}>
+              {t("heroValueHome")}
+            </Link>
+          </div>
+        </nav>
+      </header>
 
-      {/* ── (00) EL HERO-DOSSIER ───────────────────────────────────────── */}
-      <section className="relative pt-36 lg:pt-44 pb-16 overflow-hidden">
-        {/* Marco de taller: esquinas marcadas del lienzo. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-6 lg:inset-x-12 top-28 bottom-6 hidden sm:block">
-          {["top-0 left-0 border-t border-l", "top-0 right-0 border-t border-r", "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r"].map((pos) => (
-            <span key={pos} className={`absolute w-6 h-6 ${pos}`} style={{ borderColor: TEJA }} />
-          ))}
-        </div>
-
+      {/* ── EL TITULAR CON LA FOTO DENTRO ──────────────────────────────── */}
+      <section className="relative min-h-[100svh] flex flex-col justify-center pt-28 pb-16 overflow-hidden">
+        <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(80rem 40rem at 50% -10%, rgba(255,74,31,0.07), transparent 60%)` }} />
         <div className={`${WRAP} relative text-center`}>
-          <p className={`hero-in ${EY}`} style={{ color: TINTA_SUAVE }}>{t("heroLocation")}</p>
-
-          <h1 className="mt-8 font-medium tracking-[-0.04em] leading-[0.9] text-[16vw] sm:text-[12vw] lg:text-[10rem]">
-            <span className="hw-mask"><span className="hw-line">Human</span></span>
-            <span className="hw-mask"><span className="hw-line hw-outline" style={{ animationDelay: "0.14s" }}>Real Estate</span></span>
-          </h1>
-
-          <p className="hero-in mt-8 mx-auto max-w-[36ch] text-[17px] lg:text-[19px] leading-[1.55]" style={{ color: TINTA_SUAVE, animationDelay: "0.3s" }}>
-            {C.intro}
+          <p className={`hero-in ${EY}`} style={{ color: HUESO_SUAVE }}>
+            {t("heroLocation")}
           </p>
 
-          <div className="hero-in mt-9 flex flex-wrap justify-center gap-3" style={{ animationDelay: "0.38s" }}>
-            <Link href="/valoracion" className="inline-flex items-center gap-2 rounded-full text-[15px] font-medium px-7 py-3.5 transition-opacity hover:opacity-90" style={{ background: TEJA, color: "#FFF" }}>
+          <h1 className="mt-8 font-bold leading-[0.88] tracking-[-0.03em]" style={DISPLAY}>
+            <span className="hw-mask">
+              <span className="hw-line hw-cliptext block text-[22vw] sm:text-[17vw] lg:text-[15rem]" style={{ backgroundImage: "url(/hero.jpg)" }}>
+                HUMAN
+              </span>
+            </span>
+            <span className="hw-mask">
+              <span className="hw-line block text-[8.5vw] sm:text-[6.5vw] lg:text-[5.6rem] mt-1 lg:mt-2" style={{ color: HUESO, animationDelay: "0.14s" }}>
+                REAL ESTATE
+              </span>
+            </span>
+          </h1>
+
+          <p className="hero-in mt-9 mx-auto max-w-[42ch] text-[16px] lg:text-[19px] leading-[1.55]" style={{ color: HUESO_SUAVE, animationDelay: "0.32s" }}>
+            Las mejores casas de Vilanova, Sitges y el Garraf — producidas, enseñadas y vendidas como merecen.
+          </p>
+
+          <div className="hero-in mt-10 flex flex-wrap justify-center gap-3" style={{ animationDelay: "0.4s" }}>
+            <Link href="/valoracion" className="inline-flex items-center gap-2 rounded-full text-[15px] font-medium px-8 py-4 transition-opacity hover:opacity-90" style={{ background: FUEGO, color: "#FFF" }}>
               {t("heroValueHome")}
               <ArrowUpRight size={16} />
             </Link>
-            <Link href="/propiedades-wow" className="inline-flex items-center rounded-full text-[15px] font-medium px-7 py-3.5 transition-colors hover:bg-black/5" style={{ boxShadow: `inset 0 0 0 1px ${FILO}` }}>
+            <Link href="/propiedades-wow" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-colors hover:bg-white/5" style={{ boxShadow: `inset 0 0 0 1px ${HUMO}`, color: HUESO }}>
               {t("heroSeeProperties")}
             </Link>
           </div>
 
-          <div className="hero-in mt-8 flex items-center justify-center gap-3" style={{ animationDelay: "0.46s" }}>
+          <div className="hero-in mt-9 flex items-center justify-center gap-3" style={{ animationDelay: "0.48s" }}>
             <span className="text-[16px] font-medium tracking-tight">{ratingTxt}</span>
             <Stars />
-            <span className="text-[13px]" style={{ color: TINTA_SUAVE }}>
+            <span className="text-[13px]" style={{ color: HUESO_SUAVE }}>
               {totalReviews} {t("heroReviews")}
             </span>
-          </div>
-
-          {/* Las tarjetas flotantes: dos casas reales asomadas al hero. */}
-          {flotantes[0] && (
-            <Link
-              href={`/propiedades/${flotantes[0].slug}`}
-              className="hero-in group absolute hidden lg:block left-0 top-[46%] w-[230px] -rotate-[5deg] transition-transform duration-500 hover:-rotate-[2deg] hover:scale-[1.03]"
-              style={{ animationDelay: "0.5s" }}
-            >
-              <span className="block rounded-2xl p-2.5 pb-3 shadow-xl shadow-black/15" style={{ background: BLANCO }}>
-                <span className="relative block aspect-[4/3] overflow-hidden rounded-xl">
-                  <Image src={flotantes[0].imagenes[0].url} alt={tipologia(flotantes[0])} fill sizes="230px" className="object-cover" />
-                </span>
-                <span className="mt-2.5 flex items-center justify-between px-1 text-[12.5px] font-medium">
-                  <span>{tipologia(flotantes[0])} · {flotantes[0].ciudad}</span>
-                  <span style={{ color: TEJA }}>{flotantes[0].precio?.toLocaleString("es-ES")} €</span>
-                </span>
-              </span>
-            </Link>
-          )}
-          {flotantes[1] && (
-            <Link
-              href={`/propiedades/${flotantes[1].slug}`}
-              className="hero-in group absolute hidden lg:block right-0 top-[24%] w-[230px] rotate-[4deg] transition-transform duration-500 hover:rotate-[1deg] hover:scale-[1.03]"
-              style={{ animationDelay: "0.58s" }}
-            >
-              <span className="block rounded-2xl p-2.5 pb-3 shadow-xl shadow-black/15" style={{ background: BLANCO }}>
-                <span className="relative block aspect-[4/3] overflow-hidden rounded-xl">
-                  <Image src={flotantes[1].imagenes[0].url} alt={tipologia(flotantes[1])} fill sizes="230px" className="object-cover" />
-                </span>
-                <span className="mt-2.5 flex items-center justify-between px-1 text-[12.5px] font-medium">
-                  <span>{tipologia(flotantes[1])} · {flotantes[1].ciudad}</span>
-                  <span style={{ color: TEJA }}>{flotantes[1].precio?.toLocaleString("es-ES")} €</span>
-                </span>
-              </span>
-            </Link>
-          )}
-
-          {/* El sello giratorio — la firma de acabado. */}
-          <div aria-hidden className="hero-in absolute right-2 lg:right-10 -bottom-2 hidden sm:block" style={{ animationDelay: "0.66s" }}>
-            <div className="hw-spin relative w-[110px] h-[110px]">
-              <svg viewBox="0 0 100 100" className="w-full h-full">
-                <defs>
-                  <path id="hwCircle" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
-                </defs>
-                <text style={{ fontSize: "10.5px", letterSpacing: "2.6px", fill: TINTA }}>
-                  <textPath href="#hwCircle">HUMAN REAL ESTATE · THE VILA HOME ·</textPath>
-                </text>
-              </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-[20px]" style={{ color: TEJA }}>✦</span>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ── La cinta teja: el golpe de color ───────────────────────────── */}
-      <div aria-hidden className="overflow-hidden select-none hw-marquee-pause py-4" style={{ background: TEJA, color: "#FFF" }}>
-        <div className="hw-marquee flex whitespace-nowrap will-change-transform">
+      {/* ── Marquesina en contorno hueso ───────────────────────────────── */}
+      <div aria-hidden className="py-6 overflow-hidden select-none hw-marquee-pause" style={{ borderTop: `1px solid ${HUMO}`, borderBottom: `1px solid ${HUMO}` }}>
+        <div className="hw-marquee flex whitespace-nowrap will-change-transform items-center">
           {[0, 1].map((copia) => (
             <div key={copia} className="flex shrink-0 items-center">
               {MUNICIPIOS.map((m) => (
-                <span key={`${copia}-${m}`} className="flex items-center gap-6 pr-6">
-                  <span className="text-[15px] font-medium tracking-[0.08em] uppercase">{m}</span>
-                  <span aria-hidden className="text-[11px] opacity-70">✦</span>
+                <span key={`${copia}-${m}`} className="flex items-center">
+                  <span className="px-7 font-bold uppercase tracking-[-0.01em] text-[7vw] sm:text-[4.5vw] lg:text-[3.2rem] leading-[1.25]" style={{ ...DISPLAY, color: "transparent", WebkitTextStroke: `1px ${HUESO_SUAVE}` }}>
+                    {m}
+                  </span>
+                  <span aria-hidden className="text-[1.1rem]" style={{ color: FUEGO }}>✦</span>
                 </span>
               ))}
             </div>
@@ -200,179 +182,180 @@ export default function HomeWow({
         </div>
       </div>
 
-      {/* ── (01) LA CARTERA: bento de fotos ────────────────────────────── */}
+      {/* ── EL ÍNDICE: la cartera como lista tipográfica ───────────────── */}
       <section className="py-16 lg:py-24">
         <div className={WRAP}>
-          <Rotulo n="01">La cartera</Rotulo>
-          <div className="mt-8 flex flex-wrap items-end justify-between gap-6">
-            <h2 className="rv font-medium tracking-[-0.035em] leading-[0.96] text-[11vw] sm:text-[6vw] lg:text-[3.8rem]">
-              {t("featuredTitle")}
-            </h2>
-            <Link href="/propiedades-wow" className="rv group inline-flex items-center gap-2 text-[15px] font-medium pb-2" style={{ color: TEJA }}>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className={`rv ${EY}`} style={{ color: FUEGO }}>Ahora en venta</p>
+              <h2 className="rv mt-4 font-bold tracking-[-0.02em] leading-[0.96] text-[11vw] sm:text-[6.5vw] lg:text-[4.2rem]" style={DISPLAY}>
+                El índice.
+              </h2>
+            </div>
+            <Link href="/propiedades-wow" className="rv group inline-flex items-center gap-2 text-[15px] font-medium pb-2" style={{ color: HUESO }}>
               {t("featuredSeeAll")}
-              <ArrowUpRight size={16} className="transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <ArrowUpRight size={16} className="transition-transform duration-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" style={{ color: FUEGO }} />
             </Link>
           </div>
 
-          {/* Bento: 2 grandes + 4 medianas, todas con sus chips de oficio. */}
-          <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-            {bento.map((p, i) => {
-              const grande = i < 2;
-              return (
+          <div className="mt-12 grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] gap-10 items-start">
+            {/* Las filas del índice. */}
+            <div>
+              {cartera.map((p, i) => (
                 <Link
                   key={p.ref}
                   href={`/propiedades/${p.slug}`}
-                  className={`rv group relative overflow-hidden rounded-2xl lg:rounded-[1.25rem] ${grande ? "col-span-2 aspect-[16/10]" : "col-span-1 aspect-[4/5] sm:aspect-[4/4]"}`}
-                  style={{ animationDelay: `${(i % 4) * 60}ms`, background: "#E9E2D5" }}
+                  onMouseEnter={() => setEnfoque(i)}
+                  onFocus={() => setEnfoque(i)}
+                  className="rv group flex items-baseline gap-4 lg:gap-6 py-5 lg:py-6 transition-colors"
+                  style={{ borderTop: `1px solid ${HUMO}`, animationDelay: `${i * 40}ms` }}
                 >
+                  <span className="text-[12px] font-medium tabular-nums w-7 shrink-0 transition-colors" style={{ color: enfoque === i ? FUEGO : HUESO_SUAVE }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {/* En móvil la foto va dentro de la fila. */}
+                  <span className="relative lg:hidden w-16 h-12 shrink-0 overflow-hidden rounded-lg">
+                    <Image src={p.imagenes[0].url} alt="" fill sizes="64px" className="object-cover" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block font-bold tracking-[-0.02em] leading-[1.05] text-[6vw] sm:text-[3.4vw] lg:text-[2.4rem] truncate transition-transform duration-500 lg:group-hover:translate-x-2" style={DISPLAY}>
+                      {tipologia(p)} · {p.ciudad}
+                    </span>
+                    {p.zona && <span className="block mt-1 text-[13px] truncate" style={{ color: HUESO_SUAVE }}>{p.zona}</span>}
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className="block font-medium tabular-nums text-[4.5vw] sm:text-[2.4vw] lg:text-[1.5rem]" style={{ color: enfoque === i ? FUEGO : HUESO }}>
+                      {p.precio?.toLocaleString("es-ES")} €
+                    </span>
+                    {p.estadoFicha === 7 && (
+                      <span className="mt-1 inline-block text-[10px] font-medium tracking-[0.18em] uppercase" style={{ color: FUEGO }}>
+                        {t("cardReserved")}
+                      </span>
+                    )}
+                  </span>
+                </Link>
+              ))}
+              <div style={{ borderTop: `1px solid ${HUMO}` }} />
+            </div>
+
+            {/* El visor: la foto de la fila enfocada (escritorio). */}
+            <div className="rv hidden lg:block sticky top-28">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl" style={{ background: NOCHE_2 }}>
+                {cartera.map((p, i) => (
                   <Image
+                    key={p.ref}
                     src={p.imagenes[0].url}
                     alt={`${tipologia(p)} en ${p.ciudad ?? ""}`}
                     fill
-                    sizes={grande ? "(max-width:1024px) 100vw, 50vw" : "(max-width:1024px) 50vw, 25vw"}
-                    className="object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.05]"
+                    sizes="40vw"
+                    className="object-cover transition-opacity duration-500"
+                    style={{ opacity: enfoque === i ? 1 : 0 }}
                   />
-                  <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(22,18,14,0) 50%, rgba(22,18,14,0.55) 100%)" }} />
-
-                  {/* Chips de oficio: nº de fotos arriba, datos abajo. */}
-                  <span className="absolute top-3 left-3 flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full text-white" style={{ background: "rgba(22,18,14,0.55)", backdropFilter: "blur(8px)" }}>
-                    <Camera size={11} />
-                    {p.imagenes.length}
-                  </span>
-                  {p.estadoFicha === 7 && (
-                    <span className="absolute top-3 right-3 text-[10px] font-medium tracking-[0.18em] uppercase px-2.5 py-1 rounded-full" style={{ background: TEJA, color: "#FFF" }}>
-                      {t("cardReserved")}
-                    </span>
-                  )}
-                  <div className="absolute inset-x-0 bottom-0 p-4 lg:p-5 flex items-end justify-between gap-3 text-white">
-                    <div>
-                      <p className={`font-medium ${grande ? "text-[19px]" : "text-[15px]"}`}>
-                        {tipologia(p)} · {p.ciudad}
-                      </p>
-                      {p.zona && grande && <p className="mt-0.5 text-[12.5px] text-white/70">{p.zona}</p>}
-                    </div>
-                    <p className={`font-medium shrink-0 ${grande ? "text-[19px]" : "text-[14px]"}`}>{p.precio?.toLocaleString("es-ES")} €</p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── (02) EL MÉTODO — bloque chocolate con el comparador ────────── */}
-      <section className="py-8 lg:py-12">
-        <div className={WRAP}>
-          <div className="rounded-[1.75rem] lg:rounded-[2.25rem] p-8 sm:p-12 lg:p-16" style={{ background: CHOCO, color: CREMA }}>
-            <Rotulo n="02" claro>Nuestro método</Rotulo>
-            <div className="mt-10 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-              <div>
-                <h2 className="rv max-w-[16ch] font-medium tracking-[-0.03em] leading-[1.04] text-[9vw] sm:text-[5.5vw] lg:text-[3.4rem]">
-                  Tu casa, producida <span style={{ color: TEJA }}>como se merece.</span>
-                </h2>
-                <div className="mt-10">
-                  {METODO.map((m) => (
-                    <div key={m.n} className="rv flex items-baseline gap-5 py-4" style={{ borderTop: "1px solid rgba(245,240,231,0.15)" }}>
-                      <span className="text-[13px] font-medium tabular-nums w-8 shrink-0" style={{ color: TEJA }}>{m.n}</span>
-                      <div>
-                        <p className="text-[16px] font-medium">{m.nombre}</p>
-                        <p className="mt-0.5 text-[14px]" style={{ color: "rgba(245,240,231,0.6)" }}>{m.detalle}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rv">
-                <AntesDespues mal="/images/vender/salon-mal.png" bien="/images/vender/salon-bien.jpg" chip="Arrastra para comparar" />
+                ))}
+                <span className="absolute top-4 left-4 flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ background: "rgba(11,10,8,0.6)", color: HUESO, backdropFilter: "blur(8px)" }}>
+                  <Camera size={11} style={{ color: FUEGO }} />
+                  {cartera[enfoque]?.imagenes.length}
+                </span>
+                <span className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[13px] font-medium" style={{ color: HUESO }}>
+                  <span>{tipologia(cartera[enfoque])} · {cartera[enfoque]?.ciudad}</span>
+                  <span style={{ color: FUEGO }}>{String(enfoque + 1).padStart(2, "0")}/{String(cartera.length).padStart(2, "0")}</span>
+                </span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── (03) LA PRUEBA: reseñas como fichas apiladas ───────────────── */}
-      <section className="py-16 lg:py-24">
-        <div className={WRAP}>
-          <Rotulo n="03">La prueba</Rotulo>
-          <div className="mt-8 flex flex-wrap items-end justify-between gap-6">
-            <h2 className="rv max-w-[22ch] font-medium tracking-[-0.035em] leading-[0.98] text-[10vw] sm:text-[5.5vw] lg:text-[3.4rem]">
-              No nos creas a nosotros.
+      {/* ── EL MÉTODO + comparador ─────────────────────────────────────── */}
+      <section className="py-16 lg:py-24" style={{ background: NOCHE_2 }}>
+        <div className={`${WRAP} grid lg:grid-cols-2 gap-12 lg:gap-16 items-center`}>
+          <div>
+            <p className={`rv ${EY}`} style={{ color: FUEGO }}>El método</p>
+            <h2 className="rv mt-5 max-w-[16ch] font-bold tracking-[-0.02em] leading-[1.0] text-[9.5vw] sm:text-[5.5vw] lg:text-[3.6rem]" style={DISPLAY}>
+              Del móvil a la obra.
             </h2>
-            <div className="rv flex items-center gap-3 pb-2">
-              <span className="font-medium tracking-[-0.03em] text-[2.2rem] leading-none">{ratingTxt}</span>
-              <Stars />
-              <span className="text-[13px]" style={{ color: TINTA_SUAVE }}>
-                {totalReviews} {t("heroReviews")}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {reviews.slice(0, 3).map((r, i) => (
-              <figure
-                key={i}
-                className={`rv rounded-2xl p-7 flex flex-col gap-5 shadow-lg shadow-black/5 ${i === 1 ? "sm:-rotate-1 sm:translate-y-3" : i === 2 ? "sm:rotate-1" : "sm:-translate-y-1"}`}
-                style={{ background: BLANCO, boxShadow: `inset 0 0 0 1px ${FILO}, 0 14px 34px rgba(22,18,14,0.07)`, animationDelay: `${i * 80}ms` }}
-              >
-                <div className="flex items-center justify-between">
-                  <Stars />
-                  <span className="text-[11px] font-medium uppercase tracking-[0.16em]" style={{ color: TEJA }}>Google</span>
+            <p className="rv mt-5 max-w-[42ch] text-[15px] lg:text-[17px] leading-[1.6]" style={{ color: HUESO_SUAVE }}>
+              La mayoría anuncia con ocho fotos de móvil. Nosotros producimos cada casa — y esa es la diferencia entre esperar comprador y elegirlo.
+            </p>
+            <div className="mt-9">
+              {METODO.map((m) => (
+                <div key={m.n} className="rv flex items-baseline gap-5 py-4" style={{ borderTop: `1px solid ${HUMO}` }}>
+                  <span className="text-[13px] font-medium tabular-nums w-8 shrink-0" style={{ color: FUEGO }}>{m.n}</span>
+                  <div>
+                    <p className="text-[16px] font-medium">{m.nombre}</p>
+                    <p className="mt-0.5 text-[14px]" style={{ color: HUESO_SUAVE }}>{m.detalle}</p>
+                  </div>
                 </div>
-                <blockquote className="text-[15px] leading-[1.65] flex-1">
-                  <span className="line-clamp-[7]">{r.text}</span>
-                </blockquote>
-                <figcaption className="text-[13.5px] font-medium" style={{ color: TINTA_SUAVE }}>{r.author}</figcaption>
-              </figure>
-            ))}
+              ))}
+            </div>
+          </div>
+          <div className="rv">
+            <AntesDespues mal="/images/vender/salon-mal.png" bien="/images/vender/salon-bien.jpg" chip="Arrastra para comparar" />
           </div>
         </div>
       </section>
 
-      {/* ── (04) ¿VENDES? — la banda teja ──────────────────────────────── */}
-      <section className="py-8 lg:py-12">
-        <div className={WRAP}>
-          <div className="relative overflow-hidden rounded-[1.75rem] lg:rounded-[2.25rem] p-8 sm:p-12 lg:p-16" style={{ background: TEJA, color: "#FFF" }}>
-            <span aria-hidden className="absolute -right-10 -top-16 font-medium leading-none tracking-[-0.04em] text-[14rem] lg:text-[20rem] opacity-[0.12] select-none">
-              ✦
-            </span>
-            <Rotulo n="04" claro>{t("ctaLabel")}</Rotulo>
-            <div className="mt-10 grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] gap-10 items-center">
-              <div>
-                <h2 className="rv max-w-[18ch] font-medium tracking-[-0.03em] leading-[1.0] text-[10vw] sm:text-[6vw] lg:text-[4rem]">
-                  Empieza por saber cuánto vale.
-                </h2>
-                <p className="rv mt-5 max-w-[40ch] text-[16px] lg:text-[18px] leading-[1.55] text-white/80">
-                  {C.cta.subtitulo}
-                </p>
-              </div>
-              <div className="rv flex flex-wrap lg:justify-end gap-3">
-                <Link href="/valoracion" className="inline-flex items-center gap-2 rounded-full text-[15px] font-medium px-8 py-4 transition-opacity hover:opacity-90" style={{ background: TINTA, color: CREMA }}>
-                  {t("ctaValuate")}
-                  <ArrowUpRight size={16} />
-                </Link>
-                <Link href="/contacto" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 text-white transition-colors hover:bg-white/10" style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.45)" }}>
-                  {t("ctaContact")}
-                </Link>
-              </div>
+      {/* ── LA PRUEBA ──────────────────────────────────────────────────── */}
+      <section className="py-20 lg:py-28">
+        <div className={`${WRAP} max-w-[62rem] text-center`}>
+          <p className={`rv ${EY}`} style={{ color: FUEGO }}>Palabra de cliente</p>
+          {cita && (
+            <>
+              <blockquote className="rv mt-8 font-bold leading-[1.25] tracking-[-0.01em] text-[5.5vw] sm:text-[3.2vw] lg:text-[2.1rem]" style={DISPLAY}>
+                <span className="line-clamp-[6]">“{cita.text}”</span>
+              </blockquote>
+              <figcaption className="rv mt-7 flex items-center justify-center gap-3">
+                <Stars />
+                <span className="text-[14px] font-medium">{cita.author}</span>
+              </figcaption>
+            </>
+          )}
+          <p className="rv mt-8 text-[14px]" style={{ color: HUESO_SUAVE }}>
+            <span className="font-medium" style={{ color: FUEGO }}>{ratingTxt} / 5</span> · {totalReviews} {t("heroReviews")}
+          </p>
+        </div>
+      </section>
+
+      {/* ── ¿CUÁNTO VALE LA TUYA? — foto a sangre ──────────────────────── */}
+      <section className="relative overflow-hidden">
+        <div className="relative min-h-[70svh] flex items-center">
+          <Image src="/images/vender/terraza-bien.jpg" alt="Terraza producida por The Vila Home" fill sizes="100vw" className="object-cover" />
+          <div aria-hidden className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(11,10,8,0.85) 0%, rgba(11,10,8,0.35) 60%, rgba(11,10,8,0.15) 100%)" }} />
+          <div className={`${WRAP} relative py-20`}>
+            <p className={`rv ${EY}`} style={{ color: FUEGO }}>¿Vendes?</p>
+            <h2 className="rv mt-5 max-w-[14ch] font-bold tracking-[-0.02em] leading-[0.98] text-[11vw] sm:text-[7vw] lg:text-[4.6rem]" style={DISPLAY}>
+              ¿Cuánto vale la tuya?
+            </h2>
+            <p className="rv mt-5 max-w-[36ch] text-[16px] lg:text-[18px] leading-[1.55]" style={{ color: "rgba(237,230,218,0.75)" }}>
+              No hace falta tenerlo claro para empezar. Empieza por el número.
+            </p>
+            <div className="rv mt-9 flex flex-wrap gap-3">
+              <Link href="/valoracion" className="inline-flex items-center gap-2 rounded-full text-[15px] font-medium px-8 py-4 transition-opacity hover:opacity-90" style={{ background: FUEGO, color: "#FFF" }}>
+                {t("ctaValuate")}
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link href="/contacto" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-colors hover:bg-white/10" style={{ boxShadow: "inset 0 0 0 1px rgba(237,230,218,0.4)", color: HUESO }}>
+                {t("ctaContact")}
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── Hablemos ───────────────────────────────────────────────────── */}
+      {/* ── HABLEMOS ───────────────────────────────────────────────────── */}
       <section className="py-20 lg:py-28">
         <div className={`${WRAP} text-center`}>
-          <h2 className="rv font-medium tracking-[-0.04em] leading-[0.9] text-[15vw] sm:text-[10vw] lg:text-[7rem]">
-            <span className="hw-outline">{C.cta.titulo}</span>
+          <h2 className="rv font-bold uppercase tracking-[-0.02em] leading-[0.9] text-[16vw] sm:text-[12vw] lg:text-[9rem]" style={{ ...DISPLAY, color: "transparent", WebkitTextStroke: `1.5px ${HUESO}` }}>
+            Hablemos
           </h2>
-          <p className="rv mt-6 mx-auto max-w-[38ch] text-[17px] lg:text-[19px] leading-[1.55]" style={{ color: TINTA_SUAVE }}>
-            {C.cta.subtitulo}
+          <p className="rv mt-7 mx-auto max-w-[38ch] text-[16px] lg:text-[19px] leading-[1.55]" style={{ color: HUESO_SUAVE }}>
+            No hace falta tenerlo claro para empezar.
           </p>
           <div className="rv mt-9 flex flex-wrap justify-center gap-3">
-            <a href="tel:936061800" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-opacity hover:opacity-90" style={{ background: TINTA, color: CREMA }}>
+            <a href="tel:936061800" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-opacity hover:opacity-90" style={{ background: HUESO, color: NOCHE }}>
               936 061 800
             </a>
-            <Link href="/contacto" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-colors hover:bg-black/5" style={{ boxShadow: `inset 0 0 0 1px ${FILO}` }}>
+            <Link href="/contacto" className="inline-flex items-center rounded-full text-[15px] font-medium px-8 py-4 transition-colors hover:bg-white/5" style={{ boxShadow: `inset 0 0 0 1px ${HUMO}`, color: HUESO }}>
               {t("ctaContact")}
             </Link>
           </div>
@@ -391,7 +374,7 @@ function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: st
   const [v, setV] = useState(58);
   return (
     <div className="relative w-full max-w-[560px] mx-auto">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-black/30 select-none">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl shadow-black/50 select-none">
         <Image src={mal} alt="El salón, con foto de móvil" fill sizes="(max-width:1024px) 90vw, 560px" className="object-cover" />
         <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - v}% 0 0)` }}>
           <Image src={bien} alt="El mismo salón, producido" fill sizes="(max-width:1024px) 90vw, 560px" className="object-cover" />
@@ -399,15 +382,15 @@ function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: st
         <div aria-hidden className="absolute top-0 bottom-0 w-[2px] bg-white shadow" style={{ left: `${v}%` }} />
         <div
           aria-hidden
-          className="absolute w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center text-[15px]"
-          style={{ left: `${v}%`, top: "50%", transform: "translate(-50%,-50%)", color: TINTA }}
+          className="absolute w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center text-[15px] text-black"
+          style={{ left: `${v}%`, top: "50%", transform: "translate(-50%,-50%)" }}
         >
           ⇄
         </div>
         <span className="absolute top-3 left-3 text-[10px] font-medium uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-black/55 text-white backdrop-blur-sm">
           Móvil
         </span>
-        <span className="absolute top-3 right-3 text-[10px] font-medium uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-white/85 backdrop-blur-sm" style={{ color: TINTA }}>
+        <span className="absolute top-3 right-3 text-[10px] font-medium uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-white/85 text-black backdrop-blur-sm">
           Producción
         </span>
         <input
@@ -420,19 +403,19 @@ function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: st
           className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
         />
       </div>
-      <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: TEJA, color: "#FFF" }}>
+      <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: FUEGO, color: "#FFF" }}>
         {chip}
       </span>
     </div>
   );
 }
 
-/* Estrellas en teja: el acento nuevo. */
+/* Estrellas en fuego: el único color de la galería. */
 function Stars() {
   return (
     <span className="inline-flex gap-0.5" aria-hidden>
       {Array.from({ length: 5 }).map((_, i) => (
-        <svg key={i} viewBox="0 0 24 24" className="w-3.5 h-3.5" fill={TEJA}>
+        <svg key={i} viewBox="0 0 24 24" className="w-3.5 h-3.5" fill={FUEGO}>
           <path d="M12 2l2.9 6.3 6.8.8-5 4.7 1.3 6.8L12 17.3 6 20.6l1.3-6.8-5-4.7 6.8-.8z" />
         </svg>
       ))}
