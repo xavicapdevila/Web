@@ -28,7 +28,7 @@
    DATOS: nada inventado — Google Places real, XML real, i18n real.
    ───────────────────────────────────────────────────────────────────── */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ArrowDown } from "lucide-react";
@@ -143,12 +143,21 @@ export default function HomeWow({
         </div>
       </section>
 
-      {/* ── 2 · Declaración + marquesina ───────────────────────────────── */}
+      {/* ── 2 · Declaración + marquesina ─────────────────────────────────
+          La frase se ENCIENDE palabra a palabra al hacer scroll: cada
+          palabra lleva su animation-range escalonado (CSS puro). */}
       <section className="pt-20 sm:pt-24 lg:pt-28">
         <div className={WRAP}>
-          <p className="rv max-w-[26ch] font-medium tracking-[-0.03em] leading-[1.14] text-[7vw] sm:text-[4.2vw] lg:text-[2.8rem]">
-            {C.intro.split(" ").slice(0, 5).join(" ")}{" "}
-            <span style={{ color: INK_SOFT }}>{C.intro.split(" ").slice(5).join(" ")}</span>
+          <p className="max-w-[26ch] font-medium tracking-[-0.03em] leading-[1.14] text-[7vw] sm:text-[4.2vw] lg:text-[2.8rem]">
+            {C.intro.split(" ").map((palabra, i) => (
+              <span
+                key={i}
+                className="hw-word"
+                style={{ animationRange: `entry ${25 + i * 4}% cover ${42 + i * 4}%` } as React.CSSProperties}
+              >
+                {palabra}{" "}
+              </span>
+            ))}
           </p>
         </div>
         <div aria-hidden className="mt-12 lg:mt-16 overflow-hidden select-none hw-marquee-pause">
@@ -189,7 +198,7 @@ export default function HomeWow({
               return (
                 <article
                   key={paso.n}
-                  className="sticky rounded-[1.75rem] lg:rounded-[2.25rem] p-8 sm:p-12 lg:p-14 min-h-[48vh] flex flex-col justify-between overflow-hidden"
+                  className="sticky rounded-[1.75rem] lg:rounded-[2.25rem] p-8 sm:p-12 lg:p-14 min-h-[52vh] overflow-hidden"
                   style={{
                     top: `calc(6rem + ${i * 1.25}rem)`,
                     background: piel.bg,
@@ -204,12 +213,49 @@ export default function HomeWow({
                   >
                     {paso.n}
                   </span>
-                  <div className="relative max-w-[22ch]">
-                    <h3 className="font-medium tracking-[-0.03em] leading-[1.08] text-[6.5vw] sm:text-[3.6vw] lg:text-[2.5rem]">{paso.titulo}</h3>
+
+                  {/* Texto a la izquierda, PRUEBA VISUAL a la derecha: la
+                      imagen hace el trabajo que antes hacía el adjetivo. */}
+                  <div className="relative grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] gap-8 lg:gap-12 items-center h-full min-h-[inherit]">
+                    <div className="flex flex-col justify-center py-2">
+                      <h3 className="max-w-[20ch] font-medium tracking-[-0.03em] leading-[1.08] text-[6.5vw] sm:text-[3.6vw] lg:text-[2.5rem]">{paso.titulo}</h3>
+                      <p className="mt-6 max-w-[46ch] text-[16px] lg:text-[18px] leading-[1.6]" style={{ color: piel.soft }}>
+                        {cuerpo}
+                      </p>
+                    </div>
+
+                    {i === 0 && (
+                      /* La foto "de móvil" torcida, como pegada en el portal. */
+                      <div className="relative mx-auto w-full max-w-[420px] -rotate-2">
+                        <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-2xl shadow-black/25">
+                          <Image src="/images/vender/salon-mal.png" alt="Foto de anuncio hecha con el móvil" fill sizes="(max-width:1024px) 90vw, 420px" className="object-cover" />
+                        </div>
+                        <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: INK, color: PAPER }}>
+                          {paso.chip}
+                        </span>
+                      </div>
+                    )}
+
+                    {i === 1 && (
+                      /* El comparador: el MISMO salón, móvil vs producción. */
+                      <AntesDespues
+                        mal="/images/vender/salon-mal.png"
+                        bien="/images/vender/salon-bien.jpg"
+                        chip={paso.chip}
+                      />
+                    )}
+
+                    {i === 2 && (
+                      /* La nota, gigante: el dato real como imagen. */
+                      <div className="flex flex-col items-center justify-center text-center py-4">
+                        <span className="font-medium tracking-[-0.05em] leading-none text-[22vw] sm:text-[12vw] lg:text-[9rem]">{ratingTxt}</span>
+                        <span className="mt-4 flex [&_svg]:w-5 [&_svg]:h-5 [&_svg]:fill-[#F7F5EF]"><Stars /></span>
+                        <span className="mt-4 text-[13px]" style={{ color: piel.soft }}>
+                          {totalReviews} {t("heroReviews")}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <p className="relative mt-10 max-w-[52ch] text-[16px] lg:text-[18px] leading-[1.6]" style={{ color: piel.soft }}>
-                    {cuerpo}
-                  </p>
                 </article>
               );
             })}
@@ -352,6 +398,49 @@ function Cifra({ to, decimals = 0, prefix = "", label, stars }: {
         {stars && <Stars />}
       </div>
       <p className="mt-3 text-[13px] lg:text-[14px]" style={{ color: INK_SOFT }}>{label}</p>
+    </div>
+  );
+}
+
+/* Antes/después arrastrable: el MISMO salón con móvil y producido. El
+   control es un <input range> invisible a pantalla completa — funciona
+   con dedo y con ratón, y sin JS queda la foto buena medio revelada. */
+function AntesDespues({ mal, bien, chip }: { mal: string; bien: string; chip: string }) {
+  const [v, setV] = useState(58);
+  return (
+    <div className="relative w-full max-w-[480px] mx-auto">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-xl shadow-black/15 select-none">
+        <Image src={mal} alt="El salón, con foto de móvil" fill sizes="(max-width:1024px) 90vw, 480px" className="object-cover" />
+        <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - v}% 0 0)` }}>
+          <Image src={bien} alt="El mismo salón, producido" fill sizes="(max-width:1024px) 90vw, 480px" className="object-cover" />
+        </div>
+        <div aria-hidden className="absolute top-0 bottom-0 w-[2px] bg-white shadow" style={{ left: `${v}%` }} />
+        <div
+          aria-hidden
+          className="absolute w-10 h-10 rounded-full bg-white shadow-xl flex items-center justify-center text-[15px]"
+          style={{ left: `${v}%`, top: "50%", transform: "translate(-50%,-50%)", color: INK }}
+        >
+          ⇄
+        </div>
+        <span className="absolute top-3 left-3 text-[10px] font-medium uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-black/55 text-white backdrop-blur-sm">
+          Móvil
+        </span>
+        <span className="absolute top-3 right-3 text-[10px] font-medium uppercase tracking-[0.14em] px-2.5 py-1 rounded-full bg-white/85 backdrop-blur-sm" style={{ color: INK }}>
+          Producción
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={v}
+          onChange={(e) => setV(Number(e.target.value))}
+          aria-label="Comparar foto de móvil con producción profesional"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
+        />
+      </div>
+      <span className="absolute -bottom-3 left-4 text-[11px] font-medium px-3 py-1.5 rounded-full shadow-lg" style={{ background: INK, color: PAPER }}>
+        {chip}
+      </span>
     </div>
   );
 }

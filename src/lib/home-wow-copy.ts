@@ -26,26 +26,32 @@ export const HOME_WOW_COPY = {
     label: "Por qué The Vila Home",
     titulo1: "Vender bien no es suerte.",
     titulo2: "Es método.",
+    /* v3 (26 jul): cada tarjeta gana su IMAGEN — la prueba visual hace el
+       trabajo que antes hacía el adjetivo. Los assets son los pares
+       mal/bien de /vender: EL MISMO SALÓN con móvil y producido. */
     pasos: [
       {
         n: "01",
-        titulo: "Tu casa se descarta en segundos.",
+        titulo: "Así anuncia tu casa la mayoría.",
         cuerpo:
-          "Así se mira un portal: pasando anuncios con el pulgar. Ocho fotos hechas con un móvil no detienen a nadie. Una producción de verdad, sí.",
+          "Fotos de móvil, a contraluz, en vertical. El comprador pasa el pulgar, tu casa desaparece — y no vuelve a pasar por ella.",
+        chip: "Así se ve en el portal",
       },
       {
         n: "02",
-        titulo: "Nosotros la producimos como lo que es: tu mayor activo.",
+        titulo: "El mismo salón, producido.",
         cuerpo:
-          "Fotografía profesional, vídeo, plano 3D y tour virtual. Quien la ve desde el sofá ya quiere verla en persona — y quien pide visita, llega medio convencido.",
+          "Arrastra y compara: esta es la diferencia entre anunciar y producir. Fotografía profesional, vídeo, plano 3D y tour virtual — para que quien mira desde el sofá llegue a la visita medio convencido.",
+        chip: "Arrastra para comparar",
       },
       {
         n: "03",
-        titulo: "Y no hace falta que nos creas a nosotros.",
+        titulo: "No nos creas a nosotros.",
         /* {rating} y {reviews} se rellenan con los datos vivos de Google
            Places vía fillTemplate — si la nota cambia, el texto cambia. */
         cuerpo:
-          "{rating} sobre 5 en {reviews} reseñas de Google. Lee lo que cuentan los que ya han vendido con nosotros.",
+          "{rating} sobre 5 en {reviews} reseñas de Google — vendedores que ya pasaron por esto. Léelas antes de decidir con quién vas.",
+        chip: "Reseñas verificadas de Google",
       },
     ],
   },

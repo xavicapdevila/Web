@@ -181,6 +181,22 @@
   }
   @keyframes hw-line { to { transform: none; } }
 
+  /* La declaración se ENCIENDE palabra a palabra con el scroll: cada
+     palabra lleva su animation-range inline (escalonado) sobre su propio
+     view(). Sin soporte, el texto queda visible del todo. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .hw-word {
+        animation: hw-word linear both;
+        animation-timeline: view();
+      }
+    }
+  }
+  @keyframes hw-word {
+    from { opacity: 0.16; }
+    to   { opacity: 1; }
+  }
+
   /* Texto en contorno (sin relleno), en tinta y en blanco.
      Inter y SIN tracking negativo: con General Sans y letras apretadas los
      trazos de letras vecinas se cruzaban ("líneas entrelazadas" — feedback
