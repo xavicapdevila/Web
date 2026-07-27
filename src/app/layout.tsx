@@ -166,6 +166,24 @@ export default function RootLayout({
         {/* next/font self-aloja las fuentes: no hace falta preconnect a Google Fonts */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+        {/* SOLO fuera de Vercel (dev y `next start` locales). El runtime de
+            streaming de React 19.2 difiere el reveal de los boundaries de
+            Suspense ($RC→$RV) y el retry de hidratación a requestAnimationFrame,
+            que NO se dispara con la pestaña oculta/ocluida (panel embebido,
+            Chrome tapado por otra ventana…). Resultado: en rutas standalone
+            (todo el body dentro del boundary de loading.tsx) la página se ve
+            pero no hidrata hasta que la pestaña vuelve a ser visible — parecía
+            un bug local y era la visibilidad. Con el documento oculto, rAF cae
+            a setTimeout para que reveal+hidratación avancen igual. En Vercel
+            no se emite: producción queda byte a byte como estaba. */}
+        {process.env.VERCEL !== "1" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html:
+                "(function(){var r=window.requestAnimationFrame.bind(window),c=window.cancelAnimationFrame.bind(window),O=1e9;window.requestAnimationFrame=function(f){return document.visibilityState==='hidden'?O+setTimeout(function(){f(performance.now())},32):r(f)};window.cancelAnimationFrame=function(i){i>=O?clearTimeout(i-O):c(i)}})();",
+            }}
+          />
+        )}
       </head>
       <body className="bg-[#0a0a0a] text-[#f5f0e8] min-h-screen flex flex-col antialiased">
         {/* Splash de arranque universal (iOS/Android/escritorio): se pinta con el
