@@ -1,26 +1,67 @@
 /**
- * Aviso de vacaciones configurable desde /admin.
+ * Aviso de vacaciones configurable desde Ora (Reglas → Web) o el /admin.
  * Vive en Vercel Blob (aviso-vacaciones.json) — mismo patrón que
- * links-content.ts pero sin histórico: es un documento de dos campos y
+ * links-content.ts pero sin histórico: es un documento de tres campos y
  * re-guardarlo cuesta un clic, así que no hay nada irrecuperable.
+ *
+ * Los TEXTOS de la barra también nacen aquí (textosAviso): la API los sirve ya
+ * montados en los 4 idiomas y tanto la barra pública como la vista previa de
+ * Ora enseñan lo mismo sin copiar plantillas.
  */
 
 const BLOB_KEY = 'aviso-vacaciones.json'
 
 export type AvisoVacaciones = {
   activo: boolean
-  /** Fecha de vuelta (YYYY-MM-DD) o null para un aviso sin fecha. */
-  vuelta: string | null
+  /** Inicio y fin en hora de Madrid, "YYYY-MM-DDTHH:mm" (o null = sin límite). */
+  desde: string | null
+  hasta: string | null
 }
 
-export const AVISO_DEFAULT: AvisoVacaciones = { activo: false, vuelta: null }
+export type TextosAviso = { es: string; ca: string; en: string; fr: string }
 
-/** Hoy en Madrid como YYYY-MM-DD (las funciones serverless corren en UTC). */
-export function hoyMadrid(): string {
-  return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' }).format(new Date())
+export const AVISO_DEFAULT: AvisoVacaciones = { activo: false, desde: null, hasta: null }
+
+const RE_FECHA_HORA = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+
+export function normalizaFechaHora(v: unknown): string | null {
+  return typeof v === 'string' && RE_FECHA_HORA.test(v) ? v : null
 }
 
-/** Configuración cruda tal y como se guardó, para el panel de admin. */
+/** Ahora en Madrid como "YYYY-MM-DDTHH:mm" — comparable con desde/hasta. */
+export function ahoraMadrid(): string {
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Europe/Madrid',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).format(new Date()).replace(' ', 'T')
+}
+
+/**
+ * Los 4 textos de la barra para un fin dado: la fecha de vuelta que se enseña
+ * es el DÍA de `hasta` (la hora solo decide cuándo se retira la barra).
+ */
+export function textosAviso(hasta: string | null): TextosAviso {
+  if (!hasta) {
+    return {
+      es: "Estamos de vacaciones. Te respondemos a la vuelta.",
+      ca: "Estem de vacances. Et respondrem quan tornem.",
+      en: "We are on holiday. We will reply when we are back.",
+      fr: "Nous sommes en vacances. Nous vous répondrons à notre retour.",
+    }
+  }
+  const dia = new Date(`${hasta.slice(0, 10)}T12:00:00Z`)
+  const f = (locale: string) =>
+    new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" }).format(dia)
+  return {
+    es: `Estamos de vacaciones. Volvemos el ${f("es-ES")} — te respondemos entonces.`,
+    ca: `Estem de vacances. Tornem el ${f("ca-ES")} — et respondrem llavors.`,
+    en: `We are on holiday. Back on ${f("en-GB")} — we will reply then.`,
+    fr: `Nous sommes en vacances. De retour le ${f("fr-FR")} — nous vous répondrons alors.`,
+  }
+}
+
+/** Configuración cruda tal y como se guardó, para los paneles de admin. */
 export async function getAvisoVacaciones(): Promise<AvisoVacaciones> {
   try {
     const { list } = await import('@vercel/blob')
@@ -31,10 +72,15 @@ export async function getAvisoVacaciones(): Promise<AvisoVacaciones> {
     )[0]
     const res = await fetch(newest.url, { cache: 'no-store' })
     if (!res.ok) return AVISO_DEFAULT
-    const doc = (await res.json()) as Partial<AvisoVacaciones>
+    const doc = (await res.json()) as Partial<AvisoVacaciones> & { vuelta?: unknown }
+    // Formato viejo ({vuelta: "YYYY-MM-DD"}): el día de vuelta era el fin.
+    const legacy = typeof doc.vuelta === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(doc.vuelta)
+      ? `${doc.vuelta}T00:00`
+      : null
     return {
       activo: Boolean(doc.activo),
-      vuelta: typeof doc.vuelta === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(doc.vuelta) ? doc.vuelta : null,
+      desde: normalizaFechaHora(doc.desde),
+      hasta: normalizaFechaHora(doc.hasta) ?? legacy,
     }
   } catch {
     return AVISO_DEFAULT
@@ -42,14 +88,18 @@ export async function getAvisoVacaciones(): Promise<AvisoVacaciones> {
 }
 
 /**
- * El aviso tal y como debe verse en la web pública: apagado si no está activo
- * o si ya llegó el día de la vuelta (se retira solo esa mañana).
+ * El aviso tal y como debe verse en la web pública: solo dentro de la ventana
+ * [desde, hasta) en hora de Madrid, con los textos ya montados.
  */
-export async function getAvisoPublico(): Promise<AvisoVacaciones> {
+export async function getAvisoPublico(): Promise<{ activo: boolean; textos: TextosAviso | null }> {
   const aviso = await getAvisoVacaciones()
-  if (!aviso.activo) return AVISO_DEFAULT
-  if (aviso.vuelta && aviso.vuelta <= hoyMadrid()) return AVISO_DEFAULT
-  return aviso
+  const ahora = ahoraMadrid()
+  const visible =
+    aviso.activo &&
+    (!aviso.desde || aviso.desde <= ahora) &&
+    (!aviso.hasta || ahora < aviso.hasta)
+  if (!visible) return { activo: false, textos: null }
+  return { activo: true, textos: textosAviso(aviso.hasta) }
 }
 
 export async function saveAvisoVacaciones(aviso: AvisoVacaciones): Promise<void> {

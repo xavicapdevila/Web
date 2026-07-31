@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { Plane } from "lucide-react";
-import type { AvisoVacaciones } from "@/lib/aviso-vacaciones";
+import { textosAviso, type AvisoVacaciones } from "@/lib/aviso-vacaciones";
 
 /**
  * Tarjeta del dashboard para el aviso de vacaciones de la web pública.
- * Guarda en Blob vía PUT /api/admin/vacaciones; la barra se retira sola
- * el día de la vuelta, así que no hace falta acordarse de apagarla.
+ * Guarda en Blob vía PUT /api/admin/vacaciones; la barra solo se ve dentro de
+ * la ventana [desde, hasta] (hora de Madrid) y se retira sola al terminar.
+ * Normalmente se maneja desde Ora (Reglas → Web); esta tarjeta es el mando
+ * de reserva dentro de la propia web.
  */
 export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }) {
   const [activo, setActivo] = useState(inicial.activo);
-  const [vuelta, setVuelta] = useState(inicial.vuelta ?? "");
+  const [desde, setDesde] = useState(inicial.desde ?? "");
+  const [hasta, setHasta] = useState(inicial.hasta ?? "");
   const [estado, setEstado] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   async function guardar() {
@@ -20,7 +23,7 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
       const res = await fetch("/api/admin/vacaciones", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ activo, vuelta: vuelta || null }),
+        body: JSON.stringify({ activo, desde: desde || null, hasta: hasta || null }),
       });
       if (!res.ok) throw new Error(String(res.status));
       setEstado("saved");
@@ -29,6 +32,8 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
       setEstado("error");
     }
   }
+
+  const textos = textosAviso(hasta || null);
 
   return (
     <div className="border border-[#1a1a1a] bg-[#0d0d0d] mb-10">
@@ -48,11 +53,21 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
         </label>
 
         <div>
-          <p className="text-[#444] text-xs tracking-widest uppercase font-body mb-2">Día de vuelta</p>
+          <p className="text-[#444] text-xs tracking-widest uppercase font-body mb-2">Empieza (opcional)</p>
           <input
-            type="date"
-            value={vuelta}
-            onChange={(e) => setVuelta(e.target.value)}
+            type="datetime-local"
+            value={desde}
+            onChange={(e) => setDesde(e.target.value)}
+            className="bg-[#111] border border-[#1a1a1a] text-white text-sm px-3 py-2 [color-scheme:dark] focus:border-[#C9B99A]/50 outline-none"
+          />
+        </div>
+
+        <div>
+          <p className="text-[#444] text-xs tracking-widest uppercase font-body mb-2">Termina (opcional)</p>
+          <input
+            type="datetime-local"
+            value={hasta}
+            onChange={(e) => setHasta(e.target.value)}
             className="bg-[#111] border border-[#1a1a1a] text-white text-sm px-3 py-2 [color-scheme:dark] focus:border-[#C9B99A]/50 outline-none"
           />
         </div>
@@ -69,12 +84,20 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
           <p className="text-red-400 text-xs pb-2">No se pudo guardar. Prueba otra vez.</p>
         )}
       </div>
-      <p className="text-[#444] text-xs px-6 pb-5">
-        Barra en la parte alta de toda la web pública, en los 4 idiomas: «Estamos de vacaciones.
-        Volvemos el {vuelta ? new Date(`${vuelta}T12:00:00`).toLocaleDateString("es-ES", { day: "numeric", month: "long" }) : "…"} —
-        te respondemos entonces.» Se retira sola el día de la vuelta; sin fecha, muestra
-        «te respondemos a la vuelta» hasta que la apagues aquí.
-      </p>
+
+      {/* Vista previa: lo que pone la barra (la fecha de vuelta = el día del fin) */}
+      <div className="px-6 pb-5">
+        <p className="bg-[#C9B99A] text-black text-center text-[11px] font-body tracking-[0.14em] uppercase px-4 py-2">
+          {textos.es}
+        </p>
+        <p className="text-[#444] text-xs mt-2">
+          {textos.ca} · {textos.en} · {textos.fr}
+        </p>
+        <p className="text-[#444] text-xs mt-2">
+          La barra sale en toda la web pública en el idioma de cada visitante, solo dentro de la ventana
+          de fechas (hora de Madrid), y se retira sola al terminar. Sin fechas, se ve mientras esté activada.
+        </p>
+      </div>
     </div>
   );
 }

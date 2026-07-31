@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAvisoVacaciones, saveAvisoVacaciones } from "@/lib/aviso-vacaciones";
+import { getAvisoVacaciones, saveAvisoVacaciones, textosAviso, normalizaFechaHora } from "@/lib/aviso-vacaciones";
 import { verifySession, ADMIN_COOKIE } from "@/lib/admin-auth";
 
 /**
@@ -13,24 +13,28 @@ function isAuth(req: NextRequest) {
   return !!secret && req.headers.get("Authorization") === `Bearer ${secret}`;
 }
 
-/** GET /api/admin/vacaciones — la configuración cruda (para los paneles). */
+/**
+ * GET /api/admin/vacaciones — la configuración cruda + los textos que la barra
+ * enseñaría con ella (para la vista previa de los paneles).
+ */
 export async function GET(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  return NextResponse.json(await getAvisoVacaciones());
+  const aviso = await getAvisoVacaciones();
+  return NextResponse.json({ ...aviso, textos: textosAviso(aviso.hasta) });
 }
 
-/** PUT /api/admin/vacaciones  body: { activo: boolean, vuelta: string|null } */
+/** PUT /api/admin/vacaciones  body: { activo, desde|null, hasta|null } ("YYYY-MM-DDTHH:mm"). */
 export async function PUT(req: NextRequest) {
   if (!isAuth(req)) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   try {
     const body = await req.json();
-    const activo = Boolean(body?.activo);
-    const vuelta =
-      typeof body?.vuelta === "string" && /^\d{4}-\d{2}-\d{2}$/.test(body.vuelta)
-        ? body.vuelta
-        : null;
-    await saveAvisoVacaciones({ activo, vuelta });
-    return NextResponse.json({ ok: true, activo, vuelta });
+    const aviso = {
+      activo: Boolean(body?.activo),
+      desde: normalizaFechaHora(body?.desde),
+      hasta: normalizaFechaHora(body?.hasta),
+    };
+    await saveAvisoVacaciones(aviso);
+    return NextResponse.json({ ok: true, ...aviso });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
