@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Building2, FileText, Clock } from "lucide-react";
 import { getDbRestored } from "@/lib/db";
 import { getAllBlogPostsAdmin } from "@/lib/blog";
+import { getAvisoVacaciones, AVISO_DEFAULT } from "@/lib/aviso-vacaciones";
+import VacacionesCard from "@/components/admin/VacacionesCard";
 
 export const metadata = { title: "Admin — The Vila Home" };
 export const dynamic  = "force-dynamic";
@@ -56,6 +58,8 @@ export default async function AdminPage() {
   const s = await getStats();
   let blogCount = 0;
   try { blogCount = (await getAllBlogPostsAdmin()).length; } catch {}
+  let aviso = AVISO_DEFAULT;
+  try { aviso = await getAvisoVacaciones(); } catch {}
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -101,6 +105,9 @@ export default async function AdminPage() {
           </div>
         </Link>
       </div>
+
+      {/* ── Aviso de vacaciones ────────────────────────── */}
+      <VacacionesCard inicial={aviso} />
 
       {/* ── Sync log ───────────────────────────────────── */}
       <div className="border border-[#1a1a1a] bg-[#0d0d0d]">

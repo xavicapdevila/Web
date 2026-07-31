@@ -7,6 +7,7 @@ import { Menu, X, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { LANGS } from "@/lib/i18n";
+import AvisoVacaciones from "@/components/layout/AvisoVacaciones";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -46,6 +47,7 @@ export default function Navbar() {
             : "bg-transparent"
         )}
       >
+        <AvisoVacaciones scrolled={scrolled} />
         <nav className="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           {/* Logo — siempre un enlace a Home; estando en Home solo sube arriba */}
           <Link
