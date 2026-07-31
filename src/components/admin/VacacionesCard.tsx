@@ -63,7 +63,7 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
         </div>
 
         <div>
-          <p className="text-[#444] text-xs tracking-widest uppercase font-body mb-2">Termina (opcional)</p>
+          <p className="text-[#444] text-xs tracking-widest uppercase font-body mb-2">Día de vuelta (opcional)</p>
           <input
             type="datetime-local"
             value={hasta}
@@ -94,8 +94,8 @@ export default function VacacionesCard({ inicial }: { inicial: AvisoVacaciones }
           {textos.ca} · {textos.en} · {textos.fr}
         </p>
         <p className="text-[#444] text-xs mt-2">
-          La barra sale en toda la web pública en el idioma de cada visitante, solo dentro de la ventana
-          de fechas (hora de Madrid), y se retira sola al terminar. Sin fechas, se ve mientras esté activada.
+          La barra sale en toda la web pública en el idioma de cada visitante. Dice «volvemos el» con el día
+          de vuelta y se retira sola ese día a la hora puesta (hora de Madrid). Sin fechas, se ve mientras esté activada.
         </p>
       </div>
     </div>

@@ -44,20 +44,20 @@ export function ahoraMadrid(): string {
 export function textosAviso(hasta: string | null): TextosAviso {
   if (!hasta) {
     return {
-      es: "Estamos de vacaciones. Te respondemos a la vuelta.",
-      ca: "Estem de vacances. Et respondrem quan tornem.",
-      en: "We are on holiday. We will reply when we are back.",
-      fr: "Nous sommes en vacances. Nous vous répondrons à notre retour.",
+      es: "Estamos de vacaciones.",
+      ca: "Estem de vacances.",
+      en: "We are on holiday.",
+      fr: "Nous sommes en vacances.",
     }
   }
   const dia = new Date(`${hasta.slice(0, 10)}T12:00:00Z`)
   const f = (locale: string) =>
     new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" }).format(dia)
   return {
-    es: `Estamos de vacaciones. Volvemos el ${f("es-ES")} — te respondemos entonces.`,
-    ca: `Estem de vacances. Tornem el ${f("ca-ES")} — et respondrem llavors.`,
-    en: `We are on holiday. Back on ${f("en-GB")} — we will reply then.`,
-    fr: `Nous sommes en vacances. De retour le ${f("fr-FR")} — nous vous répondrons alors.`,
+    es: `Estamos de vacaciones. Volvemos el ${f("es-ES")}.`,
+    ca: `Estem de vacances. Tornem el ${f("ca-ES")}.`,
+    en: `We are on holiday. Back on ${f("en-GB")}.`,
+    fr: `Nous sommes en vacances. De retour le ${f("fr-FR")}.`,
   }
 }
 
