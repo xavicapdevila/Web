@@ -74,8 +74,11 @@ async function fetchPlaceData(): Promise<PlaceData> {
 
     const data = await res.json();
 
+    // REGLA (Xavi, ago 2026): en la web no aparece NADA por debajo de 5
+    // estrellas, y solo reseñas que existan en Google (esta API es la única
+    // fuente; las opiniones privadas de /resena viven en Ora, nunca aquí).
     const reviews: GoogleReview[] = ((data.reviews as any[]) ?? [])
-      .filter((r) => r.rating >= 4 && (r.originalText?.text ?? r.text?.text)?.trim())
+      .filter((r) => r.rating === 5 && (r.originalText?.text ?? r.text?.text)?.trim())
       .sort((a, b) => new Date(b.publishTime ?? 0).getTime() - new Date(a.publishTime ?? 0).getTime())
       .slice(0, 6)
       .map((r) => ({
