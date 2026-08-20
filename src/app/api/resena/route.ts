@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { forwardResenaOpinionToOra } from "@/lib/ora-resenas";
 
 // Opinión privada: cuando el cliente valora con MENOS de 5★, en lugar de
 // publicarse en Google, el comentario llega a dirección para poder mejorar y
@@ -73,6 +74,13 @@ export async function POST(request: Request) {
     if (res.error) {
       console.error("[resena] email failed", res.error);
       return NextResponse.json({ error: "internal_error" }, { status: 500 });
+    }
+
+    // Copia consultable en Ora (best-effort: el correo ya salió).
+    try {
+      await forwardResenaOpinionToOra({ rating, comment, name, contact });
+    } catch (err) {
+      console.error("[resena] forward a Ora falló", err);
     }
 
     return NextResponse.json({ ok: true });
