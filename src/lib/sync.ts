@@ -14,7 +14,9 @@ const _getCachedXmlProperties = unstable_cache(
     return fetchAndParseXML();
   },
   ["xml-properties"],
-  { revalidate: 3600, tags: ["properties"] }
+  // 5 min: Inmovilla vuelca una vez al día de madrugada; así la web lo
+  // recoge casi al instante sin depender de la hora exacta del volcado.
+  { revalidate: 300, tags: ["properties"] }
 );
 
 /** Returns a single property by slug.
