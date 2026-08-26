@@ -373,3 +373,13 @@ h1 .text-white, h2 .text-white, h3 .text-white, h4 .text-white {
     animation: splash-spin 1.2s linear infinite;
   }
 }
+
+/* iOS hace ZOOM automático al enfocar un campo con letra menor de 16 px, y una
+   página ampliada se panea lateralmente por diseño (ningún overflow/touch-action
+   lo impide). En dispositivos táctiles todo campo va a 16 px — el !important es
+   necesario porque las utilidades text-sm/text-xs de Tailwind ganan a esta capa. */
+@media (hover: none) and (pointer: coarse) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
