@@ -113,6 +113,7 @@ type ListFilters = {
   habitaciones?: number;
   m2Min?: number;
   ciudad?: string;
+  orden?: string; // "recientes" | "precio-asc" | "precio-desc"
   page?: number;
   limit?: number;
 };
@@ -162,9 +163,15 @@ export async function getCachedPropertiesList(
     filtered = filtered.filter((p) => p.ciudad.toLowerCase().includes(lc));
   }
 
-  // Price filter active → sort by price ascending (cheapest first)
-  // No price filter → most recently added first
-  if (filters.precioMin != null || filters.precioMax != null) {
+  // Explicit user sort (top-right selector) always wins.
+  // Otherwise: price filter active → price ascending; else most recent first.
+  if (filters.orden === "precio-asc") {
+    filtered.sort((a, b) => a.precio - b.precio);
+  } else if (filters.orden === "precio-desc") {
+    filtered.sort((a, b) => b.precio - a.precio);
+  } else if (filters.orden === "recientes") {
+    filtered.sort((a, b) => b.fecha.localeCompare(a.fecha));
+  } else if (filters.precioMin != null || filters.precioMax != null) {
     filtered.sort((a, b) => a.precio - b.precio);
   } else {
     filtered.sort((a, b) => b.fecha.localeCompare(a.fecha));

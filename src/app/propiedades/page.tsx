@@ -45,6 +45,7 @@ interface Props {
     habitaciones?: string;
     m2Min?: string;
     ciudad?: string;
+    orden?: string;
     page?: string;
   }>;
 }
@@ -65,6 +66,7 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     habitaciones:params.habitaciones ? Number(params.habitaciones): undefined,
     m2Min:       params.m2Min       ? Number(params.m2Min)       : undefined,
     ciudad:      params.ciudad,
+    orden:       params.orden,
     page,
     limit,
   });

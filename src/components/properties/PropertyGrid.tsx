@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import PropertyCard from "./PropertyCard";
 import type { Property } from "@/types/property";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -18,12 +18,27 @@ interface Props {
 export default function PropertyGrid({ properties, total, page, totalPages }: Props) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const router = useRouter();
   const { t } = useLanguage();
 
   const buildPageUrl = (p: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(p));
     return `${pathname}?${params.toString()}`;
+  };
+
+  const orden = searchParams.get("orden") ?? "";
+
+  const handleSortChange = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set("orden", value);
+    } else {
+      params.delete("orden");
+    }
+    params.delete("page");
+    const qs = params.toString();
+    router.push(qs ? `${pathname}?${qs}` : pathname);
   };
 
   if (properties.length === 0) {
@@ -39,8 +54,8 @@ export default function PropertyGrid({ properties, total, page, totalPages }: Pr
 
   return (
     <div>
-      {/* Results count */}
-      <div className="flex items-center justify-between mb-6">
+      {/* Results count + sort */}
+      <div className="flex items-center justify-between gap-4 mb-6">
         <p className="text-[#666] text-sm font-body">
           {t("gridShowing")}{" "}
           <span className="text-white">
@@ -48,6 +63,24 @@ export default function PropertyGrid({ properties, total, page, totalPages }: Pr
           </span>{" "}
           {t("gridOf")} <span className="text-white">{total}</span> {t("gridProperties")}
         </p>
+
+        <div className="relative shrink-0">
+          <select
+            value={orden}
+            onChange={(e) => handleSortChange(e.target.value)}
+            aria-label={t("gridSort")}
+            className="appearance-none bg-transparent border border-[#2a2a2a] text-[#888] text-sm font-body pl-3 pr-9 py-2 cursor-pointer transition-colors hover:border-[#C9B99A] hover:text-[#C9B99A] focus:outline-none focus:border-[#C9B99A]"
+          >
+            <option value="" className="bg-[#111] text-[#888]">{t("gridSort")}</option>
+            <option value="recientes" className="bg-[#111] text-[#888]">{t("gridSortRecent")}</option>
+            <option value="precio-asc" className="bg-[#111] text-[#888]">{t("gridSortPriceAsc")}</option>
+            <option value="precio-desc" className="bg-[#111] text-[#888]">{t("gridSortPriceDesc")}</option>
+          </select>
+          <ChevronDown
+            size={14}
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#666]"
+          />
+        </div>
       </div>
 
       {/* Grid */}

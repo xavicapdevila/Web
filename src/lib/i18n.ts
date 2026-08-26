@@ -185,6 +185,10 @@ const dict = {
     gridShowing: "Mostrando",
     gridOf: "de",
     gridProperties: "propiedades",
+    gridSort: "Ordenar",
+    gridSortRecent: "Más recientes",
+    gridSortPriceAsc: "Precio: de menor a mayor",
+    gridSortPriceDesc: "Precio: de mayor a menor",
 
     // About page
     aboutLabel: "La parte humana",
@@ -486,6 +490,10 @@ const dict = {
     gridShowing: "Mostrant",
     gridOf: "de",
     gridProperties: "propietats",
+    gridSort: "Ordenar",
+    gridSortRecent: "Més recents",
+    gridSortPriceAsc: "Preu: de menor a major",
+    gridSortPriceDesc: "Preu: de major a menor",
 
     aboutLabel: "La part humana",
     aboutIntro1: "Darrere de cada habitatge hi ha persones. I creiem que vendre o comprar una casa hauria de sentir-se més clar, més humà i menys impersonal.",
@@ -783,6 +791,10 @@ const dict = {
     gridShowing: "Showing",
     gridOf: "of",
     gridProperties: "properties",
+    gridSort: "Sort",
+    gridSortRecent: "Newest first",
+    gridSortPriceAsc: "Price: low to high",
+    gridSortPriceDesc: "Price: high to low",
 
     aboutLabel: "The human side",
     aboutIntro1: "Behind every home there are people. And we believe that buying or selling a house should feel clearer, more human, and less impersonal.",
@@ -1080,6 +1092,10 @@ const dict = {
     gridShowing: "Affichage",
     gridOf: "sur",
     gridProperties: "propriétés",
+    gridSort: "Trier",
+    gridSortRecent: "Plus récentes",
+    gridSortPriceAsc: "Prix : croissant",
+    gridSortPriceDesc: "Prix : décroissant",
 
     aboutLabel: "Le côté humain",
     aboutIntro1: "Derrière chaque bien immobilier, il y a des personnes. Et nous croyons que vendre ou acheter une maison devrait être plus clair, plus humain et moins impersonnel.",
