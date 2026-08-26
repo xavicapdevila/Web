@@ -67,10 +67,13 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    /* La página solo se desplaza en vertical; clip no crea scroll-container
-       (no rompe sticky) y hidden queda de fallback para Safari viejos */
-    overflow-x: hidden;
+    /* La página solo se desplaza en vertical. Doble capa:
+       - clip recorta el desbordamiento sin crear scroll-container (no rompe sticky);
+       - touch-action veta el gesto de paneo horizontal en iOS, donde el clip
+         de la raíz no siempre lo impide. Los carruseles (overflow-x-auto) son
+         sus propios contenedores de scroll y no se ven afectados. */
     overflow-x: clip;
+    touch-action: pan-y pinch-zoom;
   }
 
   body {
@@ -78,8 +81,8 @@
     color: #f5f0e8;
     font-family: "Inter", system-ui, sans-serif;
     line-height: 1.6;
-    overflow-x: hidden;
     overflow-x: clip;
+    touch-action: pan-y pinch-zoom;
   }
 
   h1, h2, h3, h4 {
