@@ -67,6 +67,10 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* La página solo se desplaza en vertical; clip no crea scroll-container
+       (no rompe sticky) y hidden queda de fallback para Safari viejos */
+    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   body {
@@ -74,6 +78,8 @@
     color: #f5f0e8;
     font-family: "Inter", system-ui, sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1, h2, h3, h4 {
