@@ -11,7 +11,7 @@ const agents = [
     name: "Ariadna Garcia",
     descKey: "aboutDesc1" as const,
     roleKey: "aboutRoleManager" as const,
-    photo: "/images/agents/ariadna.jpg",
+    photo: "/images/agents/ariadna.jpg" as string | null,
   },
   {
     name: "Sofía Pascual",
@@ -20,12 +20,26 @@ const agents = [
     photo: "/images/agents/sofia.jpg",
   },
   {
+    name: "Toni Aguilar",
+    descKey: "aboutDesc4" as const,
+    roleKey: "aboutRoleAdvisorM" as const,
+    // Pendiente de sesión de fotos: mientras tanto se muestra un placeholder con iniciales.
+    photo: null,
+  },
+  {
     name: "Xavier Capdevila",
     descKey: "aboutDesc3" as const,
     roleKey: "aboutRoleFounder" as const,
     photo: "/images/agents/xavier.jpg",
   },
 ];
+
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("");
+}
 
 export default function QuienesSomosContent() {
   const { t } = useLanguage();
@@ -72,18 +86,26 @@ export default function QuienesSomosContent() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {agents.map((agent) => (
               <div key={agent.name} className="group">
                 <div className="relative aspect-[3/4] overflow-hidden mb-4 bg-[#111]">
                   <div className="absolute inset-0 border border-[#1e1e1e] group-hover:border-[#C9B99A]/30 transition-colors duration-500 z-10 pointer-events-none" />
-                  <Image
-                    src={agent.photo}
-                    alt={agent.name}
-                    fill
-                    className="object-cover object-top"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
+                  {agent.photo ? (
+                    <Image
+                      src={agent.photo}
+                      alt={agent.name}
+                      fill
+                      className="object-cover object-top"
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-[#121212] to-[#0d0d0d]">
+                      <span className="font-display text-5xl text-[#C9B99A]/20 tracking-wider select-none">
+                        {initials(agent.name)}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <h3 className="font-display text-lg text-white mb-0.5">{agent.name}</h3>
                 <p className="text-[#C9B99A] text-xs font-body tracking-wide uppercase mb-2">
