@@ -23,8 +23,7 @@ const agents = [
     name: "Toni Aguilar",
     descKey: "aboutDesc4" as const,
     roleKey: "aboutRoleAdvisorM" as const,
-    // Pendiente de sesión de fotos: mientras tanto se muestra un placeholder con iniciales.
-    photo: null,
+    photo: "/images/agents/toni.jpg",
   },
   {
     name: "Xavier Capdevila",
