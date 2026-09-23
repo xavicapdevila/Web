@@ -21,8 +21,8 @@ import type { GoogleReview } from "@/lib/googlePlaces";
 
 const { googleReviews } = siteConfig;
 
-const TEAM_PHOTOS = ["/images/agents/ariadna.jpg", "/images/agents/sofia.jpg", "/images/agents/xavier.jpg"];
-const TEAM_NAMES = ["Ariadna Garcia", "Sofía Pascual", "Xavier Capdevila"];
+const TEAM_PHOTOS = ["/images/agents/ariadna.jpg", "/images/agents/toni.jpg", "/images/agents/xavier.jpg"];
+const TEAM_NAMES = ["Ariadna Garcia", "Toni Aguilar", "Xavier Capdevila"];
 
 /* Logos reales de los canales (public/images/portales). Se pintan en tinta
    (filter brightness(0) + opacidad) para no romper la paleta monocroma.

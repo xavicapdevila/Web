@@ -22,8 +22,8 @@ import type { GoogleReview } from "@/lib/googlePlaces";
 
 const { googleReviews } = siteConfig;
 
-const TEAM_PHOTOS = ["/images/agents/ariadna.jpg", "/images/agents/sofia.jpg", "/images/agents/xavier.jpg"];
-const TEAM_NAMES = ["Ariadna Garcia", "Sofía Pascual", "Xavier Capdevila"];
+const TEAM_PHOTOS = ["/images/agents/ariadna.jpg", "/images/agents/toni.jpg", "/images/agents/xavier.jpg"];
+const TEAM_NAMES = ["Ariadna Garcia", "Toni Aguilar", "Xavier Capdevila"];
 
 const INCLUDE_ICONS = [
   <svg key="0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M7.5 3.75h6.69a2 2 0 0 1 1.42.59l4.55 4.55a2 2 0 0 1 0 2.82l-6.69 6.69a2 2 0 0 1-2.82 0l-4.55-4.55a2 2 0 0 1-.59-1.42V5.75a2 2 0 0 1 2-2Z" /><circle cx="9.5" cy="7.5" r="1.1" /></svg>,

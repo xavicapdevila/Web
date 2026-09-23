@@ -89,7 +89,7 @@ export interface VenderCopy {
     eyebrow: string;
     title: string;
     sub: string;
-    roles: string[]; // Ariadna, Sofía, Xavier
+    roles: string[]; // Ariadna, Toni, Xavier
     rolesShort: string[]; // etiqueta corta bajo el retrato del hero
     moreText: string;
     moreLink: string;
@@ -291,8 +291,8 @@ const es: VenderCopy = {
     eyebrow: "Quiénes lo hacemos",
     title: "Personas, no un número de expediente",
     sub: "Cuando vendes con nosotros no hablas con un call center. Somos tres, nos conoces por tu nombre y respondemos por tu casa de principio a fin.",
-    roles: ["Responsable de equipo · Asesora inmobiliaria", "Asesora inmobiliaria", "Fundador · Dirección & Marketing"],
-    rolesShort: ["Responsable de equipo", "Asesora inmobiliaria", "Fundador"],
+    roles: ["Responsable de equipo · Asesora inmobiliaria", "Asesor inmobiliario", "Fundador · Dirección & Marketing"],
+    rolesShort: ["Responsable de equipo", "Asesor inmobiliario", "Fundador"],
     moreText: "¿Quieres saber más de nosotros?",
     moreLink: "Conoce al equipo",
   },
@@ -502,8 +502,8 @@ const ca: VenderCopy = {
     eyebrow: "Qui ho fem",
     title: "Persones, no un número d'expedient",
     sub: "Quan vens amb nosaltres no parles amb un call center. Som tres, ens coneixes pel teu nom i responem per casa teva de principi a fi.",
-    roles: ["Responsable d'equip · Assessora immobiliària", "Assessora immobiliària", "Fundador · Direcció & Màrqueting"],
-    rolesShort: ["Responsable d'equip", "Assessora immobiliària", "Fundador"],
+    roles: ["Responsable d'equip · Assessora immobiliària", "Assessor immobiliari", "Fundador · Direcció & Màrqueting"],
+    rolesShort: ["Responsable d'equip", "Assessor immobiliari", "Fundador"],
     moreText: "Vols saber-ne més, de nosaltres?",
     moreLink: "Coneix l'equip",
   },
@@ -924,8 +924,8 @@ const fr: VenderCopy = {
     eyebrow: "Qui le fait",
     title: "Des personnes, pas un numéro de dossier",
     sub: "Quand vous vendez avec nous, vous ne parlez pas à un call center. Nous sommes trois, nous vous connaissons par votre nom et nous répondons de votre maison du début à la fin.",
-    roles: ["Responsable d'équipe · Conseillère immobilière", "Conseillère immobilière", "Fondateur · Direction & Marketing"],
-    rolesShort: ["Responsable d'équipe", "Conseillère immobilière", "Fondateur"],
+    roles: ["Responsable d'équipe · Conseillère immobilière", "Conseiller immobilier", "Fondateur · Direction & Marketing"],
+    rolesShort: ["Responsable d'équipe", "Conseiller immobilier", "Fondateur"],
     moreText: "Envie d'en savoir plus sur nous ?",
     moreLink: "Rencontrer l'équipe",
   },

@@ -156,7 +156,7 @@ const es: VendeCopy = {
   team: {
     eyebrow: "Quiénes somos",
     title: "Somos tres. Nos conocerás por el nombre.",
-    sub: "Cuando llames no te atenderá un departamento: te atenderemos Ariadna, Sofía o Xavier. Los mismos que valorarán tu casa, la enseñarán y estarán contigo el día de la firma.",
+    sub: "Cuando llames no te atenderá un departamento: te atenderemos Ariadna, Toni o Xavier. Los mismos que valorarán tu casa, la enseñarán y estarán contigo el día de la firma.",
   },
   social: {
     eyebrow: "Lo que dicen los propietarios",
@@ -250,7 +250,7 @@ const ca: VendeCopy = {
   team: {
     eyebrow: "Qui som",
     title: "Som tres. Ens coneixeràs pel nom.",
-    sub: "Quan truquis no t'atendrà un departament: t'atendrem l'Ariadna, la Sofía o el Xavier. Els mateixos que valoraran casa teva, l'ensenyaran i seran amb tu el dia de la signatura.",
+    sub: "Quan truquis no t'atendrà un departament: t'atendrem l'Ariadna, el Toni o el Xavier. Els mateixos que valoraran casa teva, l'ensenyaran i seran amb tu el dia de la signatura.",
   },
   social: {
     eyebrow: "El que diuen els propietaris",
@@ -344,7 +344,7 @@ const en: VendeCopy = {
   team: {
     eyebrow: "Who we are",
     title: "We are three. You'll know us by name.",
-    sub: "When you call, you won't reach a department: you'll reach Ariadna, Sofía or Xavier. The same people who will value your home, show it and be with you on signing day.",
+    sub: "When you call, you won't reach a department: you'll reach Ariadna, Toni or Xavier. The same people who will value your home, show it and be with you on signing day.",
   },
   social: {
     eyebrow: "What owners say",
@@ -438,7 +438,7 @@ const fr: VendeCopy = {
   team: {
     eyebrow: "Qui sommes-nous",
     title: "Nous sommes trois. Vous nous connaîtrez par nos prénoms.",
-    sub: "Quand vous appellerez, vous ne tomberez pas sur un service : vous parlerez à Ariadna, Sofía ou Xavier. Les mêmes qui estimeront votre maison, la feront visiter et seront à vos côtés le jour de la signature.",
+    sub: "Quand vous appellerez, vous ne tomberez pas sur un service : vous parlerez à Ariadna, Toni ou Xavier. Les mêmes qui estimeront votre maison, la feront visiter et seront à vos côtés le jour de la signature.",
   },
   social: {
     eyebrow: "Ce que disent les propriétaires",

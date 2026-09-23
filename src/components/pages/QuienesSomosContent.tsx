@@ -14,12 +14,6 @@ const agents = [
     photo: "/images/agents/ariadna.jpg" as string | null,
   },
   {
-    name: "Sofía Pascual",
-    descKey: "aboutDesc2" as const,
-    roleKey: "aboutRoleAdvisor" as const,
-    photo: "/images/agents/sofia.jpg",
-  },
-  {
     name: "Toni Aguilar",
     descKey: "aboutDesc4" as const,
     roleKey: "aboutRoleAdvisorM" as const,
@@ -85,7 +79,7 @@ export default function QuienesSomosContent() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {agents.map((agent) => (
               <div key={agent.name} className="group">
                 <div className="relative aspect-[3/4] overflow-hidden mb-4 bg-[#111]">

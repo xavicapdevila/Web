@@ -5,12 +5,12 @@ import QuienesSomosContent from "@/components/pages/QuienesSomosContent";
 export const metadata: Metadata = {
   title: "Quiénes somos",
   description:
-    "Conoce al equipo de The Vila Home: Ariadna Garcia, Sofía Pascual y Xavier Capdevila. Tres profesionales que trabajan con honestidad, criterio y presencia real en cada operación inmobiliaria en Vilanova i la Geltrú.",
+    "Conoce al equipo de The Vila Home: Ariadna Garcia, Toni Aguilar y Xavier Capdevila. Tres profesionales que trabajan con honestidad, criterio y presencia real en cada operación inmobiliaria en Vilanova i la Geltrú.",
   alternates: { canonical: "https://www.thevilahome.com/quienes-somos" },
   openGraph: {
     type: "website",
     title: "Quiénes somos — The Vila Home",
-    description: "El equipo humano detrás de The Vila Home. Ariadna, Sofía y Xavi: cercanos, honestos y sin corporativismo.",
+    description: "El equipo humano detrás de The Vila Home. Ariadna, Toni y Xavi: cercanos, honestos y sin corporativismo.",
     url: "https://www.thevilahome.com/quienes-somos",
     siteName: "The Vila Home",
     locale: "es_ES",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Quiénes somos — The Vila Home",
-    description: "El equipo humano detrás de The Vila Home. Ariadna, Sofía y Xavi.",
+    description: "El equipo humano detrás de The Vila Home. Ariadna, Toni y Xavi.",
     images: ["https://www.thevilahome.com/og-image.jpg"],
   },
 };
@@ -40,9 +40,8 @@ const schemaPeople = [
   {
     "@context": "https://schema.org",
     "@type": "Person",
-    name: "Sofía Pascual",
-    jobTitle: "Asesora inmobiliaria",
-    email: "s.pascual@thevilahome.com",
+    name: "Toni Aguilar",
+    jobTitle: "Asesor inmobiliario",
     url: `${BASE_URL}/quienes-somos`,
     worksFor: { "@type": "Organization", "@id": `${BASE_URL}/#organization`, name: "The Vila Home" },
     knowsAbout: ["Compraventa inmobiliaria", "Vilanova i la Geltrú", "Garraf"],

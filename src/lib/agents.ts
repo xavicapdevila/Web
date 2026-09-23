@@ -24,12 +24,11 @@ export const AGENTS: Record<string, AgentInfo> = {
     photo:  "/images/agents/xavier.jpg",
     mobile: "34638359612",
   },
-  "s.pascual@thevilahome.com": {
-    name:   "Sofía Pascual",
-    photo:  "/images/agents/sofia.jpg",
-    mobile: "34679876331",
-  },
 };
+
+// Sofía Pascual ya no está (sep 2026): sus inmuebles pasan a Ariadna. Si el
+// feed aún trae alguno a su nombre, se atiende como Ariadna.
+AGENTS["s.pascual@thevilahome.com"] = AGENTS["a.garcia@thevilahome.com"];
 
 /** Fallback when the property has no agent or an unrecognised email. */
 export const DEFAULT_AGENT: AgentInfo = {
@@ -46,7 +45,7 @@ export function getAgentInfo(email?: string): AgentInfo & { contactEmail: string
   const agent = email ? (AGENTS[email] ?? null) : null;
   return {
     ...(agent ?? DEFAULT_AGENT),
-    contactEmail: agent ? email! : "info@thevilahome.com",
+    contactEmail: agent ? (email === "s.pascual@thevilahome.com" ? "a.garcia@thevilahome.com" : email!) : "info@thevilahome.com",
   };
 }
 
